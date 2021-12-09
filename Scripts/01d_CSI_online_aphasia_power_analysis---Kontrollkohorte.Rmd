@@ -1,0 +1,618 @@
+---
+title: "Power Analysis for CSI online typing with patients with aphasia - Control cohort: Analyse the power for the interactoion effect Interaction effect: Session x Ordinal position with 20 participant"
+author: "Kirsten Stark"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# load packages
+
+```{r message=FALSE}
+library(tidyr)
+library(dplyr)
+library(devtools)
+library(MASS)
+library(lme4)
+library(lmerTest)
+library(simr)
+library(pbkrtest)
+library(testthat)
+library(ggplot2)
+
+rm(list = ls())
+
+today <- Sys.Date()
+today <- format(today, format="%d%m%y")
+```
+
+
+# Load data from Stark, van Scherpenberg, Obrig, & Abdel Rahman (2021, Experiment 1)
+
+In this online study, we tested 30 young, neurotypical participants with the same paradigm and stimuli as in the current experiment. Now we would like to analyse the effect of the session on the CSI-effect. To this end, we will have to generate data for the second and third session, assuming that the variances will be comparable in the three sessions. 
+
+```{r load data Stark_et_al}
+# Set number of iterations 
+n_iter = 1000
+
+# set seed
+set.seed(99)
+
+# load data
+input = "Starketal_CSI_online_combined.csv"
+df <- read.csv(here::here("data", "power-analysis", input))
+
+# do some transformations
+df <- df %>% 
+  # filter spoken naming only
+  filter(df$experiment == "verbal") %>%
+  # factorize columns 
+  mutate(subject = as.factor(subject),
+         category=as.factor(category),
+         experiment=as.factor(experiment)) %>%
+  # make sure RTs are numeric
+  mutate(RT = as.numeric(as.character(RT)))
+```
+
+## A) Interaction effect when the session main effect is 40 ms
+
+Now we need to generate data for the second and third session
+
+```{r generate_data}
+# 1) We increase the length of the data set by 3 and add the column session
+n_obs = nrow(df)
+df <- rbind(df, df , df)
+df %>% mutate(session = rep(c(1,2,3), each=n_obs)) -> df
+
+# 2) To prevent linear dependencies, we need to introduce some jitter in the RT data for session 2 and 3
+    # generate n_obs random numbers from a normal distribution and add them to the data
+    # at first we implement a difference of 40 ms between session 1 and 2 and session 2 and 3, and a variance of 20 and 30
+rand1 = rnorm(n_obs, mean = 40, sd = 20)
+rand2 = rnorm(n_obs, mean = 80, sd = 30)
+
+df %>% mutate(RT = case_when(session == 1 ~ RT, 
+                             session == 2 ~ RT + rand1,
+                             session == 3 ~ RT + rand2),
+              session = as.factor(session)) %>% droplevels() -> df
+
+# Plot the results
+summary <- df %>%  
+   Rmisc::summarySEwithin(.,"RT",idvar = "subject",
+                          withinvars = c("Pos", "session"), 
+                          na.rm = T)
+ggplot(data=summary, aes(x=Pos, y=RT, group=session, 
+                         color = session)) +
+    geom_line(aes(y = RT),
+              size = 0.5, linetype = "dashed")+
+    geom_errorbar(aes(ymin=RT-se, ymax=RT+se), width =.1) 
+```
+
+## 1) Set up a model based on the structure of the planned CSI experiment
+Unfortunately, simr does not work properly with GLMMs. Therefore, for the power analysis, we will set up an LMM with transformed RTs    
+a) center OrdPos (continuous predictor)
+
+```{r}
+# center continuous predictor
+df %>% mutate(Pos.c=scale(as.numeric(as.character(Pos)), 
+                     center = TRUE, scale = FALSE)) -> df
+```
+
+b) Check distribution of RTs
+
+```{r RT distributions}
+# Boxcox plot suggests inverse transformation: 
+boxcox(df$RT ~ df$Pos*df$session)
+```
+
+Check the goodness of fit of an inverse transformation (with RT divided by 1000: 1/(x/1000) = 1000/x): 
+
+```{r fit.normal}
+df$iRT <-1000/df$RT
+# plot this transformation distribution
+plot(df$RT, df$iRT)
+# check fit
+fit.normal_inv<- fitdistrplus::fitdist(
+  df$iRT, distr = "norm", method = "mle")
+summary(fit.normal_inv)
+plot(fit.normal_inv)
+```
+
+An inverse transformation fits the data relatively well. We will thus use this kind of transformation
+
+
+c) Set up the models 
+
+*Model 1: Linear model with continuous predictor "Ordinal position", sliding difference contrasted predictor "session" and inversely transformed RT data*
+
+```{r LMM1 online}
+# compute sliding difference contrast: Intercept is grand mean, second level is compared to first level
+contrasts(df$session) <- contr.sdif(3)
+# maximal model has singular fit - stepwise reduction
+# lmm1 <- lmer(iRT ~ Pos.c*session +
+#               (Pos.c*session|subject) +(Pos.c*session|category) ,
+#            data = df, REML = FALSE,
+#            control=lmerControl(optimizer = "bobyqa"))
+# lmm1 <- lmer(iRT ~ Pos.c*session +
+#               (Pos.c*session|subject) +(Pos.c*session|category) ,
+#            data = df, REML = FALSE,
+#            control=lmerControl(optimizer = "bobyqa",
+#                                 optCtrl=list(maxfun=2e5)))
+lmm1 <- lmer(iRT ~ Pos.c*session +
+              (Pos.c|subject) +(Pos.c|category) ,
+           data = df, REML = FALSE,
+           control=lmerControl(optimizer = "bobyqa",
+                                optCtrl=list(maxfun=2e5)))
+
+isSingular(lmm1)
+summary(lmm1)
+```
+
+### 2) Extend dataset
+In this case we want less subjects than in the previous study, so we do not need to extend. 
+
+
+### 3) Specify effect sizes for the interaction effect and compute power analyses
+
+To specify the effect sizes, we always take the grand mean and take +- 1/2 the inversely transformed difference we want to implement. 
+We keep the two main effects unchanged. 
+
+#### 15 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_15ms <- (1000/(gm+(15/2))) - (1000/(gm-(15/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_15ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_15ms
+```
+
+```{r power_eff_15_2-1, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_15_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_15_21
+```
+
+```{r power_eff_15_3-2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_15_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_15_32
+```
+
+
+#### 13 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_13ms <- (1000/(gm+(13/2))) - (1000/(gm-(13/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_13ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_13ms
+```
+
+```{r power_eff_13_2-1, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_13_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_13_21
+```
+
+```{r power_eff_13_3-2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_13_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_13_32
+```
+
+
+#### 12 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_12ms <- (1000/(gm+(12/2))) - (1000/(gm-(12/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_13ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_13ms
+```
+
+```{r power_eff_12_2-1, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_12_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_12_21
+```
+
+```{r power_eff_12_3-2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_12_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_12_32
+```
+
+
+#### 10 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_10ms <- (1000/(gm+(10/2))) - (1000/(gm-(10/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_10ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_10ms
+```
+
+```{r power_eff_10_2-1, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_10_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_10_21
+```
+
+```{r power_eff_10_3-2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_10_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_10_32
+```
+
+
+### Calculate effect size for interaction effect 
+Use the method by Westfall, Judd, and Kenny (2014), as reviewed in Brysbaert & Stevens (2018)  
+Westfall d = (difference between the means)/sqrt(variances of all random effects)  
+We use the experimental variances and the simulated effect sizes
+
+```{r}
+# x <- summary(lmm1)
+randomvars <-  0.0109747+0.0003202+0.0085983+0.0003377+0.0525453 
+ (d_15 <- eff_15ms /sqrt(randomvars))
+ (d_13 <- eff_13ms /sqrt(randomvars))
+ (d_12 <- eff_12ms /sqrt(randomvars))
+ (d_10 <- eff_10ms /sqrt(randomvars))
+```
+
+## 4) Calculate the power for the ordinal position effect at an interaction effect of 15 ms 
+
+```{r}
+gm <- mean(df$RT)
+eff_15ms <- (1000/(gm+(15/2))) - (1000/(gm-(15/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_15ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_15ms
+```
+
+```{r power_eff_15_Pos.c, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_Pos.c <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_Pos.c
+```
+
+
+# --------------------------------------------
+## B) Interaction effect when the session main effect is 0 ms
+
+Now we need to generate data for the second and third session
+
+```{r generate_data2}
+# load data
+input = "Starketal_CSI_online_combined.csv"
+df <- read.csv(here::here("data", "power-analysis", input))
+
+# do some transformations
+df <- df %>% 
+  # filter spoken naming only
+  filter(df$experiment == "verbal") %>%
+  # factorize columns 
+  mutate(subject = as.factor(subject),
+         category=as.factor(category),
+         experiment=as.factor(experiment)) %>%
+  # make sure RTs are numeric
+  mutate(RT = as.numeric(as.character(RT)))
+
+# 1) We increase the length of the data set by 3 and add the column session
+n_obs = nrow(df)
+df <- rbind(df, df , df)
+df %>% mutate(session = rep(c(1,2,3), each=n_obs)) -> df
+
+# 2) To prevent linear dependencies, we need to introduce some jitter in the RT data for session 2 and 3
+    # generate n_obs random numbers from a normal distribution and add them to the data
+    # at first we implement a difference of 0 ms between session 1 and 2 and session 2 and 3, and a variance of 20 and 30
+rand1 = rnorm(n_obs, mean = 0, sd = 20)
+rand2 = rnorm(n_obs, mean = 0, sd = 30)
+
+df %>% mutate(RT = case_when(session == 1 ~ RT, 
+                             session == 2 ~ RT + rand1,
+                             session == 3 ~ RT + rand2),
+              session = as.factor(session)) %>% droplevels() -> df
+
+# Plot the results
+summary <- df %>%  
+   Rmisc::summarySEwithin(.,"RT",idvar = "subject",
+                          withinvars = c("Pos", "session"), 
+                          na.rm = T)
+ggplot(data=summary, aes(x=Pos, y=RT, group=session, 
+                         color = session)) +
+    geom_line(aes(y = RT),
+              size = 0.5, linetype = "dashed")+
+    geom_errorbar(aes(ymin=RT-se, ymax=RT+se), width =.1) 
+```
+
+## 1) Set up a model based on the structure of the planned CSI experiment
+Unfortunately, simr does not work properly with GLMMs. Therefore, for the power analysis, we will set up an LMM with transformed RTs    
+a) center OrdPos (continuous predictor)
+
+```{r}
+# center continuous predictor
+df %>% mutate(Pos.c=scale(as.numeric(as.character(Pos)), 
+                     center = TRUE, scale = FALSE)) -> df
+```
+
+b) Check distribution of RTs
+
+```{r RT distributions2}
+# Boxcox plot suggests inverse transformation: 
+boxcox(df$RT ~ df$Pos*df$session)
+```
+
+Check the goodness of fit of an inverse transformation (with RT divided by 1000: 1/(x/1000) = 1000/x): 
+
+```{r fit.normal2}
+df$iRT <-1000/df$RT
+# plot this transformation distribution
+plot(df$RT, df$iRT)
+# check fit
+fit.normal_inv<- fitdistrplus::fitdist(
+  df$iRT, distr = "norm", method = "mle")
+summary(fit.normal_inv)
+plot(fit.normal_inv)
+```
+
+An inverse transformation fits the data relatively well. We will thus use this kind of transformation
+
+
+c) Set up the models 
+
+*Model 1: Linear model with continuous predictor "Ordinal position", sliding difference contrasted predictor "session" and inversely transformed RT data*
+
+```{r LMM1 online2}
+# compute sliding difference contrast: Intercept is grand mean, second level is compared to first level
+contrasts(df$session) <- contr.sdif(3)
+# maximal model has singular fit - stepwise reduction
+# lmm1 <- lmer(iRT ~ Pos.c*session +
+#               (Pos.c*session|subject) +(Pos.c*session|category) ,
+#            data = df, REML = FALSE,
+#            control=lmerControl(optimizer = "bobyqa"))
+# lmm1 <- lmer(iRT ~ Pos.c*session +
+#               (Pos.c*session|subject) +(Pos.c*session|category) ,
+#            data = df, REML = FALSE,
+#            control=lmerControl(optimizer = "bobyqa",
+#                                 optCtrl=list(maxfun=2e5)))
+lmm1 <- lmer(iRT ~ Pos.c*session +
+              (Pos.c|subject) +(Pos.c|category) ,
+           data = df, REML = FALSE,
+           control=lmerControl(optimizer = "bobyqa",
+                                optCtrl=list(maxfun=2e5)))
+
+isSingular(lmm1)
+summary(lmm1)
+```
+
+### 2) Extend dataset
+In this case we want less subjects than in the previous study, so we do not need to extend. 
+
+
+### 3) Specify effect sizes for the interaction effect and compute power analyses
+
+To specify the effect sizes, we always take the grand mean and take +- 1/2 the inversely transformed difference we want to implement. 
+We keep the two main effects unchanged. 
+
+#### 16 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_16ms <- (1000/(gm+(16/2))) - (1000/(gm-(16/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_16ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_16ms
+```
+
+```{r power_eff_16_2-1, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_16_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_16_21
+```
+
+```{r power_eff_16_3-2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_16_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_16_32
+```
+
+
+#### 15 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_15ms <- (1000/(gm+(15/2))) - (1000/(gm-(15/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_15ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_15ms
+```
+
+```{r power_eff_15_2-1_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_15_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_15_21
+```
+
+```{r power_eff_15_3-2_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_15_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_15_32
+```
+
+#### 14 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_14ms <- (1000/(gm+(14/2))) - (1000/(gm-(14/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_14ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_14ms
+```
+
+```{r power_eff_14_2-1_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_14_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_14_21
+```
+
+```{r power_eff_14_3-2_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_14_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_14_32
+```
+
+#### 13 ms interaction effect, 20 VP
+
+```{r}
+gm <- mean(df$RT)
+eff_13ms <- (1000/(gm+(13/2))) - (1000/(gm-(13/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_13ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_13ms
+```
+
+```{r power_eff_13_2-1_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_13_21 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session2-1","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_13_21
+```
+
+```{r power_eff_13_3-2_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_13_32 <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c:session3-2","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_13_32
+```
+
+
+### Calculate effect size for interaction effect 
+Use the method by Westfall, Judd, and Kenny (2014), as reviewed in Brysbaert & Stevens (2018)  
+Westfall d = (difference between the means)/sqrt(variances of all random effects)  
+We use the experimental variances and the simulated effect sizes
+
+```{r}
+# x <- summary(lmm1)
+randomvars <-  0.0130899+0.0003685+0.0102540+0.0004281+0.0621335 
+ (d_16 <- eff_16ms /sqrt(randomvars))
+ (d_15 <- eff_15ms /sqrt(randomvars))
+ (d_13 <- eff_13ms /sqrt(randomvars))
+```
+
+## 4) Calculate the power for the ordinal position effect at an interaction effect of 15 ms 
+
+```{r}
+gm <- mean(df$RT)
+eff_15ms <- (1000/(gm+(15/2))) - (1000/(gm-(15/2)))
+fixef(lmm1)["Pos.c:session2-1"]<- eff_15ms
+fixef(lmm1)["Pos.c:session3-2"]<- eff_15ms
+```
+
+```{r power_eff_15_Pos.c_2, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM_Pos.c <- powerCurve(lmm1,along = "subject", 
+                                 test=fixed("Pos.c","t"),
+                          breaks = c(20), nsim = n_iter) 
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+PowerLMM_Pos.c
+```

@@ -1,0 +1,374 @@
+---
+title: "Power Analysis for CSI online typing with patients with aphasia"
+author: "Kirsten Stark"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# load packages
+
+```{r message=FALSE}
+library(tidyr)
+library(dplyr)
+library(devtools)
+library(MASS)
+library(lme4)
+library(lmerTest)
+library(simr)
+library(pbkrtest)
+library(testthat)
+library(ggplot2)
+
+rm(list = ls())
+
+today <- Sys.Date()
+today <- format(today, format="%d%m%y")
+
+# Set number of iterations 
+n_iter = 1000
+```
+
+
+# Load data from Lorenz, Doering, van Scherpenberg, Pino, Abdel Rahman, & Obrig (2021)
+
+In this lab-based study, people with Aphasia did a CSI task with 3 repetitions in two subsequent weeks. Both testing sessions had different items. Additionally, participants also did a CSI task with compounds (not relevant here).  
+The data loaded here are already cleaned for errors and participants.
+
+```{r load data Lorenz_et_al}
+# load data
+df <- read.csv2(here::here("data", "power-analysis",
+                "Doeringetal_PWA_naming_simple_nouns_data_for_modelling.csv"))
+
+# subset the relevant columns
+df <- df %>% 
+  filter(error==1) %>% 
+    # repet_trig = repetition (151,152,153 is 1,2,3), 
+    # wh = testing session 1 and 2, 
+    # cat_nr = 18 categories (à 5 members each)
+  dplyr::select(c(subject, Ordinal_position, RT, 
+                  repet_trig, wh, item_id, cat_nr)) %>%
+  droplevels() %>% 
+  dplyr::rename(repet = repet_trig, 
+                OrdPos = Ordinal_position) %>% 
+  # factorize colums
+  mutate(subject = as.factor(subject),
+         repet = as.factor(repet), 
+         wh = as.factor(wh), 
+         item_id = as.factor(item_id),
+         cat_nr = as.factor(cat_nr))
+```
+
+The data structure is somewhat different from the planned experiment. Our experiment will have no repetition, but three testing sessions with the same items. Does the variance differ between the repetitions within a session and the two testing sessions? 
+
+```{r}
+df %>% group_by(wh, repet, OrdPos) %>% 
+  summarize(sd = sd(RT, na.rm = T))
+
+df %>% group_by(wh)%>% summarize(sd = sd(RT, na.rm = T))
+df %>% group_by(repet)%>% summarize(sd = sd(RT, na.rm = T))
+df %>% group_by(wh, repet)%>%summarize(sd = sd(RT, na.rm = T))
+df %>% group_by(OrdPos)%>%summarize(sd = sd(RT,na.rm=T))
+```
+
+Overall, the variances are not too different (but still). The variance in the second session seems to be somewhat higher and the variances seem to increase with ordinal position.
+
+
+# Comparison 1: Power analysis for the ordinal position effect
+
+Subset the data to the first session and first repetition 
+
+```{r}
+df_Ord <- df %>% filter(wh == 1, repet == 151) %>% droplevels()
+```
+
+## 1) Set up models based on the structure of the online CSI experiment
+Unfortunately, simr does not work properly with GLMMs. Therefore, for the power analysis, we will set up an LMM with transformed RTs  
+a) center OrdPos (continuous predictor)
+
+```{r}
+# center continuous predictor
+df_Ord %>% mutate(OrdPos_num = case_when(OrdPos == "OP1" ~1,
+                                         OrdPos == "OP2" ~2,
+                                         OrdPos == "OP3" ~3,
+                                         OrdPos == "OP4" ~4,
+                                         OrdPos == "OP5" ~5)) %>%
+                  mutate(OrdPos.c=
+                    scale(as.numeric(as.character(OrdPos_num)), 
+                     center = TRUE, scale = FALSE)) -> df_Ord
+```
+
+b) Check distribution of RTs
+
+```{r RT distributions}
+# Boxcox plot suggests inverse transformation: 
+boxcox(df_Ord$RT ~ df_Ord$OrdPos)
+
+# # check distribution of RTs (by eyeballing)
+# # 1) density plot of RTs
+# qplot(data=df_Ord, RT, geom="density", na.rm=TRUE)+ theme_bw() 
+# # 2) plot data against real normal distribution -> is it way off?
+# qqnorm(df_Ord$RT); qqline(df_Ord$RT)
+# 
+# # check distribution of logRTs (by eyeballing)
+# df_Ord$lRT <- log(df_Ord$RT)
+# # 1) density plot of logRTs
+# qplot(data=df_Ord, lRT, geom="density", na.rm=TRUE)+ theme_bw() 
+# # 2) plot data against real normal distribution -> is it way off?
+# qqnorm(df_Ord$lRT); qqline(df_Ord$lRT)
+# ### data kind of normally distributed. Log RTs fit better
+# 
+# # check distribution of 1/RT (by eyeballing)
+# df_Ord$iRT <- 1/df_Ord$RT
+# # 1) density plot of logRTs
+# qplot(data=df_Ord, iRT, geom="density", na.rm=TRUE)+ theme_bw() 
+# # 2) plot data against real normal distribution -> is it way off?
+# qqnorm(df_Ord$iRT); qqline(df_Ord$iRT)
+# ### data kind of normally distributed. Inverse RTs fit well
+```
+
+Check the goodness of fit of an inverse transformation (with RT divided by 1000: 1/(x/1000) = 1000/x): 
+
+```{r fit.normal}
+library(fitdistrplus)
+# fit.normal<- fitdist(df_Ord$RT, distr = "norm", method = "mle")
+# summary(fit.normal)
+# plot(fit.normal)
+df_Ord$iRT <-1000/df_Ord$RT
+# plot this transformation distribution
+plot(df_Ord$RT, df_Ord$iRT)
+# check fit
+fit.normal_inv<- fitdist(df_Ord$iRT, distr = "norm", method = "mle")
+summary(fit.normal_inv)
+plot(fit.normal_inv)
+```
+
+An inverse transformation fits the data well. We will thus use this kind of transformation
+
+
+c) Set up the models  
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data*
+
+```{r LMM1 online}
+lmm1 <- lmer(iRT ~ OrdPos.c + (OrdPos.c|subject) +(OrdPos.c|cat_nr) ,
+            data = df_Ord, REML = FALSE,
+            control=lmerControl(optimizer = "bobyqa"))
+isSingular(lmm1)
+summary(lmm1)
+```
+
+## 2) Extend dataset
+
+We already know that we want 24 categories (we use the same stimuli as in Stark, van Scherpenberg et al., 2021). So we extend along categories.  
+Additionally, we also extend along participants
+
+```{r}
+lmm1_2 <- extend(lmm1, along="cat_nr", n=24)
+m2data <- getData(lmm1_2) 
+## ok, data were indeed extended to n categories ;-)
+str(m2data)
+str(df_Ord)
+
+lmm24_18 <- extend(lmm1_2, along="subject", n=18)
+ m2data <- getData(lmm24_18) 
+# ## ok, data were indeed extended to n subjects ;-)
+str(m2data)
+# str(df_Ord)
+
+lmm24_30 <- extend(lmm1_2, along="subject", n=30)
+ m2data <- getData(lmm24_30) 
+# ## ok, data were indeed extended to n subjects ;-)
+str(m2data)
+# str(df_Ord)
+```
+
+To be sure nothing went wrong with the category extension, we do another power analysis for 17 categories (category 5 was deleted whilst subsetting the data): 
+
+```{r}
+lmm17_30 <- extend(lmm1, along="subject", n=30)
+ m2data <- getData(lmm17_30) 
+# ## ok, data were indeed extended to n subjects ;-)
+str(m2data)
+# str(df_Ord)
+```
+
+## 3a) Specify effect sizes: Use effect from Stark et al 2021
+As a first attempt, we use the effect size from Stark, van Scherpenberg et al., 2021, Exp. 1 as this is the smallest effect size that we have: 31 ms (We take the most conservative calculation)
+
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data* 
+
+What effect size is 31 ms in 1/(RT/1000) depends on the position: We take the grand mean 
+
+```{r}
+mean(df_Ord$RT)
+
+# calculate the effect size in the transformed scale
+Ord1 <- 1000/(mean(df_Ord$RT)-(31/2))
+Ord2 <- 1000/(mean(df_Ord$RT)+(31/2))
+eff1 <- Ord2 - Ord1
+```
+
+```{r LMM1_Stark}
+# use this as the fixed effect of interest
+fixef(lmm24_30)
+fixef(lmm24_30)["OrdPos.c"] <- eff1
+```
+
+
+## 4a) Run the power analysis based on effect size from Stark et al (2021)
+
+```{r}
+set.seed(99)
+```
+
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data* 
+
+```{r power_eff_Stark, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM1_Stark <- powerSim(lmm24_30, test=fixed("OrdPos.c","t"), nsim = n_iter) # increase to nsim > 1000 for real test
+```
+
+```{r}
+#lastResult()$warnings
+#lastResult()$errors
+```
+
+```{r}
+PowerLMM1_Stark
+```
+
+
+## 3b) Specify effect sizes: Use effect from Lorenz et al (2021)
+Now we use the experimental effect size from Lorenz et al (2021), but with 24 categories
+
+
+```{r LMM1_Lorenz}
+fixef(lmm24_18)
+```
+
+
+## 4b) Run the power analysis based on effect size from Lorenz et al (2021)
+
+```{r}
+set.seed(99)
+```
+
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data* 
+
+```{r PowerSim_LMM1_Lorenz, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM1_Lorenz <- powerSim(lmm24_18, test=fixed("OrdPos.c","t"), nsim = n_iter) # increase to nsim > 1000 for real test
+lastResult()$warnings
+lastResult()$errors
+``` 
+
+```{r}
+#lastResult()$warnings
+#lastResult()$errors
+```
+
+```{r}
+PowerLMM1_Lorenz
+```
+
+## 3c) Specify effect sizes: Use effect from Stark et al 2021
+Now we use the effect size from Stark Stark, van Scherpenberg et al., 2021, Exp. 1, but with the original 17 categories.
+
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data* 
+
+What effect size is 31 ms in 1/(RT/1000) depends on the position: We take the grand mean 
+
+```{r LMM1_Stark_eff}
+# use this as the fixed effect of interest
+fixef(lmm17_30)
+fixef(lmm17_30)["OrdPos.c"] <- eff1
+```
+
+
+## 4c) Run the power analysis based on effect size from Stark et al (2021) with 17 categories
+
+```{r}
+set.seed(99)
+```
+
+*Model 1: Linear model with continuous predictor "Ordinal position" and inversely transformed RT data* 
+
+```{r power_eff_Stark_17, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+PowerLMM1_Stark_17cat <- powerSim(lmm17_30, test=fixed("OrdPos.c","t"), nsim = n_iter) # increase to nsim > 1000 for real test
+```
+
+```{r}
+#lastResult()$warnings
+#lastResult()$errors
+```
+
+```{r}
+PowerLMM1_Stark_17cat
+```
+
+
+
+## 5a) Power analyses at a range of sample sizes with effect from Stark, van Scherpenberg et al, 2021
+Try out different sample sizes:
+
+```{r PowerCurve LMM1_Stark, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+lmm24_60 <- extend(lmm1_2, along="subject", n=60)
+fixef(lmm24_60)["OrdPos.c"] <- eff1
+pc_lmm24_60 <- powerCurve(lmm24_60, along = "subject", 
+                          breaks = c(20, 24, 30, 40, 60), nsim = n_iter)
+lastResult()$warnings
+lastResult()$errors
+```
+
+```{r}
+#lastResult()$warnings
+#lastResult()$errors
+```
+
+```{r}
+pc_lmm24_60
+plot(pc_lmm24_60)
+```
+
+## 5b) Power analyses at a range of sample sizes with effect size from Lorenz et al (2021)
+Try out different sample sizes )
+
+Several sample sizes 
+
+```{r PowerCurve LMM1_Lorenz, message=FALSE, warning=FALSE, cache=TRUE, results="hide"}
+lmm24_18 <- extend(lmm1_2, along="subject", n=30)
+pc_lmm24_18 <- powerCurve(lmm24_18, along = "subject", 
+                          breaks = c(10, 16, 24, 30), nsim = n_iter)
+```
+
+```{r}
+#lastResult()$warnings
+#lastResult()$errors
+```
+
+```{r}
+pc_lmm24_18
+plot(pc_lmm24_18)
+```
+
+
+# write results
+
+```{r}
+# powersim_results_cont <- rbind(summary(PowerLMM1),
+#                           summary(powersim_24_cont_log), 
+#                           summary(powersim_40_cont_log_015),
+#                           summary(powersim_24_cont_log_015),
+#                           summary(powersim_40_cont),
+#                           summary(powersim_24_cont),
+#                           summary(powersim_40_cont_18ms),
+#                           summary(powersim_24_cont_18ms),
+#                           summary(powersim_30_cont_18ms))
+#                           
+# powersim_results_cont <- cbind(powersim_results_cont, n = c(40,24,40,24,40,24,40,24,30), RT_transform = c("log","log","log","log","no","no","no","no","no"),Effect = c("0.031","0.031","0.015","0.015","32.2ms","32.2ms","18ms","18ms","18ms"))
+# 
+# write.table(powersim_results_cont, "powersim_results_cont.csv", append = FALSE, sep = ";", row.names = FALSE, col.names = TRUE)
+
+```
+
