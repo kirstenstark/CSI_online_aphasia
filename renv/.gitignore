@@ -1,4 +1,8 @@
 library/
+<<<<<<< HEAD
+=======
+local/
+>>>>>>> afc2dd89d4289ef504eb84290827e80da6a9af84
 lock/
 python/
 staging/
