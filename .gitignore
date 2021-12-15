@@ -1,3 +1,7 @@
+# pseudomized data
+data/raw/
+data/power-analysis/
+
 # History files
 .Rhistory
 .Rapp.history
