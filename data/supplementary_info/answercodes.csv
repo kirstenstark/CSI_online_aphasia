@@ -1,0 +1,1462 @@
+﻿item;word;answercode;category
+kleiderschrank;SCHABackspaceRANK ;almostcorrect;Aufbewahrung
+kleiderschrank;SCHARNKEnter;almostcorrect;Aufbewahrung
+kleiderschrank;SCHRANK ;almostcorrect;Aufbewahrung
+kleiderschrank;SCHRANKEnter;almostcorrect;Aufbewahrung
+kleiderschrank;schranlBackspacek ;almostcorrect;Aufbewahrung
+kleiderschrank;SHCRBackspaceBackspaceBackspaceCHRANKEnter;almostcorrect;Aufbewahrung
+kleiderschrank;KLEIDERSCHRANK ;correct;Aufbewahrung
+kleiderschrank;KLEIDERSCHRANKEnter;correct;Aufbewahrung
+kleiderschrank;PFHÖRERBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceSCHRANKEnter;first_letter_incorrect;Aufbewahrung
+kleiderschrank;;isna;Aufbewahrung
+kleiderschrank;regal ;semantic_relation;Aufbewahrung
+kleiderschrank;REGALEnter;semantic_relation;Aufbewahrung
+regal;REBackspaceEGAL ;almostcorrect;Aufbewahrung
+regal;SCHRANK ;semantic_relation;Aufbewahrung
+regal;SCHRANKEnter;semantic_relation;Aufbewahrung
+regal;REGAL ;correct;Aufbewahrung
+regal;REGALEnter;correct;Aufbewahrung
+regal;TEGALEnter;first_letter_incorrect;Aufbewahrung
+safe;SAGE ;almostcorrect;Aufbewahrung
+safe;SAGFEBackspaceBackspaceFBackspaceBackspaceFE ;almostcorrect;Aufbewahrung
+safe;SBackspaceTBackspaceSBackspaceTRBackspaceBackspaceSFAEBackspaceBackspaceBackspaceAFDEBackspaceBackspaceE ;unrelated_other;Aufbewahrung
+safe;teBackspaceresor ;almostcorrect;Aufbewahrung
+safe;TRESOREnter;almostcorrect;Aufbewahrung
+safe;SAFE ;correct;Aufbewahrung
+safe;SAFEEnter;correct;Aufbewahrung
+safe;EnterEnter;unrelated_other;Aufbewahrung
+safe;ASBackspaceBackspaceSAFE ;first_letter_incorrect;Aufbewahrung
+schachtel;BOX ;almostcorrect;Aufbewahrung
+schachtel;BOXENEnter;almostcorrect;Aufbewahrung
+schachtel;BOXEnter;almostcorrect;Aufbewahrung
+schachtel;KARTONEnter;almostcorrect;Aufbewahrung
+schachtel;KISTE ;almostcorrect;Aufbewahrung
+schachtel;KISTEEnter;almostcorrect;Aufbewahrung
+schachtel;SCHACTBackspaceHTELEnter;almostcorrect;Aufbewahrung
+schachtel;SCHACHTEL ;correct;Aufbewahrung
+schachtel;SCHACHTELEnter;correct;Aufbewahrung
+schachtel;BBackspaceSCHUHBOXEnter;first_letter_incorrect;Aufbewahrung
+schublade;KISTE ;semantic_relation;Aufbewahrung
+schublade;schblade ;almostcorrect;Aufbewahrung
+schublade;SCHRANKEnter;semantic_relation;Aufbewahrung
+schublade;SCHUBABackspaceABackspaceLADEEnter;almostcorrect;Aufbewahrung
+schublade;SCHUBLADE ;correct;Aufbewahrung
+schublade;SCHUBLADEEnter;correct;Aufbewahrung
+schublade;BBackspaceSCHUBLADEEnter;first_letter_incorrect;Aufbewahrung
+schublade;;isna;Aufbewahrung
+schublade;SCHUBEnter;unrelated_other;Aufbewahrung
+axt;ACBackspaceXTEnter;almostcorrect;Bauernhof
+axt;AKBackspaceXTXBackspaceBackspaceTEnter;almostcorrect;Bauernhof
+axt;AXEnter;almostcorrect;Bauernhof
+axt;AXRBackspaceTEnter;almostcorrect;Bauernhof
+axt;AXTRBackspaceEnter;almostcorrect;Bauernhof
+axt;AXT ;correct;Bauernhof
+axt;AXTEnter;correct;Bauernhof
+axt;hBackspaceaxtEnter;first_letter_incorrect;Bauernhof
+axt;TBackspaceAXREnter;first_letter_incorrect;Bauernhof
+axt;;isna;Bauernhof
+besen; BESEN ;backspace_space_enter;Bauernhof
+besen;BESEN ;correct;Bauernhof
+besen;BESENEnter;correct;Bauernhof
+besen;EBackspaceBESENEnter;first_letter_incorrect;Bauernhof
+besen;VESBackspaceBackspaceBackspaceBESENEnter;first_letter_incorrect;Bauernhof
+besen;;isna;Bauernhof
+besen;SBackspaceBESENEnter;first_letter_incorrect;Bauernhof
+säge; SÄGE ;backspace_space_enter;Bauernhof
+säge;SÄGE ;correct;Bauernhof
+säge;SÄGEEnter;correct;Bauernhof
+säge;;isna;Bauernhof
+säge;L ;unrelated_other;Bauernhof
+schaufel;SPATEN ;almostcorrect;Bauernhof
+schaufel;SCHAUFEL ;correct;Bauernhof
+schaufel;SCHAUFELEnter;correct;Bauernhof
+schaufel;;isna;Bauernhof
+sense;SENESBackspaceBackspaceSEEnter;almostcorrect;Bauernhof
+sense;SICHELEnter;almostcorrect;Bauernhof
+sense;BackspaceULLIBackspaceBackspaceBackspaceBackspaceBackspaceSENSEEnter;backspace_space_enter;Bauernhof
+sense;SENSE ;correct;Bauernhof
+sense;SENSEEnter;correct;Bauernhof
+sense;sBackspaceBackspacesenseEnter;first_letter_incorrect;Bauernhof
+sense;STOCKEnter;semantic_relation;Bauernhof
+sense;'Enter;unrelated_other;Bauernhof
+biene;BEIBackspaceBackspaceIENEEnter;almostcorrect;Biene
+biene;BIENE ;correct;Biene
+biene;BIENEEnter;correct;Biene
+biene;MEBackspaceBackspaceBIENE ;first_letter_incorrect;Biene
+biene;OOEnter;unrelated_other;Biene
+löwenzahn;LÄBackspaceÖWENZAHLBackspaceNEnter;almostcorrect;Blumen
+löwenzahn;LÄBackspaceÖWENZAHN ;almostcorrect;Blumen
+löwenzahn;LÖWENZANBackspaceHNEnter;almostcorrect;Blumen
+löwenzahn;LÖWENZAHN ;correct;Blumen
+löwenzahn;LÖWENZAHNEnter;correct;Blumen
+löwenzahn;ÖBackspaceLÖWENZAHNEnter;first_letter_incorrect;Blumen
+löwenzahn;;isna;Blumen
+löwenzahn;BLUME ;semantic_relation;Blumen
+löwenzahn;BLUMEEnter;semantic_relation;Blumen
+löwenzahn;BULBackspaceBackspaceLUME ;semantic_relation;Blumen
+löwenzahn;SONNENBLUMEEnter;semantic_relation;Blumen
+löwenzahn;ShiftlÖWENZAHNEnter;shift_start;Blumen
+löwenzahn;LÖWENAZBackspaceBackspaceZAHNEnter;almostcorrect;Blumen
+orchidee;ORIBackspaceCHIDEE ;almostcorrect;Blumen
+orchidee;BLUBackspaceBackspaceBackspaceVEILCHENEnter;semantic_relation;Blumen
+orchidee;ORCHIDEE ;correct;Blumen
+orchidee;ORCHIDEEEnter;correct;Blumen
+orchidee;IRCHBackspaceBackspaceBackspaceBackspaceORCHIDEEEnter;first_letter_incorrect;Blumen
+orchidee;;isna;Blumen
+orchidee;BLUME ;semantic_relation;Blumen
+orchidee;BLUMEEnter;semantic_relation;Blumen
+orchidee;PLFANZE ;semantic_relation;Blumen
+orchidee;BLMEEnter;semantic_relation;Blumen
+orchidee;FLIEDER ;semantic_relation;Blumen
+orchidee;HBackspaceORCHIDEE ;first_letter_incorrect;Blumen
+rose;ROSE ;correct;Blumen
+rose;ROSEEnter;correct;Blumen
+rose;BLUBackspaceBackspaceBackspaceBackspaceROSE ;first_letter_incorrect;Blumen
+rose;ORCHIDEEEnter;semantic_relation;Blumen
+rose;ORCHIDEE ;semantic_relation;Blumen
+sonnenblume;SCBackspaceONNENBLUMEEnter;almostcorrect;Blumen
+sonnenblume;SONNEBBackspaceNBLUMEEnter;almostcorrect;Blumen
+sonnenblume;SONNEBKUMEBackspaceBackspaceBackspaceBackspaceLUMEEnter;almostcorrect;Blumen
+sonnenblume;SONNENBLUEBackspaceMEEnter;almostcorrect;Blumen
+sonnenblume;SONNENBLUME ;correct;Blumen
+sonnenblume;SONNENBLUMEEnter;correct;Blumen
+sonnenblume;BBackspaceBackspaceSONNENBLUMEEnter;first_letter_incorrect;Blumen
+sonnenblume;;isna;Blumen
+sonnenblume;HHEnter;unrelated_other;Blumen
+sonnenblume;EEnter;unrelated_other;Blumen
+tulpe;TIULBackspaceBackspaceBackspaceULPE ;almostcorrect;Blumen
+tulpe;TUIBackspaceLPEEnter;almostcorrect;Blumen
+tulpe;TULIPEnter;almostcorrect;Blumen
+tulpe;TULPFEEnter;almostcorrect;Blumen
+tulpe;TULPE ;correct;Blumen
+tulpe;TULPEEnter;correct;Blumen
+tulpe;ABackspaceBackspaceBackspaceTULPEEnter;first_letter_incorrect;Blumen
+tulpe;BBackspaceUBackspaceTULPEEnter;first_letter_incorrect;Blumen
+tulpe;BLUEMBackspaceBackspaceME ;semantic_relation;Blumen
+tulpe;BLUME ;semantic_relation;Blumen
+tulpe;BLUMEEnter;semantic_relation;Blumen
+tulpe;ROSEEnter;semantic_relation;Blumen
+bleistift;BEISBackspaceBackspaceLBackspaceBackspaceLEISTIFTEnter;almostcorrect;Büro
+bleistift;BELISTIFTEnter;almostcorrect;Büro
+bleistift;BLE$IBackspaceBackspaceISTIFTEnter;almostcorrect;Büro
+bleistift;BLEIFSTBackspaceBackspaceBackspaceSTIFTEnter;almostcorrect;Büro
+bleistift;BLEISCHBackspaceBackspaceTIFTEnter;almostcorrect;Büro
+bleistift;BLEISTFBackspaceIFTEnter;almostcorrect;Büro
+bleistift;BLEISTIFTEBackspaceEnter;almostcorrect;Büro
+bleistift;BLEISTIFTTEnter;almostcorrect;Büro
+bleistift;STIFT ;almostcorrect;Büro
+bleistift;BLEISTIFT ;correct;Büro
+bleistift;BLEISTIFTEnter;correct;Büro
+bleistift;NBackspaceSTIFTBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBLEISTIFT ;first_letter_incorrect;Büro
+bleistift;SBackspaceBLEISTIFTEnter;first_letter_incorrect;Büro
+bleistift;;isna;Büro
+klammer;BRIEFKLAMMEREnter;almostcorrect;Büro
+klammer;BÜROKABackspaceLAMMEREnter;almostcorrect;Büro
+klammer;BÜROKALMMEREnter;almostcorrect;Büro
+klammer;BÜROKLAMMER ;almostcorrect;Büro
+klammer;BÜROKLAMMEREnter;almostcorrect;Büro
+klammer;BÜROKÖABackspaceBackspaceLAMMEREnter;almostcorrect;Büro
+klammer;KLAMERBackspaceBackspaceMER ;almostcorrect;Büro
+klammer;KLAMMERNEnter;almostcorrect;Büro
+klammer; KLAMMER ;backspace_space_enter;Büro
+klammer;KLAMMER ;correct;Büro
+klammer;KLAMMEREnter;correct;Büro
+klammer;;isna;Büro
+lineal;LINEAREnter;almostcorrect;Büro
+lineal;LINELABackspaceBackspaceAL ;almostcorrect;Büro
+lineal;LINELBackspaceAL ;almostcorrect;Büro
+lineal;LINEAL ;correct;Büro
+lineal;LINEALEnter;correct;Büro
+lineal;SPULEEnter;unrelated_other;Büro
+radiergummi;RADIEREREnter;almostcorrect;Büro
+radiergummi;RADIERGUMIBackspaceMIEnter;almostcorrect;Büro
+radiergummi;RADIERGUMMIGBackspaceEnter;almostcorrect;Büro
+radiergummi;radierkBackspacegummi ;almostcorrect;Büro
+radiergummi;RAIFEBackspaceBackspaceBackspaceDIERGUMMIEnter;almostcorrect;Büro
+radiergummi;RADIERGUMMI ;correct;Büro
+radiergummi;RADIERGUMMIEnter;correct;Büro
+radiergummi;SBackspaceKBackspaceRADIERGUMMIEnter;first_letter_incorrect;Büro
+radiergummi;;isna;Büro
+radiergummi;DBackspaceRADIERGUMMI ;first_letter_incorrect;Büro
+radiergummi;DBackspaceRADIERGUMMI ;first_letter_incorrect;Büro
+schere;SCHEEBackspaceREEnter;almostcorrect;Büro
+schere;SCHREBackspaceBackspaceEREEnter;almostcorrect;Büro
+schere;SCHERE ;correct;Büro
+schere;SCHEREEnter;correct;Büro
+schere;OOBackspaceBackspaceBackspaceBackspaceSCHEREEnter;first_letter_incorrect;Büro
+schere;;isna;Büro
+schere;SCHEREnterE;almostcorrect;Büro
+schere;SCHRBackspaceERE ;almostcorrect;Büro
+ampel;AMOFELBackspaceBackspaceBackspacePFBackspaceBackspaceBackspacePFBackspaceEL ;almostcorrect;Filler
+ampel;AMPEL ;correct;Filler
+ampel;AMPELEnter;correct;Filler
+baby;BABVBackspaceY ;almostcorrect;Filler
+baby;BABY'BackspaceEnter;almostcorrect;Filler
+baby;BABZBackspaceYEnter;almostcorrect;Filler
+baby;BABY ;correct;Filler
+baby;BABYEnter;correct;Filler
+baby;VBABackspaceBackspaceBackspaceBABYEnter;first_letter_incorrect;Filler
+badewanne;BADEWBackspaceWANNE ;almostcorrect;Filler
+badewanne;BADWBackspaceEWANNE ;almostcorrect;Filler
+badewanne;WANNEEnter;almostcorrect;Filler
+badewanne;WBackspaceBASBackspaceDEWANNEEnter;first_letter_incorrect;Filler
+badewanne;BADEWANNE ;correct;Filler
+badewanne;BADEWANNEEnter;correct;Filler
+badewanne;KWBackspaceBackspaceWANNE ;first_letter_incorrect;Filler
+badewanne;;isna;Filler
+badewanne;WANNE ;almostcorrect;Filler
+ball;BAÖLBackspaceBackspaceLLEnter;almostcorrect;Filler
+ball;BALL ;correct;Filler
+ball;BALLEnter;correct;Filler
+ball;PBackspaceBALL ;first_letter_incorrect;Filler
+ball;eEnter;unrelated_other;Filler
+briefkasten;BRIEFKASENBackspaceBackspaceTENEnter;almostcorrect;Filler
+briefkasten;BRIEFKASTERNBackspaceBackspaceNEnter;almostcorrect;Filler
+briefkasten;BRIEFKATSBackspaceBackspaceSTEN ;almostcorrect;Filler
+briefkasten;BVBackspaceRIEFKASTENEnter;almostcorrect;Filler
+briefkasten;BRIEFKASTEN ;correct;Filler
+briefkasten;BRIEFKASTENEnter;correct;Filler
+briefkasten;ABackspaceKASTEN ;first_letter_incorrect;Filler
+briefkasten;;isna;Filler
+briefkasten;POSTFACHEnter;almostcorrect;Filler
+briefmarke;BIRBackspaceBackspaceRIEFMARKE ;almostcorrect;Filler
+briefmarke;BRIEGBackspaceFMARKE ;almostcorrect;Filler
+briefmarke;BRIEFMARKE ;correct;Filler
+briefmarke;BRIEFMARKEEnter;correct;Filler
+briefmarke;;isna;Filler
+brille;BIRBackspaceBackspaceRILLÖEBackspaceBackspaceEEnter;almostcorrect;Filler
+brille;BRILLE ;correct;Filler
+brille;BRILLEEnter;correct;Filler
+brille;GBackspaceBRILLEEnter;first_letter_incorrect;Filler
+brille;VRBackspaceBackspaceBRILLE ;first_letter_incorrect;Filler
+brille;SBackspaceBRILLEEnter;first_letter_incorrect;Filler
+bürste;BBÜRSTEControlBackspaceBÜRSTEEnter;almostcorrect;Filler
+bürste;BRBackspaceÜRSTEEnter;almostcorrect;Filler
+bürste;BÜRSEBackspaceTEEnter;almostcorrect;Filler
+bürste;HAARBÜRSTEEnter;almostcorrect;Filler
+bürste;KAMControlABÜRSTE ;semantic_relation;Filler
+bürste;KAMM ;semantic_relation;Filler
+bürste;KAMMBackspaceBackspaceBackspaceBackspaceBÜRSTEEnter;semantic_relation;Filler
+bürste;EnterBURSCGEnter;backspace_space_enter;Filler
+bürste;BÜRSTE ;correct;Filler
+bürste;BÜRSTEEnter;correct;Filler
+bürste;KÜRSTE ;first_letter_incorrect;Filler
+bürste;NBackspaceBackspaceBÜRSTEEnter;first_letter_incorrect;Filler
+bürste;NÜRSTE ;first_letter_incorrect;Filler
+bürste;;isna;Filler
+cd;CEBackspaceDEnter;almostcorrect;Filler
+cd;CFBackspaceD ;almostcorrect;Filler
+cd;CHBackspaceD ;almostcorrect;Filler
+cd;CD ;correct;Filler
+cd;CDEnter;correct;Filler
+cd;UBackspaceCD ;first_letter_incorrect;Filler
+fächer;FECHEREnter;almostcorrect;Filler
+fächer;FFÄCHEREnter;almostcorrect;Filler
+fächer;FÄCHER ;correct;Filler
+fächer;FÄCHEREnter;correct;Filler
+fächer;SBackspaceFÄCHER ;first_letter_incorrect;Filler
+fächer;;isna;Filler
+fächer;FANEnter3Enter;unrelated_other;Filler
+fenster;FENSEDRTBackspaceBackspaceBackspaceBackspaceTER ;almostcorrect;Filler
+fenster;fentBackspacester ;almostcorrect;Filler
+fenster;FENTEREnter;almostcorrect;Filler
+fenster;FGEBackspaceBackspaceENSTEREnter;almostcorrect;Filler
+fenster;FENSTER ;correct;Filler
+fenster;FENSTEREnter;correct;Filler
+fenster;GENBackspaceBackspaceFBackspaceBackspaceFENSTEREnter;first_letter_incorrect;Filler
+fenster;HANBackspaceBackspaceBackspaceBackspaceFENSTEREnter;first_letter_incorrect;Filler
+fenster;;isna;Filler
+fernglas;FERNGLAD ;almostcorrect;Filler
+fernglas;FERNGLAS ;correct;Filler
+fernglas;FERNGLASEnter;correct;Filler
+fernglas;DBackspaceFERNGLASEnter;first_letter_incorrect;Filler
+fernglas;;isna;Filler
+glocke;GLOKBackspaceCKEEnter;almostcorrect;Filler
+glocke;KLINGEL ;almostcorrect;Filler
+glocke;BackspaceBackspaceBackspaceGLOCKEEnter;backspace_space_enter;Filler
+glocke;EnterGLOCKEEnter;backspace_space_enter;Filler
+glocke;GLOCKE ;correct;Filler
+glocke;GLOCKEEnter;correct;Filler
+glocke;JBackspaceGLOCEBackspaceEKBackspaceBackspaceKE ;first_letter_incorrect;Filler
+glocke;LBackspaceGLOCKEEnter;first_letter_incorrect;Filler
+glocke;CLOCKEEnter;almostcorrect;Filler
+käfig;KÖBackspaceÄFIG ;almostcorrect;Filler
+kamera;KAMER ;almostcorrect;Filler
+kamera;KAMERE ;almostcorrect;Filler
+kamera;KAMERA ;correct;Filler
+kamera;KAMERAEnter;correct;Filler
+kamera;ABackspaceKAMERAEnter;first_letter_incorrect;Filler
+kamera;;isna;Filler
+kassette;KASEBackspaceSETEBackspaceBackspaceBackspaceBackspaceETTEEnter;almostcorrect;Filler
+kassette;KASEBackspaceSETTEEnter;almostcorrect;Filler
+kassette;KASEETTBackspaceBackspaceTTE ;almostcorrect;Filler
+kassette;KASETTE ;almostcorrect;Filler
+kassette;KASETTEBackspaceBackspaceBackspaceBackspaceSETBackspaceBackspaceBackspaceETTEEnter;almostcorrect;Filler
+kassette;KASETTEEnter;almostcorrect;Filler
+kassette;KASSBackspaceETTEEnter;almostcorrect;Filler
+kassette;KASSETE ;almostcorrect;Filler
+kassette;KASSETTE ;correct;Filler
+kassette;KASSETTEEnter;correct;Filler
+kassette;;isna;Filler
+kerze;KERZE ;correct;Filler
+kerze;KERZEEnter;correct;Filler
+kerze;ERBackspaceBackspaceKERZEEnter;first_letter_incorrect;Filler
+kerze;;isna;Filler
+kopfhörer;KLBackspaceOPFHÖREREnter;almostcorrect;Filler
+kopfhörer;KOPFHÖHREREnter;almostcorrect;Filler
+kopfhörer;KOPFHÖREREEnter;almostcorrect;Filler
+kopfhörer;KOPFHOREREnter;almostcorrect;Filler
+kopfhörer;KOPFHÖRHEREnter;almostcorrect;Filler
+kopfhörer;kopfhötrBackspaceBackspacerer ;almostcorrect;Filler
+kopfhörer;KOPHBackspaceFHÖREREnter;almostcorrect;Filler
+kopfhörer;KOPFHÖRER ;correct;Filler
+kopfhörer;KOPFHÖREREnter;correct;Filler
+kopfhörer;hBackspacekopfhörer ;first_letter_incorrect;Filler
+kopfhörer;PBackspaceKOPHÖHREREnter;first_letter_incorrect;Filler
+kopfhörer;;isna;Filler
+kopfhörer;KOPHBackspaceFHÖRER ;almostcorrect;Filler
+kopfkissen;KABackspaceISSENEnter;almostcorrect;Filler
+kopfkissen;KISEBackspaceSENEnter;almostcorrect;Filler
+kopfkissen;KISSE ;almostcorrect;Filler
+kopfkissen;KISSEN ;almostcorrect;Filler
+kopfkissen;KISSENEnter;almostcorrect;Filler
+kopfkissen;KOPFKISSEN ;correct;Filler
+kopfkissen;KOPFKISSENEnter;correct;Filler
+kopfkissen;ShiftkOPFKISSENEnter;shift_start;Filler
+lippenstift;LIFFENSBackspaceBackspaceBackspaceBackspaceBackspacePPFENSTIFTEnter;almostcorrect;Filler
+lippenstift;LIPPENSCHBackspaceBackspaceTIFTEnter;almostcorrect;Filler
+lippenstift;LIPPENSTBackspaceTIFTEnter;almostcorrect;Filler
+lippenstift;LIPPENSTIFF ;almostcorrect;Filler
+lippenstift;lippenstifrtEnter;almostcorrect;Filler
+lippenstift;LIPPENSTIGBackspaceFTEnter;almostcorrect;Filler
+lippenstift;LIPPENTIFTArrowLeftArrowLeftArrowLeftArrowLeftSEnter;almostcorrect;Filler
+lippenstift;LIPPENSTIFT ;correct;Filler
+lippenstift;LIPPENSTIFTEnter;correct;Filler
+lippenstift;;isna;Filler
+lippenstift;HIRSHEnter;unrelated_other;Filler
+lippenstift;LIPPENSTFTBackspaceBackspaceBackspaceTIFTEnter;almostcorrect;Filler
+luftballon;BALLBackspaceBackspaceBackspaceBackspaceLUFTBALLONEnter;almostcorrect;Filler
+luftballon;BALLON ;almostcorrect;Filler
+luftballon;BALLONEnter;almostcorrect;Filler
+luftballon;BLABackspaceBackspaceALLON ;almostcorrect;Filler
+luftballon;LIFTBackspaceBackspaceBackspaceUFTBALLONEnter;almostcorrect;Filler
+luftballon;LUFTBALLONEnterBackspace;almostcorrect;Filler
+luftballon;LUFTBALLON ;correct;Filler
+luftballon;LUFTBALLONEnter;correct;Filler
+luftballon;FBackspaceLUFTBALLONEnter;first_letter_incorrect;Filler
+luftballon;;isna;Filler
+luftballon;LUFTBALLOONEnter;almostcorrect;Filler
+mikrofon;MIKORBackspaceBackspaceROFONEnter;almostcorrect;Filler
+mikrofon;MIKOROFNEnter;almostcorrect;Filler
+mikrofon;MIKROPHONEnter;almostcorrect;Filler
+mikrofon;MIRKBackspaceBackspaceKROFON ;almostcorrect;Filler
+mikrofon;MIRKOBackspaceBackspaceBackspaceKROFON ;almostcorrect;Filler
+mikrofon;MOBackspaceIKROFONEnter;almostcorrect;Filler
+mikrofon;MIKROFON ;correct;Filler
+mikrofon;MIKROFONEnter;correct;Filler
+mikrofon;ABackspaceMIKROFON ;first_letter_incorrect;Filler
+mikrofon;KBackspaceMIKROFONEnter;first_letter_incorrect;Filler
+mikrofon;;isna;Filler
+mülleimer;EIMERBackspaceBackspaceBackspaceBackspaceBackspaceMÜLLEIMEREnter;semantic_relation;Filler
+mülleimer;M*BackspaceÜLLEIMEREnter;almostcorrect;Filler
+mülleimer;MÜLEIMEBackspaceBackspaceBackspaceBackspaceLEIMEREnter;almostcorrect;Filler
+mülleimer;MÜLLEIMREBackspaceBackspaceEREnter;almostcorrect;Filler
+mülleimer;MÜLLEREnter;almostcorrect;Filler
+mülleimer;MÜLLEIMER ;correct;Filler
+mülleimer;MÜLLEIMEREnter;correct;Filler
+mülleimer;BBackspaceMÜLLEIMER ;first_letter_incorrect;Filler
+mülleimer;;isna;Filler
+mülleimer;EIMER ;semantic_relation;Filler
+mülleimer;MPBackspaceÜLLEIMEREnter;almostcorrect;Filler
+mülleimer;MÜLLTONNE ;almostcorrect;Filler
+parfum;PARFIBackspaceUMEnter;almostcorrect;Filler
+parfum;parfü,BackspacemEnter;almostcorrect;Filler
+parfum;parfumBackspaceBackspaceüm ;almostcorrect;Filler
+parfum;PARFÜÜBackspaceM ;almostcorrect;Filler
+parfum;PARMBackspaceBackspaceRFÜM ;almostcorrect;Filler
+parfum;CapsLockPARFÜMEnter;backspace_space_enter;Filler
+parfum;PARFUM ;correct;Filler
+parfum;PARFUMEnter;correct;Filler
+parfum;ABackspacePARUMEnter;first_letter_incorrect;Filler
+parfum;FBackspacePARFUMEnter;first_letter_incorrect;Filler
+parfum;OARFUMBackspaceBackspaceBackspaceBackspaceBackspaceBackspacePARFUMEnter;first_letter_incorrect;Filler
+parfum;RABackspaceBackspacePARFUM ;first_letter_incorrect;Filler
+parfum;ShiftpARFÜBackspaceUMEnter;shift_start;Filler
+parfum;PAFUMEnter;correct;Filler
+parfum;PARUM ;almostcorrect;Filler
+parfum;PARUM ;almostcorrect;Filler
+pfeife;PFEIFFEEnter;almostcorrect;Filler
+pfeife;PFIBackspaceEIFE ;almostcorrect;Filler
+pfeife;BackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspacePFEIFEEnter;backspace_space_enter;Filler
+pfeife;BackspacePEBackspaceFEIFE ;backspace_space_enter;Filler
+pfeife;EnterPFIFFDEEnter;backspace_space_enter;Filler
+pfeife;PFEIFE ;correct;Filler
+pfeife;PFEIFEEnter;correct;Filler
+pfeife;eBackspaceBackspaceBackspacepfiBackspaceeifeEnter;first_letter_incorrect;Filler
+pfeife;FEBackspaceBackspaceBackspacePFEIFEEnter;first_letter_incorrect;Filler
+pfeife;SBackspacePFEIFEEnter;first_letter_incorrect;Filler
+pfeife;;isna;Filler
+pfeife;PFEIEFBackspaceBackspaceFEEnter;almostcorrect;Filler
+pinsel;PISEBackspaceBackspaceNSELEnter;almostcorrect;Filler
+pinsel;PINSEL ;correct;Filler
+pinsel;PINSELEnter;correct;Filler
+pinsel;BBackspacePINSELEnter;first_letter_incorrect;Filler
+pinsel;FBackspacePINSEL ;first_letter_incorrect;Filler
+pinsel;"WBackspacePINSE;LEnter";first_letter_incorrect;Filler
+pinsel;;isna;Filler
+puppe;PUPPE ;correct;Filler
+puppe;PUPPEEnter;correct;Filler
+puppe;BBackspacePUPPEEnter;first_letter_incorrect;Filler
+puppe;ÜBackspacePUPPE ;first_letter_incorrect;Filler
+puppe;PUPP ;almostcorrect;Filler
+puppe;PUPEBackspacePE ;almostcorrect;Filler
+schlüssel;SCHHLÜSSEKEnter;almostcorrect;Filler
+schlüssel;SCHL*SSBackspaceBackspaceÜBackspaceBackspaceÜSSELEnter;almostcorrect;Filler
+schlüssel;SCHLÜSSEKBackspaceLEnter;almostcorrect;Filler
+schlüssel;SCHLUSSELEnter;almostcorrect;Filler
+schlüssel;SCHLÜSSEL ;correct;Filler
+schlüssel;SCHLÜSSELEnter;correct;Filler
+schornstein;kamin ;almostcorrect;Filler
+schornstein;KAMINEnter;almostcorrect;Filler
+schornstein;SCHONBackspaceRNSTEIN ;almostcorrect;Filler
+schornstein;SCHORNSTIBackspaceEINEnter;almostcorrect;Filler
+schornstein;SCHORNSTIEN ;almostcorrect;Filler
+schornstein;SCHRBackspaceORNSTEINEnter;almostcorrect;Filler
+schornstein;schronBackspaceBackspaceBackspaceornsteinEnter;almostcorrect;Filler
+schornstein;SCHORNSTEIN ;correct;Filler
+schornstein;SCHORNSTEINEnter;correct;Filler
+schornstein;KABackspaceBackspaceSCHORNSTEINEnter;almostcorrect;Filler
+schornstein;;isna;Filler
+schornstein; BackspaceEnter;unrelated_other;Filler
+schwamm;SABackspaceCHWAMMEnter;almostcorrect;Filler
+schwamm;SCHWAMEnter;almostcorrect;Filler
+schwamm;SCHWANBackspaceMM ;almostcorrect;Filler
+schwamm;SCHWANBackspaceMMEnter;almostcorrect;Filler
+schwamm;SCHWAMM ;correct;Filler
+schwamm;SCHWAMMEnter;correct;Filler
+schwamm;;isna;Filler
+schwert;SCHWARBackspaceBackspaceERT ;almostcorrect;Filler
+schwert;SCHWARTBackspaceBackspaceBackspaceERTEnter;almostcorrect;Filler
+schwert;SCHWEREnter;almostcorrect;Filler
+schwert;SCHWERT ;correct;Filler
+schwert;SCHWERTEnter;correct;Filler
+schwert;ABackspaceSCHWERTEnter;first_letter_incorrect;Filler
+schwert;;isna;Filler
+schwert;MESSEREnter;semantic_relation;Filler
+spaghetti;NUDELN ;almostcorrect;Filler
+spaghetti;NUDELNEnter;almostcorrect;Filler
+spaghetti;SPAGEBackspaceHETTIEnter;almostcorrect;Filler
+spaghetti;SPAGETHIBackspaceBackspaceTHIEnter;almostcorrect;Filler
+spaghetti;spagettiEnter;almostcorrect;Filler
+spaghetti;SPAHGBackspaceBackspaceGHETTIEnter;almostcorrect;Filler
+spaghetti;SPOABackspaceBackspaceAGEBackspaceHETTI ;almostcorrect;Filler
+spaghetti;SPAGHETTI ;correct;Filler
+spaghetti;SPAGHETTIEnter;correct;Filler
+spaghetti;;isna;Filler
+spaghetti;SPAGHETIBackspaceTIEnter;almostcorrect;Filler
+steckdose;SCBackspaceTECKDOSEEnter;almostcorrect;Filler
+steckdose;STECDBackspaceKDOSEEnter;almostcorrect;Filler
+steckdose;STECKDOEEnter;almostcorrect;Filler
+steckdose;STECKDOSE ;correct;Filler
+steckdose;STECKDOSEEnter;correct;Filler
+steckdose;SBackspaceSTECKDOSEEnter;first_letter_incorrect;Filler
+steckdose; STECKDOSE ;backspace_space_enter;Filler
+streichholz;STEICHHOLZEnter;almostcorrect;Filler
+streichholz;STRECBackspaceICHHOLZEnter;almostcorrect;Filler
+streichholz;STTREIBackspaceBackspaceBackspaceBackspaceEICHHOLZ ;almostcorrect;Filler
+streichholz;STREICHHOLZ ;correct;Filler
+streichholz;STREICHHOLZEnter;correct;Filler
+streichholz;ONBackspaceBackspaceBackspaceSTREICHHOLZEnter;first_letter_incorrect;Filler
+streichholz;;isna;Filler
+tafel;TAFEBackspaceELEnter;almostcorrect;Filler
+tafel;TAFFBackspaceELEnter;almostcorrect;Filler
+tafel;TAGELBackspaceBackspaceBackspaceFEL ;almostcorrect;Filler
+tafel;TASBackspaceBackspaceAFELEnter;almostcorrect;Filler
+tafel;TTAFELBackspaceBackspaceBackspaceBackspaceBackspaceAFELEnter;almostcorrect;Filler
+tafel;TAFEL ;correct;Filler
+tafel;TAFELEnter;correct;Filler
+tafel;;isna;Filler
+teppich;TABackspaceEPPICHEnter;almostcorrect;Filler
+teppich;TEPPCBackspaceICHEnter;almostcorrect;Filler
+teppich;TEPPICJBackspaceG ;almostcorrect;Filler
+teppich;TPPICHArrowLeftArrowLeftArrowLeftArrowLeftArrowLeftEEnter;almostcorrect;Filler
+teppich;TEPPICH ;correct;Filler
+teppich;TEPPICHEnter;correct;Filler
+teppich;BackspaceTEPPICHEnter;backspace_space_enter;Filler
+teppich;;isna;Filler
+ventilator;LÜFTEREnter;almostcorrect;Filler
+ventilator;VENITBackspaceTBackspaceBackspaceTILATOR ;almostcorrect;Filler
+ventilator;VENTIABackspaceABackspaceLATOREnter;almostcorrect;Filler
+ventilator;VENTIABackspaceLATOR ;almostcorrect;Filler
+ventilator;VENTIALTOREnter;almostcorrect;Filler
+ventilator;VENTILARBackspaceTOR ;almostcorrect;Filler
+ventilator;VENTILATOR ;correct;Filler
+ventilator;VENTILATOREnter;correct;Filler
+ventilator;WEBackspaceBackspaceVENTIABackspaceABackspaceLATOREnter;first_letter_incorrect;Filler
+ventilator;;isna;Filler
+ventilator;FANEnter;unrelated_other;Filler
+ventilator;VENTILATBackspaceTOREnter;almostcorrect;Filler
+ventilator;VENITBackspaceBackspaceTILATOR ;almostcorrect;Filler
+waage;WAAAGE ;almostcorrect;Filler
+waage;WAGBackspaceAGEEnter;almostcorrect;Filler
+waage;WAAGE ;correct;Filler
+waage;WAAGEEnter;correct;Filler
+waage;ITTELBackspaceBackspaceBackspaceBackspaceWABackspaceBackspaceBackspaceBackspaceWAAGEEnter;first_letter_incorrect;Filler
+waage;;isna;Filler
+würfel;WÜFBackspaceRFEL ;almostcorrect;Filler
+würfel;WÜRFEK ;almostcorrect;Filler
+würfel;WÜRFELÖBackspace ;almostcorrect;Filler
+würfel;WÜRFEL ;correct;Filler
+würfel;WÜRFELEnter;correct;Filler
+würfel;SÜRBackspaceBackspaceBackspaceWPRBackspaceBackspaceÜFBackspaceRFELEnter;first_letter_incorrect;Filler
+zigarette;ZIGAEBackspaceRETTE ;almostcorrect;Filler
+zigarette;ZIGARREBackspaceBackspaceETTEEnter;almostcorrect;Filler
+zigarette;ZIGARRETTEEnter;almostcorrect;Filler
+zigarette;ZIGARTBackspaceETTE ;almostcorrect;Filler
+zigarette;ZIGATBackspaceRETTEEnter;almostcorrect;Filler
+zigarette;ZIRBackspaceGARETTEEnter;almostcorrect;Filler
+zigarette;ZOIGBackspaceBackspaceBackspaceBackspaceBackspaceZIGARETTEEnter;almostcorrect;Filler
+zigarette;ZIGARETTE ;correct;Filler
+zigarette;ZIGARETTEEnter;correct;Filler
+zigarette;ßBackspacezigaretteEnter;first_letter_incorrect;Filler
+zigarette;;isna;Filler
+aal;AL ;almostcorrect;Fische
+aal;ALBackspaceALEnter;almostcorrect;Fische
+aal;AAL ;correct;Fische
+aal;AALEnter;correct;Fische
+aal;SCHBackspaceBackspaceBackspaceAALEnter;first_letter_incorrect;Fische
+aal;;isna;Fische
+delfin;DELPHIN ;almostcorrect;Fische
+delfin;DELFIN ;correct;Fische
+delfin;DELFINEnter;correct;Fische
+delfin;FBackspaceDELFINEnter;first_letter_incorrect;Fische
+delfin;FBackspaceDELPHIN ;first_letter_incorrect;Fische
+delfin;FELFBackspaceBackspaceBackspaceBackspaceDELFINEnter;first_letter_incorrect;Fische
+delfin;SBackspaceDELFIN ;first_letter_incorrect;Fische
+delfin;;isna;Fische
+delfin;Shiftdelfin ;shift_start;Fische
+goldfisch;FIBackspaceBackspaceBackspaceGOLDFISCH ;almostcorrect;Fische
+goldfisch;FISBackspaceBackspaceBackspaceGOLDFISCHEnter;almostcorrect;Fische
+goldfisch;FISCBackspaceBackspaceBackspaceBackspaceGOLBackspaceBackspaceBackspaceBackspaceFISCH ;almostcorrect;Fische
+goldfisch;FISCH ;almostcorrect;Fische
+goldfisch;FISCHEnter;almostcorrect;Fische
+goldfisch;GODLBackspaceBackspaceLDFISCHEnter;almostcorrect;Fische
+goldfisch;GOLDIBackspaceFISCHEnter;almostcorrect;Fische
+goldfisch;GOLDSBackspaceFISCHEnter;almostcorrect;Fische
+goldfisch;GOLDSBackspaceIBackspaceFISCH ;almostcorrect;Fische
+goldfisch;GOLFBackspaceDGISCHBackspaceBackspaceBackspaceBackspaceFBackspaceBackspaceFISCHEnter;almostcorrect;Fische
+goldfisch;GOLDFISCH ;correct;Fische
+goldfisch;GOLDFISCHEnter;correct;Fische
+goldfisch;gBackspacefische ;first_letter_incorrect;Fische
+hai;haoBackspaceiEnter;almostcorrect;Fische
+hai;HEBackspaceAIEnter;almostcorrect;Fische
+hai;HEBackspaceBackspaceHAIEnter;almostcorrect;Fische
+hai;HEI ;almostcorrect;Fische
+hai;HIBackspaceAIEnter;almostcorrect;Fische
+hai; hai ;backspace_space_enter;Fische
+hai;HAI ;correct;Fische
+hai;HAIEnter;correct;Fische
+hai;JBackspaceHAIEnter;first_letter_incorrect;Fische
+hai;MBackspaceHAI ;first_letter_incorrect;Fische
+hai;;isna;Fische
+hai;rochen ;semantic_relation;Fische
+rochen;fisch ;semantic_relation;Fische
+rochen;MANTAEnter;almostcorrect;Fische
+rochen;RACHENBackspaceBackspaceBackspaceBackspaceBackspaceOCHENEnter;almostcorrect;Fische
+rochen;ROCHE ;almostcorrect;Fische
+rochen;RTOBackspaceBackspaceOCHEN ;almostcorrect;Fische
+rochen;ROCHEN ;correct;Fische
+rochen;ROCHENEnter;correct;Fische
+rochen;VOGELEnterControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlBackspaceEnter;unrelated_other;Fische
+burg;BURG ;correct;Gebäude
+burg;BURGEnter;correct;Gebäude
+burg;KIURBackspaceBackspaceBackspaceBackspaceBackspaceBURGEnter;first_letter_incorrect;Gebäude
+burg;SCHBackspaceBackspaceBackspaceBackspaceBURGEnter;almostcorrect;Gebäude
+burg;SCHLOSS ;almostcorrect;Gebäude
+burg;SCHLOSSEnter;almostcorrect;Gebäude
+burg;ShiftbURGEnter;shift_start;Gebäude
+burg;NURBBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBURGEnter;first_letter_incorrect;Gebäude
+hochhaus;HBackspaceHOCHHAUSEnter;semantic_relation;Gebäude
+hochhaus;HCBackspaceOCHHAUSEnter;almostcorrect;Gebäude
+hochhaus;HCHHAUSEnter;almostcorrect;Gebäude
+hochhaus;HICHHABackspaceBackspaceBackspaceBackspaceBackspaceCBackspaceOCHHAUSEnter;almostcorrect;Gebäude
+hochhaus;HOCHHAUS ;correct;Gebäude
+hochhaus;HOCHHAUSEnter;correct;Gebäude
+hochhaus;;isna;Gebäude
+kirche;KIRSBackspaceCHE ;almostcorrect;Gebäude
+kirche;KIRSCHEBackspaceBackspaceBackspaceBackspaceCHEEnter;almostcorrect;Gebäude
+kirche;KOBackspaceIRCHE ;almostcorrect;Gebäude
+kirche;KURBackspaceBackspaceIRCHEEnter;almostcorrect;Gebäude
+kirche;BackspaceKIRCHE ;backspace_space_enter;Gebäude
+kirche;KIRCHE ;correct;Gebäude
+kirche;KIRCHEEnter;correct;Gebäude
+kirche;ShiftkirsBackspaceShiftcheEnter;unrelated_other;Gebäude
+kirche;FBackspaceKIRCHEEnter;first_letter_incorrect;Gebäude
+schloss;SCHHLOBackspaceBackspaceBackspaceLOSSEnter;almostcorrect;Gebäude
+schloss;SCHLOPBackspaceSS ;almostcorrect;Gebäude
+schloss;SCHLOSSEBackspaceEnter;almostcorrect;Gebäude
+schloss;SCHLOSS ;correct;Gebäude
+schloss;SCHLOSSEnter;correct;Gebäude
+schloss;;isna;Gebäude
+schloss;BURBackspaceBackspaceBackspaceBackspaceSCHLOSSEnter;almostcorrect;Gebäude
+schloss;burg ;almostcorrect;Gebäude
+schloss;BURGEnter;almostcorrect;Gebäude
+schloss;KIRCHEEnter;semantic_relation;Gebäude
+schloss;ShiftschlossEnter;shift_start;Gebäude
+tempel;TEMNBackspacePEL ;almostcorrect;Gebäude
+tempel;EnterRUINEEnter;backspace_space_enter;Gebäude
+tempel;tempel ;correct;Gebäude
+tempel;TEMPELEnter;correct;Gebäude
+tempel;RBackspaceTEMPELEnter;first_letter_incorrect;Gebäude
+tempel;;isna;Gebäude
+tempel;AKROPOLIS ;almostcorrect;Gebäude
+tempel;AKROPOLISEnter;almostcorrect;Gebäude
+tempel;AKROPPOBackspaceBackspaceOLIS ;almostcorrect;Gebäude
+tempel;hausEnter;semantic_relation;Gebäude
+tempel;KOLLOSSEUMEnter;semantic_relation;Gebäude
+tempel;PANTHEON ;almostcorrect;Gebäude
+tempel;PANTHEONEnter;almostcorrect;Gebäude
+tempel;RUINE ;almostcorrect;Gebäude
+tempel;RUINEEnter;almostcorrect;Gebäude
+tempel;SÄULENEnter;semantic_relation;Gebäude
+tempel;F ;unrelated_other;Gebäude
+tempel;NEnter;unrelated_other;Gebäude
+brokkoli;BBROKKOLIEnter;almostcorrect;Gemüse
+brokkoli;BORBackspaceBackspaceROKKOLIEnter;almostcorrect;Gemüse
+brokkoli;BROKKBackspaceOLIEnter;almostcorrect;Gemüse
+brokkoli;BROKOLI ;almostcorrect;Gemüse
+brokkoli;BROKOLIEnter;almostcorrect;Gemüse
+brokkoli;BROKOLLI ;almostcorrect;Gemüse
+brokkoli;BROKOLLIEnter;almostcorrect;Gemüse
+brokkoli;BROKKOLI ;correct;Gemüse
+brokkoli;BROKKOLIEnter;correct;Gemüse
+brokkoli;BackspaceWABackspaceBackspaceBROKOBackspaceKOLI ;backspace_space_enter;Gemüse
+brokkoli;KBackspaceBROKOBackspaceKOLLIEnter;first_letter_incorrect;Gemüse
+gurke;GRUKEBackspaceBackspaceBackspaceBackspaceURKEEnter;almostcorrect;Gemüse
+gurke;GURE ;almostcorrect;Gemüse
+gurke;GURKENEnter;almostcorrect;Gemüse
+gurke;GURKE ;correct;Gemüse
+gurke;GURKEEnter;correct;Gemüse
+gurke;LLIBackspaceBackspaceBackspaceGURKE ;first_letter_incorrect;Gemüse
+karotte;KAROTBackspaceBackspaceROTTE ;almostcorrect;Gemüse
+karotte;KAROZTBackspaceBackspaceTTTE ;almostcorrect;Gemüse
+karotte;KARROTBackspaceBackspaceBackspaceOTTEEnter;almostcorrect;Gemüse
+karotte;katBackspacerotte ;almostcorrect;Gemüse
+karotte;KAROTTE ;correct;Gemüse
+karotte;KAROTTEEnter;correct;Gemüse
+karotte;ABackspaceKARROTTEEnter;first_letter_incorrect;Gemüse
+karotte;;isna;Gemüse
+karotte;KARBackspaceBackspaceAROTTEEnter;almostcorrect;Gemüse
+kartoffel;KARTOFEBackspaceFELEnter;almostcorrect;Gemüse
+kartoffel;KARTOFEEBackspaceBackspaceFEL ;almostcorrect;Gemüse
+kartoffel;KARTOGBackspaceFFELEnter;almostcorrect;Gemüse
+kartoffel;KARTOLBackspaceFFELEnter;almostcorrect;Gemüse
+kartoffel;BackspaceKARTOFFEL ;backspace_space_enter;Gemüse
+kartoffel;KARTOFFEL ;correct;Gemüse
+kartoffel;KARTOFFELEnter;correct;Gemüse
+kartoffel;hBackspacekartoffekBackspacel ;first_letter_incorrect;Gemüse
+paprika;PAPBackspaceRIBackspaceBackspacePRIKA ;almostcorrect;Gemüse
+paprika;paprikaBackspacea ;almostcorrect;Gemüse
+paprika;PAPRIKEBackspaceAEnter;almostcorrect;Gemüse
+paprika;PAPRILBackspaceKA ;almostcorrect;Gemüse
+paprika;PAPRIKA ;correct;Gemüse
+paprika;PAPRIKAEnter;correct;Gemüse
+paprika;OBackspaceÜBackspacePAPRIKA ;first_letter_incorrect;Gemüse
+paprika;;isna;Gemüse
+paprika;PFEFFEREnter;semantic_relation;Gemüse
+paprika;PAKBackspacePRIKAEnter;almostcorrect;Gemüse
+bohrmaschine;BOHREnter;almostcorrect;Heimwerker
+bohrmaschine;BOHRER ;almostcorrect;Heimwerker
+bohrmaschine;BOHREREnter;almostcorrect;Heimwerker
+bohrmaschine;BOHRMASCHIENEEnter;almostcorrect;Heimwerker
+bohrmaschine;BOIBackspaceHRMASCHINE ;almostcorrect;Heimwerker
+bohrmaschine;BORBackspaceHRMASCHINEEnter;almostcorrect;Heimwerker
+bohrmaschine;BORHER ;almostcorrect;Heimwerker
+bohrmaschine;BORHEREnter;almostcorrect;Heimwerker
+bohrmaschine;BOHRMASCHINE ;correct;Heimwerker
+bohrmaschine;BOHRMASCHINEEnter;correct;Heimwerker
+bohrmaschine;NBackspaceBOHREREnter;first_letter_incorrect;Heimwerker
+bohrmaschine;SCControlAAKKUSCHRAUBER ;first_letter_incorrect;Heimwerker
+bohrmaschine;SCHBackspaceBackspaceBackspaceBOHRMASCHINE ;first_letter_incorrect;Heimwerker
+bohrmaschine;schrBackspaceBackspaceBackspaceBackspacebohrmaschine ;first_letter_incorrect;Heimwerker
+bohrmaschine;;isna;Heimwerker
+bohrmaschine;BOHRMASCHIENEnter;almostcorrect;Heimwerker
+feile;FEILSEBackspaceBackspaceE ;almostcorrect;Heimwerker
+feile;FEIÖEEnter;almostcorrect;Heimwerker
+feile;PFBackspaceBackspaceFEILE ;almostcorrect;Heimwerker
+feile;PFEBackspaceBackspaceFEILEEnter;almostcorrect;Heimwerker
+feile;PFEILE ;almostcorrect;Heimwerker
+feile;PFEILEEnter;almostcorrect;Heimwerker
+feile;REIBEEnter;almostcorrect;Heimwerker
+feile;SPACHTELEnter;almostcorrect;Heimwerker
+feile;FEILE ;correct;Heimwerker
+feile;FEILEEnter;correct;Heimwerker
+feile;OBackspaceFEILEEnter;first_letter_incorrect;Heimwerker
+feile;;isna;Heimwerker
+feile;PFEILEREnter;almostcorrect;Heimwerker
+feile;ZANGEEnter;semantic_relation;Heimwerker
+feile;ControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlControlEnter;unrelated_other;Heimwerker
+feile;schleife ;unrelated_other;Heimwerker
+hammer;HAMER ;almostcorrect;Heimwerker
+hammer; hammer ;backspace_space_enter;Heimwerker
+hammer;HAMMER ;correct;Heimwerker
+hammer;HAMMEREnter;correct;Heimwerker
+hammer;;isna;Heimwerker
+hammer;AXXBackspaceT ;semantic_relation;Heimwerker
+schraubenzieher;SCHRAUBENDREHER ;almostcorrect;Heimwerker
+zange;ZAGEBackspaceBackspaceGBackspaceNGEEnter;almostcorrect;Heimwerker
+zange;ZANGHEBackspaceBackspaceEEnter;almostcorrect;Heimwerker
+zange;ZANGE ;correct;Heimwerker
+zange;ZANGEEnter;correct;Heimwerker
+zange;;isna;Heimwerker
+zange;'Enter;unrelated_other;Heimwerker
+zange;TBackspaceZANGEEnter;first_letter_incorrect;Heimwerker
+kamel;KAEBackspaceMELEnter;almostcorrect;Huftiere
+kamel;KAKBackspaceMEL ;almostcorrect;Huftiere
+kamel;KANBackspaceMELEnter;almostcorrect;Huftiere
+kamel;KAMEL ;correct;Huftiere
+kamel;KAMELEnter;correct;Huftiere
+kuh;kugBackspaceh ;almostcorrect;Huftiere
+kuh;BackspaceEBackspaceKUHEnter;backspace_space_enter;Huftiere
+kuh;KUH ;correct;Huftiere
+kuh;KUHEnter;correct;Huftiere
+pferd;PFERD ;correct;Huftiere
+pferd;PFERDEnter;correct;Huftiere
+pferd;FBackspacePRFERBackspaceBackspaceBackspaceBackspaceFERD ;first_letter_incorrect;Huftiere
+pferd;;isna;Huftiere
+reh;REG ;almostcorrect;Huftiere
+reh;REHEnter';almostcorrect;Huftiere
+reh;REH ;correct;Huftiere
+reh;REHEnter;correct;Huftiere
+reh;;isna;Huftiere
+reh;TIEREnter;semantic_relation;Huftiere
+reh;VIECHEnter;semantic_relation;Huftiere
+reh;ShiftrEHEnter;shift_start;Huftiere
+schaf;LAMMEnter;almostcorrect;Huftiere
+schaf;SCHAAFEnter;almostcorrect;Huftiere
+schaf;SCHAFFBackspace ;almostcorrect;Huftiere
+schaf;SCHFBackspaceAFEnter;almostcorrect;Huftiere
+schaf;SXBackspaceCHAF ;almostcorrect;Huftiere
+schaf;BackspaceSCHAAFBackspaceBackspaceFEnter;backspace_space_enter;Huftiere
+schaf;SCHAF ;correct;Huftiere
+schaf;SCHAFEnter;correct;Huftiere
+schaf;n ;unrelated_other;Huftiere
+schaf;SCHAFBackspaceAF ;almostcorrect;Huftiere
+ameise;"A;EBackspaceBackspaceMEISEEnter";almostcorrect;Insekten
+ameise;amaeisBackspaceBackspaceBackspaceBackspaceeiseEnter;almostcorrect;Insekten
+ameise;AMEISTBackspaceEEnter;almostcorrect;Insekten
+ameise;AMIBackspaceEISEEnter;almostcorrect;Insekten
+ameise;ARMEISEEnter;almostcorrect;Insekten
+ameise;AMEISE ;correct;Insekten
+ameise;AMEISEEnter;correct;Insekten
+ameise;;isna;Insekten
+ameise;INSEKTEnter;semantic_relation;Insekten
+ameise;SPINEBackspaceNEEnter;semantic_relation;Insekten
+biene;NBackspaceBEINEBackspaceBackspaceBackspaceIBackspaceBackspaceIEEBackspaceNEEnter;first_letter_incorrect;Insekten
+biene;HERBackspaceBackspaceBackspaceBIENE ;first_letter_incorrect;Insekten
+fliege;FLEIGEEnter;almostcorrect;Insekten
+fliege;MÜCKE ;almostcorrect;Insekten
+fliege;mückeBackspaceeEnter;almostcorrect;Insekten
+fliege;SBackspaceBackspaceKÄFEREnter;semantic_relation;Insekten
+fliege;FLIEGE ;correct;Insekten
+fliege;FLIEGEEnter;correct;Insekten
+fliege;bBackspacefliege ;first_letter_incorrect;Insekten
+fliege;;isna;Insekten
+marienkäfer;KÄFER ;almostcorrect;Insekten
+marienkäfer;KÄFEREnter;almostcorrect;Insekten
+marienkäfer;MAIBackspaceREBackspaceIENKÄFEREnterEnter;almostcorrect;Insekten
+marienkäfer;MAIRBackspaceBackspaceRIENKÄFEREnter;almostcorrect;Insekten
+marienkäfer;MAIRNEBackspaceBackspaceBackspaceBackspaceRIENKÄFEREnter;almostcorrect;Insekten
+marienkäfer;MARIENKA#BackspaceBackspaceÖBackspaceÄFEREnter;almostcorrect;Insekten
+marienkäfer;MARIENKÄFTBackspaceER ;almostcorrect;Insekten
+marienkäfer;MARIENKÄGERBackspaceBackspaceBackspaceFEREnter;almostcorrect;Insekten
+marienkäfer;MARINBackspaceENKÄFEREnter;almostcorrect;Insekten
+marienkäfer;MARINENKÄFER ;almostcorrect;Insekten
+marienkäfer;MARINENKÖBackspaceÄFEREnter;almostcorrect;Insekten
+marienkäfer;EnterMARIENKÄFEREnter;backspace_space_enter;Insekten
+marienkäfer;MARIENKÄFER ;correct;Insekten
+marienkäfer;MARIENKÄFEREnter;correct;Insekten
+marienkäfer;bBackspacemarienkäfer ;first_letter_incorrect;Insekten
+marienkäfer;;isna;Insekten
+marienkäfer;MARIENLBackspaceKÄFEREnter;almostcorrect;Insekten
+marienkäfer;MAREBackspaceIENKÄFER ;almostcorrect;Insekten
+spinne;SOBackspacePINNE ;almostcorrect;Insekten
+spinne;SPINNNBackspaceE ;almostcorrect;Insekten
+spinne;SPINNE ;correct;Insekten
+spinne;SPINNEEnter;correct;Insekten
+spinne;;isna;Insekten
+geige;GIBackspaceEIGEEnter;almostcorrect;Instrumente
+geige;VIOLINE ;almostcorrect;Instrumente
+geige;VIOLINEnter;almostcorrect;Instrumente
+geige;GEIGE ;correct;Instrumente
+geige;GEIGEEnter;correct;Instrumente
+geige;HEBackspaceBackspaceGEIGEEnter;first_letter_incorrect;Instrumente
+geige;VBackspaceBackspaceGEIGEEnter;first_letter_incorrect;Instrumente
+geige;GITARRBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceGEIGE ;semantic_relation;Instrumente
+gitarre;GEIBackspaceBackspaceBackspaceBackspaceGITARREEnter;semantic_relation;Instrumente
+gitarre;GIRATBackspaceBackspaceBackspaceTARREEnter;almostcorrect;Instrumente
+gitarre;Backspacegitarre ;backspace_space_enter;Instrumente
+gitarre;GITARRE ;correct;Instrumente
+gitarre;GITARREEnter;correct;Instrumente
+gitarre;;isna;Instrumente
+harfe;HAFEBackspaceBackspaceRFE ;almostcorrect;Instrumente
+harfe;HAFEEnter;almostcorrect;Instrumente
+harfe;HARFFBackspaceEEnter;almostcorrect;Instrumente
+harfe;HARFE ;correct;Instrumente
+harfe;HARFEEnter;correct;Instrumente
+harfe;KABackspaceBackspaceHARFE ;first_letter_incorrect;Instrumente
+harfe;;isna;Instrumente
+klavier;KALVIEREnter;almostcorrect;Instrumente
+klavier;KLAIVBackspaceBackspaceVIR ;almostcorrect;Instrumente
+klavier;KLARVIBackspaceBackspaceBackspaceVIER ;almostcorrect;Instrumente
+klavier;KLAVIRBackspaceER ;almostcorrect;Instrumente
+klavier;PIANOEnter;almostcorrect;Instrumente
+klavier;KLAVIER ;correct;Instrumente
+klavier;KLAVIEREnter;correct;Instrumente
+klavier;FBackspaceKLAVIEREnter;first_letter_incorrect;Instrumente
+klavier;ORGBackspaceBackspaceBackspaceKLAVIEREnter;first_letter_incorrect;Instrumente
+klavier;SBackspaceKLAVIEREnter;first_letter_incorrect;Instrumente
+klavier;;isna;Instrumente
+klavier;ShiftkLAVIEREnter;shift_start;Instrumente
+klavier;JBackspaceKLAVIEREnter;first_letter_incorrect;Instrumente
+schlagzeug;SCHABackspaceLAGZEUG ;almostcorrect;Instrumente
+schlagzeug;SCHLAFBackspaceGZEUG ;almostcorrect;Instrumente
+schlagzeug;SCHLAFBackspaceGZEUGEnter;almostcorrect;Instrumente
+schlagzeug;SCHLAHGZEBackspaceBackspaceBackspaceBackspaceGEBackspaceZEUGEnter;almostcorrect;Instrumente
+schlagzeug;SCHLAGZEUG ;correct;Instrumente
+schlagzeug;SCHLAGZEUGEnter;correct;Instrumente
+schlagzeug;;isna;Instrumente
+schlagzeug;TROMMELEnter;semantic_relation;Instrumente
+kapuzenpulli;KAPPUZENPULLOVEREnter;almostcorrect;Jacke
+kapuzenpulli;KAPUTZENPULLIEnter;almostcorrect;Jacke
+kapuzenpulli;PULLIEnter;almostcorrect;Jacke
+kapuzenpulli;PULLOVER ;almostcorrect;Jacke
+kapuzenpulli;PULLOVEREnter;almostcorrect;Jacke
+kapuzenpulli;STRICKJACKE ;semantic_relation;Jacke
+kapuzenpulli;HBackspaceHOODIEEnter;first_letter_incorrect;Jacke
+kapuzenpulli;KAPUZENPULLI ;correct;Jacke
+kapuzenpulli;KAPUZENPULLIEnter;correct;Jacke
+kapuzenpulli;;isna;Jacke
+kapuzenpulli;JACKE ;semantic_relation;Jacke
+kapuzenpulli;JACKEEnter;semantic_relation;Jacke
+kapuzenpulli;MANTEL ;semantic_relation;Jacke
+arztkittel;ABackspaceKITTELEnter;first_letter_incorrect;Jacken
+arztkittel;ATBackspaceRZTKITTELEnter;almostcorrect;Jacken
+arztkittel;AZBackspaceRZTKITTELEnter;almostcorrect;Jacken
+arztkittel;KITTEL ;almostcorrect;Jacken
+arztkittel;KITTELEnter;almostcorrect;Jacken
+arztkittel;ARZTKITTEL ;correct;Jacken
+arztkittel;ARZTKITTELEnter;correct;Jacken
+arztkittel;MBackspaceKITTLBackspaceEL ;first_letter_incorrect;Jacken
+arztkittel;;isna;Jacken
+arztkittel;ANZUGEnter;semantic_relation;Jacken
+arztkittel;MANBackspaceBackspaceBackspaceBackspaceSAKKOEnter;semantic_relation;Jacken
+arztkittel;MANTEL ;semantic_relation;Jacken
+arztkittel;MANTELBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceKITTEL ;semantic_relation;Jacken
+arztkittel;mantelEnter;semantic_relation;Jacken
+arztkittel;ShiftMANTELEnter;shift_start;Jacken
+arztkittel;LABORKITTELEnter;almostcorrect;Jacken
+daunenweste;WEBackspaceBackspaceWESTEEnter;almostcorrect;Jacken
+daunenweste;WESTE ;almostcorrect;Jacken
+daunenweste;WESTEBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceDAUNENWESTE ;almostcorrect;Jacken
+daunenweste;WESTEEnter;almostcorrect;Jacken
+daunenweste;KABackspaceBackspaceBackspaceJACKEEnter;semantic_relation;Jacken
+daunenweste;DAUNENWESTE ;correct;Jacken
+daunenweste;DAUNENWESTEEnter;correct;Jacken
+daunenweste;MABackspaceBackspaceWESTEEnter;first_letter_incorrect;Jacken
+daunenweste;;isna;Jacken
+daunenweste;JACKE ;semantic_relation;Jacken
+daunenweste;VESTEEnter;first_letter_incorrect;Jacken
+daunenweste;DAUNENJACKEEnter;first_letter_incorrect;Jacken
+daunenweste;DAUNENFBackspaceWESTE ;almostcorrect;Jacken
+kapuzenpulli;KJBackspaceBackspaceJACKEEnter;first_letter_incorrect;Jacken
+kapuzenpulli;KAPUZENPULLOVER ;almostcorrect;Jacken
+pelzmantel;MABackspaceBackspacePELZUBackspaceMANTEL ;almostcorrect;Jacken
+pelzmantel;MANTBackspaceBackspaceBackspaceBackspaceELZBackspaceBackspaceBackspacePELZMANTELEnter;almostcorrect;Jacken
+pelzmantel;MANTELBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspacePELZEnter;almostcorrect;Jacken
+pelzmantel;PELZEnter;almostcorrect;Jacken
+pelzmantel;PELZMATELBackspaceBackspaceBackspaceNTEL ;almostcorrect;Jacken
+pelzmantel;BackspaceMANTELEnter;backspace_space_enter;Jacken
+pelzmantel;PELZMANTEL ;correct;Jacken
+pelzmantel;PELZMANTELEnter;correct;Jacken
+pelzmantel;EBackspacePELZEnter;first_letter_incorrect;Jacken
+pelzmantel;;isna;Jacken
+pelzmantel;MANTEL ;almostcorrect;Jacken
+pelzmantel;mantelEnter;almostcorrect;Jacken
+pelzmantel;JACKEEnter;semantic_relation;Jacken
+sakko;JACKET ;almostcorrect;Jacken
+sakko;JACKETTEnter;almostcorrect;Jacken
+sakko;MABackspaceBackspacePELZABackspaceMANTELEnter;semantic_relation;Jacken
+sakko;SAKKO ;correct;Jacken
+sakko;SAKKOEnter;correct;Jacken
+sakko;FBackspaceSAKKOEnter;first_letter_incorrect;Jacken
+sakko;MABackspaceBackspaceSAKKO ;first_letter_incorrect;Jacken
+sakko;ANZUG ;almostcorrect;Jacken
+sakko;ANZUGEnter;almostcorrect;Jacken
+sakko;JACKE ;semantic_relation;Jacken
+sakko;MANTELEnter;semantic_relation;Jacken
+sakko;JACBackspaceBackspaceBackspaceBackspaceBackspaceSAKKOEnter;first_letter_incorrect;Jacken
+sakko;ABackspaceSAKKO ;first_letter_incorrect;Jacken
+käfig;HAMSTERKÄFIGEnter;almostcorrect;Käfig
+käfig;HAMSTERKÄFIOGEnter;almostcorrect;Käfig
+käfig;KÄFIGBackspaceG ;almostcorrect;Käfig
+käfig;KÄFIG ;correct;Käfig
+käfig;KÄFIGEnter;correct;Käfig
+käfig;HBackspaceKÄFIGEnter;first_letter_incorrect;Käfig
+käfig;;isna;Käfig
+gabel;GEBLEBackspaceBackspaceBackspaceBackspaceABELEnter;almostcorrect;Kochen
+gabel;BackspaceBackspaceGABELEnter;backspace_space_enter;Kochen
+gabel;GABEL ;correct;Kochen
+gabel;GABELEnter;correct;Kochen
+gabel;EBackspaceGABEL ;first_letter_incorrect;Kochen
+gabel;HBackspaceFABackspaceBackspaceGABELLBackspace ;first_letter_incorrect;Kochen
+gabel;GABELEnter*;almostcorrect;Kochen
+kelle;KEKLBackspaceBackspaceLLE ;almostcorrect;Kochen
+kelle;SUPPControlAKELLE ;almostcorrect;Kochen
+kelle;KELLE ;correct;Kochen
+kelle;KELLEEnter;correct;Kochen
+kelle;;isna;Kochen
+kelle;KESSELEnter;unrelated_other;Kochen
+kelle;LÖFFEL ;semantic_relation;Kochen
+löffel;LÄBackspaceÖFFEL ;almostcorrect;Kochen
+löffel;LÖFFEÖBackspaceL ;almostcorrect;Kochen
+löffel;LÖFFEÖBackspaceLEnter;almostcorrect;Kochen
+löffel;LÖGGEBackspaceBackspaceBackspaceFFEL ;almostcorrect;Kochen
+löffel;LÖFFEL ;correct;Kochen
+löffel;LÖFFELEnter;correct;Kochen
+löffel;ETTEBackspaceBackspaceBackspaceBackspaceBackspaceGABELEnter;semantic_relation;Kochen
+löffel;GABELBackspaceBackspaceBackspaceBackspaceBackspaceKBackspaceLÖFFELEnter;semantic_relation;Kochen
+löffel;KBackspaceBackspaceLÖFFFBackspaceEL ;first_letter_incorrect;Kochen
+löffel;ZBackspaceBackspaceBackspaceBackspaceLÖFFELEnter;first_letter_incorrect;Kochen
+löffel;;isna;Kochen
+messer;EnterMESSEREnter;backspace_space_enter;Kochen
+messer;MESSER ;correct;Kochen
+messer;MESSEREnter;correct;Kochen
+messer;BBackspaceMESSER ;first_letter_incorrect;Kochen
+schneebesen;MIXEREnter;almostcorrect;Kochen
+schneebesen;QUIRLLEnter;almostcorrect;Kochen
+schneebesen;RÜHRBESENEnter;almostcorrect;Kochen
+schneebesen;SCHNEEBÄSENEnter;almostcorrect;Kochen
+schneebesen;SCHNEEBESEEnter;almostcorrect;Kochen
+schneebesen;SCHNEEBESEN ;correct;Kochen
+schneebesen;SCHNEEBESENEnter;correct;Kochen
+schneebesen;BBackspaceSCHNEEBESEN ;first_letter_incorrect;Kochen
+schneebesen;BEBackspaceBackspaceBESEN ;first_letter_incorrect;Kochen
+schneebesen;;isna;Kochen
+arm;AARBackspaceBackspaceRMEnter;almostcorrect;Körperteile
+arm;ARM ;correct;Körperteile
+arm;ARMEnter;correct;Körperteile
+arm;BackspaceARM ;backspace_space_enter;Körperteile
+arm;TBackspaceBackspaceBackspaceARMEnter;first_letter_incorrect;Körperteile
+bein; BackspaceBEIN ;backspace_space_enter;Körperteile
+bein;BEIN ;correct;Körperteile
+bein;BEINEnter;correct;Körperteile
+bein;fBackspaceBackspacebeinEnter;first_letter_incorrect;Körperteile
+bein;FBackspaceBEIN ;first_letter_incorrect;Körperteile
+bein;FUBackspaceBackspaceBEINEnter;first_letter_incorrect;Körperteile
+bein;;isna;Körperteile
+bein;FUSSBackspaceBackspaceBackspaceBackspaceBEIN ;semantic_relation;Körperteile
+bein;FUSEnter;semantic_relation;Körperteile
+besen;BESSENBackspaceBackspaceBackspaceENEnter;almostcorrect;Körperteile
+fuss;FPBackspaceUDeadDeadBackspaceBackspace?=BackspaceBackspaceDeadEnterABackspaceBackspaceSSEnter;almostcorrect;Körperteile
+fuss;FU? ;almostcorrect;Körperteile
+fuss;FU?BackspaceSBackspace=Backspace?Backspace ;almostcorrect;Körperteile
+fuss;FU?BackspaceSS ;almostcorrect;Körperteile
+fuss;FU?BackspaceSSEnter;almostcorrect;Körperteile
+fuss;FU?Enter;almostcorrect;Körperteile
+fuss;FUSS ;correct;Körperteile
+fuss;FUSSEnter;correct;Körperteile
+fuss;;isna;Körperteile
+hand;HAND ;correct;Körperteile
+hand;HANDEnter;correct;Körperteile
+hand;JABackspaceBackspaceHAMNDBackspaceBackspaceBackspaceMBackspaceND ;first_letter_incorrect;Körperteile
+hand;KBackspaceHANDEnter;first_letter_incorrect;Körperteile
+hand;ZIEHBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceHANDEnter;first_letter_incorrect;Körperteile
+hand;ARMEnter;semantic_relation;Körperteile
+ohr;OHR ;correct;Körperteile
+ohr;OHREnter;correct;Körperteile
+ohr;KOBackspaceBackspaceBackspaceOHR ;first_letter_incorrect;Körperteile
+ohr;KOCHBackspaceBackspaceBackspaceBackspaceOHREnter;first_letter_incorrect;Körperteile
+geschirrspüler;GESCHIRR ;semantic_relation;Küche
+geschirrspüler;GESCHIRRSOBackspacePÜHLEREnter;almostcorrect;Küche
+geschirrspüler;GESCHIRRSPÜHLEREnter;almostcorrect;Küche
+geschirrspüler;GESCHIRRWASCBackspaceBackspaceBackspaceBackspaceMASCHINE ;almostcorrect;Küche
+geschirrspüler;GESCHRBackspaceIRRSPÜLEREnter;almostcorrect;Küche
+geschirrspüler;SOBackspacePÜLEREnter;almostcorrect;Küche
+geschirrspüler;SPBackspacePÜHLMASCHINE ;almostcorrect;Küche
+geschirrspüler;spülmaschieneEnter;almostcorrect;Küche
+geschirrspüler;SPÜLMASCHINE ;almostcorrect;Küche
+geschirrspüler;SPÜLMASCHINEEnter;almostcorrect;Küche
+geschirrspüler;SPÜLMASCINEEnter;almostcorrect;Küche
+geschirrspüler;spülsBackspacemaschine ;almostcorrect;Küche
+geschirrspüler;GESCHIRRSPÜLEREnter;correct;Küche
+geschirrspüler;WBackspaceSPÜLMASCHINEEnter;first_letter_incorrect;Küche
+geschirrspüler;;isna;Küche
+geschirrspüler;SPÜHLMASCHINE ;almostcorrect;Küche
+herd;HERDPLATTEEnter;almostcorrect;Küche
+herd;OBackspaceOFENEnter;first_letter_incorrect;Küche
+herd;OFENEnter;almostcorrect;Küche
+herd;OFENPLATTEEnter;almostcorrect;Küche
+herd;HERD ;correct;Küche
+herd;HERDEnter;correct;Küche
+herd;GBackspaceHERDEnter;first_letter_incorrect;Küche
+herd;;isna;Küche
+herd;ERDEnter;unrelated_other;Küche
+kaffeemaschine;KAFEEMASCHINEEnter;almostcorrect;Küche
+kaffeemaschine;KAFEMASCHINEArrowLeftArrowLeftArrowLeftArrowLeftArrowLeftArrowLeftArrowLeftEnter;almostcorrect;Küche
+kaffeemaschine;KAFFEEABackspaceMASCHINEEnter;almostcorrect;Küche
+kaffeemaschine;kaffeemaschineneEnter;almostcorrect;Küche
+kaffeemaschine;KAFFEEMASCHNINEEnter;almostcorrect;Küche
+kaffeemaschine;KAFFEMASCHINEEnter;almostcorrect;Küche
+kaffeemaschine;KAFFEEMASCHINE ;correct;Küche
+kaffeemaschine;KAFFEEMASCHINEEnter;correct;Küche
+kaffeemaschine;MEBackspaceBackspaceKAFFE ;first_letter_incorrect;Küche
+kaffeemaschine;tBackspacekaffeemaschine ;first_letter_incorrect;Küche
+kaffeemaschine;;isna;Küche
+kaffeemaschine;KAFFEEEnter;semantic_relation;Küche
+kaffeemaschine;KAFFEMASCHINE ;almostcorrect;Küche
+kaffeemaschine;KAFFEEEMBackspaceBackspaceMASCHINE ;almostcorrect;Küche
+kühlschrank;GEFRIERSCHRANK ;almostcorrect;Küche
+kühlschrank;KÜHLSCHGRANBackspaceBackspaceBackspaceBackspaceRANK ;almostcorrect;Küche
+kühlschrank;KUHLSCHRANKEnter;almostcorrect;Küche
+kühlschrank;KÜSCHBackspaceBackspaceBackspaceHLSCHRANKEnter;almostcorrect;Küche
+kühlschrank;KÜHLSCHRANK ;correct;Küche
+kühlschrank;KÜHLSCHRANKEnter;correct;Küche
+kühlschrank;;isna;Küche
+mikrowelle;m,BackspaceikrosBackspacewelleEnter;almostcorrect;Küche
+mikrowelle;MIKROEWBackspaceBackspaceWELLE ;almostcorrect;Küche
+mikrowelle;MIKROFBackspaceWELLEEnter;almostcorrect;Küche
+mikrowelle;MIKROWELEBackspaceLE ;almostcorrect;Küche
+mikrowelle;MIKRWBackspaceOWELLEEnter;almostcorrect;Küche
+mikrowelle;MIRBackspaceKORBackspaceBackspaceBackspaceRBackspaceKROWELLEEnterEnter;almostcorrect;Küche
+mikrowelle;MIRBackspaceKROWELLEEnter;almostcorrect;Küche
+mikrowelle;MIRKOWELLEEnter;almostcorrect;Küche
+mikrowelle;MIKROWELLE ;correct;Küche
+mikrowelle;MIKROWELLEEnter;correct;Küche
+mikrowelle;BBackspaceMIKROWELLE ;first_letter_incorrect;Küche
+mikrowelle;;isna;Küche
+apfel;APFEKBackspaceLEnter;almostcorrect;Obst
+apfel;APFEL ;correct;Obst
+apfel;APFELEnter;correct;Obst
+apfel;RBackspaceAPFEL ;first_letter_incorrect;Obst
+apfel;EBackspaceAPFEL ;first_letter_incorrect;Obst
+banane;BABABackspaceBackspaceNANEEnter;almostcorrect;Obst
+banane;BANANABackspaceEEnter;almostcorrect;Obst
+banane;BANANENBackspaceBackspaceBackspaceNEEnter;almostcorrect;Obst
+banane;BANEBackspaceANE ;almostcorrect;Obst
+banane;BNBackspaceBackspaceBANANEEnter;almostcorrect;Obst
+banane;BANANE ;correct;Obst
+banane;BANANEEnter;correct;Obst
+banane;ABBackspaceBackspaceBANANEEnter;first_letter_incorrect;Obst
+banane;NBackspaceBANANEEnter;first_letter_incorrect;Obst
+birne;brBackspaceirneEnter;almostcorrect;Obst
+birne;BRINBackspaceBackspaceBackspaceIRNEEnter;almostcorrect;Obst
+birne;BIRNE ;correct;Obst
+birne;BIRNEEnter;correct;Obst
+birne;;isna;Obst
+birne;BIRENEnter;almostcorrect;Obst
+kirsche;KIEBackspaceRSCHEEnter;almostcorrect;Obst
+kirsche;kirsBackspacecheEnter;almostcorrect;Obst
+kirsche;KIRSBackspaceSCHEEnter;almostcorrect;Obst
+kirsche;KIRSHCEnter;almostcorrect;Obst
+kirsche;KIRSCHE ;correct;Obst
+kirsche;KIRSCHEEnter;correct;Obst
+kirsche;BBackspaceKIRSCHE ;first_letter_incorrect;Obst
+kirsche;TBackspaceKIRSCHEEnter;first_letter_incorrect;Obst
+kirsche;;isna;Obst
+trauben;TABackspaceRAUBE ;almostcorrect;Obst
+trauben;TRABEBackspaceBackspaceUIBBackspaceBackspaceBENEnter;almostcorrect;Obst
+trauben;TRAUBE ;almostcorrect;Obst
+trauben;TRAUBEEnter;almostcorrect;Obst
+trauben;TRBackspaceRAUBEN ;almostcorrect;Obst
+trauben;TRUABackspaceBackspaceAUBEN ;almostcorrect;Obst
+trauben;TRUAEBackspaceBBackspaceBackspaceBENEnter;almostcorrect;Obst
+trauben;WEINTRAUBENEnter;almostcorrect;Obst
+trauben;TRAUBEN ;correct;Obst
+trauben;TRAUBENEnter;correct;Obst
+trauben;BBackspaceTRAUBENEnter;first_letter_incorrect;Obst
+trauben;;isna;Obst
+trauben;TBackspaceWEINTRAUBENEnter;first_letter_incorrect;Obst
+trauben;WEINTRAUBEN ;almostcorrect;Obst
+bär;BABackspaceÄR ;almostcorrect;Raubtiere
+bär;BÄREnterEnter BackspaceEnterBackspaceBackspaceBackspaceBÄREnterEnterEnterEnter ;almostcorrect;Raubtiere
+bär;BÄT ;almostcorrect;Raubtiere
+bär;BÖRBackspaceBackspaceÄREnter;almostcorrect;Raubtiere
+bär;BRBackspaceÄREnter;almostcorrect;Raubtiere
+bär;BÄR ;correct;Raubtiere
+bär;BÄREnter;correct;Raubtiere
+bär;KOCHBackspaceBackspaceBackspaceBackspaceBackspaceBÄREnter;first_letter_incorrect;Raubtiere
+bär;BÄEnter;almostcorrect;Raubtiere
+bär;NBackspaceBÄR ;first_letter_incorrect;Raubtiere
+leopard;LEOPARD ;correct;Raubtiere
+leopard;LEOPARDEnter;correct;Raubtiere
+leopard;PBackspaceLEOPARD ;first_letter_incorrect;Raubtiere
+leopard;GEPARD ;almostcorrect;Raubtiere
+leopard;JAGUAREnter;almostcorrect;Raubtiere
+leopard;PUMA ;almostcorrect;Raubtiere
+leopard;PUMAEnter;almostcorrect;Raubtiere
+leopard;TIGER ;semantic_relation;Raubtiere
+leopard;TIGEREnter;semantic_relation;Raubtiere
+leopard;TBackspacePUMAEnter;first_letter_incorrect;Raubtiere
+löwe;LÄWBackspaceBackspaceÖWE ;almostcorrect;Raubtiere
+löwe;LOBackspaceÄBackspaceÖWEEnter;almostcorrect;Raubtiere
+löwe;LÖRBackspaceWEEnter;almostcorrect;Raubtiere
+löwe;LÖWWBackspaceWBackspaceE ;almostcorrect;Raubtiere
+löwe;LÖWWEBackspaceBackspaceEEnter;almostcorrect;Raubtiere
+löwe;LÖWE ;correct;Raubtiere
+löwe;LÖWEEnter;correct;Raubtiere
+löwe;ÄBackspaceLÖWE ;first_letter_incorrect;Raubtiere
+löwe;ÖFFELBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceLÖWEEnter;first_letter_incorrect;Raubtiere
+löwe;PPARABackspaceBackspaceBackspaceBackspaceBackspaceLÖWEEnter;first_letter_incorrect;Raubtiere
+löwe;TIBackspaceBackspaceLÖWE ;first_letter_incorrect;Raubtiere
+löwe;TIBackspaceBackspaceLÖWEEnter;first_letter_incorrect;Raubtiere
+löwe;;isna;Raubtiere
+löwe;LÖEBackspaceWEEnter;almostcorrect;Raubtiere
+panther;PANTHRBackspaceEREnter;almostcorrect;Raubtiere
+panther;PUBackspaceANTHEREnter;almostcorrect;Raubtiere
+panther;GEBackspaceBackspacePUPBackspaceMA ;semantic_relation;Raubtiere
+panther;PANTHER ;correct;Raubtiere
+panther;PANTHEREnter;correct;Raubtiere
+panther;TEBackspaceBackspaceBackspaceÜABackspaceBackspacePANTHER ;first_letter_incorrect;Raubtiere
+panther;GEPARDEnter;almostcorrect;Raubtiere
+panther;JAGUAREnter;almostcorrect;Raubtiere
+panther;PUMA ;almostcorrect;Raubtiere
+panther;PUMAEnter;almostcorrect;Raubtiere
+panther;NGEnter;unrelated_other;Raubtiere
+tiger;TIFER ;almostcorrect;Raubtiere
+tiger;TIFEREnter;almostcorrect;Raubtiere
+tiger;TIGER ;correct;Raubtiere
+tiger;TIGEREnter;correct;Raubtiere
+tiger;RBackspaceTIGEREnter;first_letter_incorrect;Raubtiere
+tiger;;isna;Raubtiere
+tiger;löweEnter;semantic_relation;Raubtiere
+armband;ARMABBackspaceBackspaceBAND ;almostcorrect;Schmuck
+armband;ARMKETTE ;almostcorrect;Schmuck
+armband;ARMREIFEnter;almostcorrect;Schmuck
+armband;HBackspaceKETTE ;semantic_relation;Schmuck
+armband;ARMBAND ;correct;Schmuck
+armband;ARMBANDEnter;correct;Schmuck
+armband;;isna;Schmuck
+armband;KETBackspaceBackspaceBackspaceARMBANDEnter;semantic_relation;Schmuck
+armband;KETTE ;semantic_relation;Schmuck
+armband;KETTEEnter;semantic_relation;Schmuck
+brosche;BROSSCHBackspaceBackspaceBackspaceCHEEnter;almostcorrect;Schmuck
+brosche;GESCHIRR ;unrelated_other;Schmuck
+brosche;BROSCHE ;correct;Schmuck
+brosche;BROSCHEEnter;correct;Schmuck
+brosche;;isna;Schmuck
+brosche;DIADEM ;almostcorrect;Schmuck
+brosche;haarspange ;almostcorrect;Schmuck
+brosche;JUControlASCHMUCK ;almostcorrect;Schmuck
+brosche;JUWELENEnter;almostcorrect;Schmuck
+brosche;KETTE ;semantic_relation;Schmuck
+brosche;KETTEEnter;semantic_relation;Schmuck
+brosche;ohrring ;almostcorrect;Schmuck
+brosche;OHRRINGEnter;almostcorrect;Schmuck
+brosche;SCHMUCHBackspaceLBackspaceK ;almostcorrect;Schmuck
+brosche;SCHMUCK ;almostcorrect;Schmuck
+brosche;SCHMUCKEnter;almostcorrect;Schmuck
+brosche;ARMBAND ;semantic_relation;Schmuck
+burg;BUGBackspaceRGEnter;almostcorrect;Schmuck
+kette;HALSKETTE ;almostcorrect;Schmuck
+kette;KETEBackspaceTEEnter;almostcorrect;Schmuck
+kette;PERLENKETTE ;almostcorrect;Schmuck
+kette;KETTE ;correct;Schmuck
+kette;KETTEEnter;correct;Schmuck
+kette;WEEnter;unrelated_other;Schmuck
+ohrring;ORHBackspaceBackspaceHRRIGNBackspaceBackspaceNG ;almostcorrect;Schmuck
+ohrring;OHRRING ;correct;Schmuck
+ohrring;OHRRINGEnter;correct;Schmuck
+ohrring;PBackspaceOHRRING ;first_letter_incorrect;Schmuck
+ohrring;;isna;Schmuck
+ohrring;SCHMUCK ;semantic_relation;Schmuck
+ring;RING ;correct;Schmuck
+ring;RINGEnter;correct;Schmuck
+schraubenzieher;SCHABackspaceRAUBENZIEHEREnter;almostcorrect;Schraubendreher
+schraubenzieher;SCHRAUBENZEIBackspaceBackspaceIEHER ;almostcorrect;Schraubendreher
+schraubenzieher;SCHRAUBENZIBackspaceBackspaceDREHEREnter;almostcorrect;Schraubendreher
+schraubenzieher;SCHRAUBENZIEHENBackspaceR ;almostcorrect;Schraubendreher
+schraubenzieher;schraubenzuiBackspaceBackspaceBackspacezieherEnter;almostcorrect;Schraubendreher
+schraubenzieher;SCHRAUBUIBackspaceBackspaceZIEHER ;almostcorrect;Schraubendreher
+schraubenzieher;SCHREBackspaceAUBENZIEHEEnter;almostcorrect;Schraubendreher
+schraubenzieher;SCHREIBENZIEHER ;almostcorrect;Schraubendreher
+schraubenzieher;EnterSCHRAUBENZIEHEREnter;backspace_space_enter;Schraubendreher
+schraubenzieher;SCHRAUBENZIEHER ;correct;Schraubendreher
+schraubenzieher;SCHRAUBENZIEHEREnter;correct;Schraubendreher
+schraubenzieher;;isna;Schraubendreher
+bank;BANEnter;almostcorrect;Sitzen
+bank;BANKÄBackspaceEnter;almostcorrect;Sitzen
+bank;BRBackspaceANKEnter;almostcorrect;Sitzen
+bank;BANK ;correct;Sitzen
+bank;BANKEnter;correct;Sitzen
+bank;GBackspaceBANKEnter;first_letter_incorrect;Sitzen
+bank;SBackspaceNABackspaceBackspaceBANK ;first_letter_incorrect;Sitzen
+bank;SBBackspaceBackspaceBANKEnter;first_letter_incorrect;Sitzen
+couch;CHOBackspaceBackspaceOUCHEnter;almostcorrect;Sitzen
+couch;CHOUCBackspaceBackspaceBackspaceBackspaceOUCHEnter;almostcorrect;Sitzen
+couch;COIBackspaceUCHGBackspace ;almostcorrect;Sitzen
+couch;COUUCHBackspaceBackspaceBackspaceCHEnter;almostcorrect;Sitzen
+couch;LEDERCOUCHEnter;almostcorrect;Sitzen
+couch;SFABackspaceBackspaceOFAEnter;almostcorrect;Sitzen
+couch;SOFA ;almostcorrect;Sitzen
+couch;SOFAEnter;almostcorrect;Sitzen
+couch;SOFBackspaceBackspaceBackspaceBackspaceCOUCHEnter;almostcorrect;Sitzen
+couch;couch ;correct;Sitzen
+couch;COUCHEnter;correct;Sitzen
+couch;KBackspaceCIBackspaceUBackspaceOUCHEnter;first_letter_incorrect;Sitzen
+couch;VBackspaceCOUCH ;first_letter_incorrect;Sitzen
+couch;ShiftcouchEnter;shift_start;Sitzen
+couch;COUHCBackspaceBackspaceCHEnter;almostcorrect;Sitzen
+hocker;HOCERBackspaceBackspaceKEREnter;almostcorrect;Sitzen
+hocker;HOCHBackspaceBackspaceCKER ;almostcorrect;Sitzen
+hocker;HOCHERBackspaceBackspaceBackspaceKER ;almostcorrect;Sitzen
+hocker;HOCJERBackspaceBackspaceBackspaceKEREnter;almostcorrect;Sitzen
+hocker;STUBackspaceBackspaceBackspaceHOCKER ;semantic_relation;Sitzen
+hocker;STUHL ;semantic_relation;Sitzen
+hocker;STUHLEnter;semantic_relation;Sitzen
+hocker;EnterControlShiftentShifteEnter;backspace_space_enter;Sitzen
+hocker;HOCKER ;correct;Sitzen
+hocker;HOCKEREnter;correct;Sitzen
+hocker;KOCBackspaceBackspaceBackspaceHOCKEREnter;first_letter_incorrect;Sitzen
+hocker;SBackspaceHOCKEREnter;first_letter_incorrect;Sitzen
+hocker;;isna;Sitzen
+sessel;SELBackspaceSSEL ;almostcorrect;Sitzen
+sessel;SELSBackspaceBackspaceSSEL ;almostcorrect;Sitzen
+sessel;SESSEÖLBackspaceBackspaceLEnter;almostcorrect;Sitzen
+sessel;STUHLEnter;semantic_relation;Sitzen
+sessel;STIBackspaceUHL ;semantic_relation;Sitzen
+sessel;SESSEL ;correct;Sitzen
+sessel;SESSELEnter;correct;Sitzen
+sessel;SBackspaceSELSSBackspaceBackspaceBackspaceSSELEnter;first_letter_incorrect;Sitzen
+sessel;ShiftsESSELEnter;shift_start;Sitzen
+sessel;VOGELEnter;unrelated_other;Sitzen
+sessel;STIBackspaceUHLEnter;semantic_relation;Sitzen
+stuhl;STUHL ;correct;Sitzen
+stuhl;STUHLEnter;correct;Sitzen
+stuhl;STUHÖBackspaceLEnter;almostcorrect;Sitzen
+stuhl;KBackspaceSTUHLEnter;first_letter_incorrect;Sitzen
+stuhl;KBackspaceSUHLBackspaceBackspaceBackspaceTUHLEnter;first_letter_incorrect;Sitzen
+stuhl;TBackspaceSTUHL ;first_letter_incorrect;Sitzen
+stuhl;ZBackspaceSTUGHLBackspaceBackspaceBackspaceHL ;first_letter_incorrect;Sitzen
+auto;autopBackspaceEnter;almostcorrect;Straße
+auto;AUTPBackspaceO ;almostcorrect;Straße
+auto;AUTO ;correct;Straße
+auto;AUTOEnter;correct;Straße
+auto;UBackspaceAUTOEnter;first_letter_incorrect;Straße
+auto;Shiftauto ;shift_start;Straße
+bus;BBUSEnter;almostcorrect;Straße
+bus;BUS ;correct;Straße
+bus;BUSEnter;correct;Straße
+kutsche;KUTZBackspaceSCHGEBackspaceBackspaceE ;almostcorrect;Straße
+kutsche;KUTSCHE ;correct;Straße
+kutsche;KUTSCHEEnter;correct;Straße
+kutsche;HARANBackspaceBackspaceBackspaceBackspaceBackspaceKUSCHEEnter;unrelated_other;Straße
+kutsche;JBackspaceKUTSCHE ;first_letter_incorrect;Straße
+kutsche;autoBackspaceBackspaceBackspaceBackspaceBackspaceBackspacekurBackspacetscheEnter;semantic_relation;Straße
+kutsche;AUTOEnter;semantic_relation;Straße
+kutsche;EnterEnter;unrelated_other;Straße
+kutsche;KURSBackspaceBackspaceTSCHE ;almostcorrect;Strasse
+lkw;LASTWAGENEnter;almostcorrect;Straße
+lkw;LLWBackspaceKW ;almostcorrect;Straße
+lkw;BackspaceLKW ;backspace_space_enter;Straße
+lkw;LKW ;correct;Straße
+lkw;LKWEnter;correct;Straße
+lkw;;isna;Straße
+lkw;ShiftlkwEnter;shift_start;Straße
+motorrad;MORBackspaceTORRAD ;almostcorrect;Straße
+motorrad;MOTORADEnter;almostcorrect;Straße
+motorrad;motorrafBackspaced ;almostcorrect;Straße
+motorrad;MOTPBackspaceOTTADBackspaceBackspaceBackspaceBackspaceRRADEnter;almostcorrect;Straße
+motorrad;MOTTBackspaceORRADEnter;almostcorrect;Straße
+motorrad;MOTTRBackspaceORRAD ;almostcorrect;Straße
+motorrad;MOTORRAD ;correct;Straße
+motorrad;MOTORRADEnter;correct;Straße
+bonbon;BIBackspaceONBONEnter;almostcorrect;Süßigkeiten
+bonbon;bobBackspacenbon ;almostcorrect;Süßigkeiten
+bonbon;BOBBackspaceNBONEnter;almostcorrect;Süßigkeiten
+bonbon;BOBNBackspaceBackspaceNBONEnter;almostcorrect;Süßigkeiten
+bonbon;BONBONNBackspace ;almostcorrect;Süßigkeiten
+bonbon;bonoBackspacebonEnter;almostcorrect;Süßigkeiten
+bonbon;BONBON ;correct;Süßigkeiten
+bonbon;BONBONEnter;correct;Süßigkeiten
+bonbon;RBackspaceBONBONEnter;first_letter_incorrect;Süßigkeiten
+bonbon;;isna;Süßigkeiten
+bonbon;BOMBackspaceNBONEnter;almostcorrect;Süssigkeiten
+eis;EIS ;correct;Süßigkeiten
+eis;EISEnter;correct;Süßigkeiten
+eis;WISEnter;first_letter_incorrect;Süßigkeiten
+kekse;KEKBackspaceBackspaceEKSEEnter;almostcorrect;Süßigkeiten
+kekse;keks ;almostcorrect;Süßigkeiten
+kekse;KEKSEnter;almostcorrect;Süßigkeiten
+kekse;KESBackspaceLSEBackspaceBackspaceBackspaceKSEEnter;almostcorrect;Süßigkeiten
+kekse;KEKSE ;correct;Süßigkeiten
+kekse;KEKSEEnter;correct;Süßigkeiten
+kekse;;isna;Süßigkeiten
+kuchen;KUCBackspaceBackspaceBackspaceTORTEEnter;almostcorrect;Süßigkeiten
+kuchen;KUCHE N;almostcorrect;Süßigkeiten
+kuchen;KUCHEEnter;almostcorrect;Süßigkeiten
+kuchen;KUICBackspaceBackspaceCHEN ;almostcorrect;Süßigkeiten
+kuchen;TORTE ;almostcorrect;Süßigkeiten
+kuchen;TORTEEnter;almostcorrect;Süßigkeiten
+kuchen; KUCHEN ;backspace_space_enter;Süßigkeiten
+kuchen;KUCHEN ;correct;Süßigkeiten
+kuchen;KUCHENEnter;correct;Süßigkeiten
+kuchen;KBackspaceTORTEEnter;first_letter_incorrect;Süßigkeiten
+schokolade;SCHJOBackspaceBackspaceOKOLOADEBackspaceBackspaceBackspaceBackspaceADEEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOKOLADEBackspaceEEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOKOLADEWEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOKOLAFBackspaceDEEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOKOÖABackspaceBackspaceLADEEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOOBackspaceKOLADEEnter;almostcorrect;Süßigkeiten
+schokolade;shcBackspaceBackspacechokoladeEnter;almostcorrect;Süßigkeiten
+schokolade;SCHOKOLADE ;correct;Süßigkeiten
+schokolade;SCHOKOLADEEnter;correct;Süßigkeiten
+schokolade;ASBackspaceBackspaceSCHOKOLADE ;first_letter_incorrect;Süßigkeiten
+schokolade;HEBackspaceBackspaceSCHOKOÖADEBackspaceBackspaceBackspaceBackspaceLADE ;first_letter_incorrect;Süßigkeiten
+schokolade; SCHOKOLADE ;backspace_space_enter;Süssigkeiten
+becher;BECEBackspaceHEREnter;almostcorrect;Trinkgefäße
+becher;BECHER ;correct;Trinkgefäße
+becher;BECHEREnter;correct;Trinkgefäße
+becher;MBackspaceBECHEREnter;first_letter_incorrect;Trinkgefäße
+becher;sBackspacebecherEnter;first_letter_incorrect;Trinkgefäße
+becher;TABackspaceBackspaceBackspaceBECHEREnter;first_letter_incorrect;Trinkgefäße
+becher;;isna;Trinkgefäße
+becher;EIMEREnter;semantic_relation;Trinkgefäße
+becher;TOPF ;semantic_relation;Trinkgefäße
+becher;PBackspaceBESCBackspaceBackspaceCHER ;first_letter_incorrect;Trinkgefässe
+flasche;falscheEnter;almostcorrect;Trinkgefäße
+flasche;FLACSBackspaceBackspaceSCHE ;almostcorrect;Trinkgefäße
+flasche;fladBackspacesche ;almostcorrect;Trinkgefäße
+flasche;FLASCHENBackspace ;almostcorrect;Trinkgefäße
+flasche;FLSBackspaceASCHE ;almostcorrect;Trinkgefäße
+flasche;GLASFLASCHEEnter;almostcorrect;Trinkgefäße
+flasche;BackspaceFLASCHEEnter;backspace_space_enter;Trinkgefäße
+flasche;FLASCHE ;correct;Trinkgefäße
+flasche;FLASCHEEnter;correct;Trinkgefäße
+flasche;GBackspaceFLASCHE ;first_letter_incorrect;Trinkgefäße
+flasche;;isna;Trinkgefäße
+flasche;GLASEnter;semantic_relation;Trinkgefäße
+flasche;FLASCHEnter;almostcorrect;Trinkgefässe
+glas;galsEnter;almostcorrect;Trinkgefäße
+glas;GLASSEnter;almostcorrect;Trinkgefäße
+glas;GLAS ;correct;Trinkgefäße
+glas;GLASEnter;correct;Trinkgefäße
+glas;BBackspaceGLASEnter;first_letter_incorrect;Trinkgefäße
+glas;HBackspaceGLASEnter;first_letter_incorrect;Trinkgefäße
+glas;KBackspaceGLAS ;first_letter_incorrect;Trinkgefäße
+kanne;KEBackspaceBackspaceTEEKANNEEnter;first_letter_incorrect;Trinkgefäße
+kanne;teekanne ;almostcorrect;Trinkgefäße
+kanne;TEEKANNEEnter;almostcorrect;Trinkgefäße
+kanne;KANNE ;correct;Trinkgefäße
+kanne;KANNEEnter;correct;Trinkgefäße
+kanne;KBackspaceTEEKANNEEnter;first_letter_incorrect;Trinkgefäße
+kanne;;isna;Trinkgefäße
+tasse;BECHEREnter;almostcorrect;Trinkgefäße
+tasse;TRABackspaceBackspaceASSEEnter;almostcorrect;Trinkgefäße
+tasse;TSSEBackspaceBackspaceBackspaceASSEEnter;almostcorrect;Trinkgefäße
+tasse;TASSE ;correct;Trinkgefäße
+tasse;TASSEEnter;correct;Trinkgefäße
+tasse;BBackspaceTASSE ;first_letter_incorrect;Trinkgefäße
+tasse;BBackspaceTASSEEnter;first_letter_incorrect;Trinkgefäße
+tasse;SBackspaceTASSEEnter;first_letter_incorrect;Trinkgefäße
+tasse;TBackspaceTASSEEnter;first_letter_incorrect;Trinkgefässe
+tasse;BECHER ;almostcorrect;Trinkgefässe
+ente;ENBackspaceBackspaceENTEEnter;almostcorrect;Vögel
+ente;ENTE ;correct;Vögel
+ente;ENTEEnter;correct;Vögel
+ente;;isna;Vögel
+eule;EIBackspaceIBackspaceULE ;almostcorrect;Vögel
+eule;ELE ;almostcorrect;Vögel
+eule;EUELBackspaceBackspaceLEEnter;almostcorrect;Vögel
+eule;EUKLEBackspaceBackspaceBackspaceLEEnter;almostcorrect;Vögel
+eule;EULKEBackspaceBackspaceE ;almostcorrect;Vögel
+eule;UHU ;almostcorrect;Vögel
+eule;UHUEnter;almostcorrect;Vögel
+eule;EULE ;correct;Vögel
+eule;EULEEnter;correct;Vögel
+eule;;isna;Vögel
+eule;UBackspaceEULEEnter;first_letter_incorrect;Vögel
+schwan;SABackspaceCHWAN ;almostcorrect;Vögel
+schwan;schweaBackspaceBackspacean ;almostcorrect;Vögel
+schwan;SCHWAN ;correct;Vögel
+schwan;SCHWANEnter;correct;Vögel
+schwan;SBackspaceBackspaceSCHWAN ;first_letter_incorrect;Vögel
+schwan;TBackspaceBackspaceSCHWAN ;first_letter_incorrect;Vögel
+schwan;WBackspaceSCHWANEnter;first_letter_incorrect;Vögel
+schwan;;isna;Vögel
+schwan;SCHWNAEnter;almostcorrect;Vögel
+strauss;STRABackspaceAUSSEnter;almostcorrect;Vögel
+strauss;STRATBackspaceUSSEnter;almostcorrect;Vögel
+strauss;STRAU?BackspaceSSEnter;almostcorrect;Vögel
+strauss;straussBackspaceBackspaceßEnter;almostcorrect;Vögel
+strauss;SCHBackspaceBackspaceBackspacePFAUEnter;first_letter_incorrect;Vögel
+strauss;STRAUSS ;correct;Vögel
+strauss;STRAUSSEnter;correct;Vögel
+strauss;;isna;Vögel
+strauss;OSTRICH ;unrelated_other;Vögel
+strauss;STRAUCHEnter;almostcorrect;Vögel
+strauss;PFAUEnter;almostcorrect;Vögel
+taube;TABBackspaceUBE ;almostcorrect;Vögel
+taube;TAUBE ;correct;Vögel
+taube;TAUBEEnter;correct;Vögel
+taube;hlBackspaceBackspaceBackspacetaubeEnter;first_letter_incorrect;Vögel
+taube;;isna;Vögel
+gondel;GONDEÖBackspaceLEnter;almostcorrect;Wasser
+gondel;GONDOLAEnter;almostcorrect;Wasser
+gondel;GONDEL ;correct;Wasser
+gondel;GONDELEnter;correct;Wasser
+gondel;OBackspaceGONDELEnter;first_letter_incorrect;Wasser
+gondel;WEBackspaceBackspaceBackspaceGONDEL ;first_letter_incorrect;Wasser
+gondel;;isna;Wasser
+gondel;BOOT ;almostcorrect;Wasser
+gondel;BOOTEnter;almostcorrect;Wasser
+gondel;KAANUEnter;semantic_relation;Wasser
+gondel;KANUEnter;semantic_relation;Wasser
+gondel;SCHIFFEnter;semantic_relation;Wasser
+kanu;BBackspaceBackspaceGONDELEnter;semantic_relation;Wasser
+kanu;KANU ;correct;Wasser
+kanu;KANUEnter;correct;Wasser
+kanu;;isna;Wasser
+kanu;BOOT ;almostcorrect;Wasser
+kanu;BOOTEnter;almostcorrect;Wasser
+kanu;SCHIFFEnter;semantic_relation;Wasser
+kanu;GONDEL ;semantic_relation;Wasser
+segelschiff;SEGELBOOT ;almostcorrect;Wasser
+segelschiff;SEGELBOOTEnter;almostcorrect;Wasser
+segelschiff;SEGELSCHIFF ;correct;Wasser
+segelschiff;SEGELSCHIFFEnter;correct;Wasser
+segelschiff;FBackspaceSCHFBackspaceIFFEnter;first_letter_incorrect;Wasser
+segelschiff;MABackspaceBackspaceSEGELSCHIFF ;first_letter_incorrect;Wasser
+segelschiff;RBackspaceSEGELSCHIFFEnter;first_letter_incorrect;Wasser
+segelschiff;;isna;Wasser
+segelschiff;BOOT ;almostcorrect;Wasser
+segelschiff;SCHIFF ;almostcorrect;Wasser
+segelschiff;SCHIFFEnter;almostcorrect;Wasser
+u-boot;U-NBackspaceBOOTEnter;almostcorrect;Wasser
+u-boot;U-PBackspaceBOOTEnter;almostcorrect;Wasser
+u-boot;U:BackspaceShift.BackspaceShift_Backspace-BOOTEnter;almostcorrect;Wasser
+u-boot;UBOOTEnter;almostcorrect;Wasser
+u-boot;U-BOOT ;correct;Wasser
+u-boot;U-BOOTEnter;correct;Wasser
+u-boot;LBackspaceBackspaceBackspaceSBackspaceBackspaceU-ShiftbOOTEnter;first_letter_incorrect;Wasser
+u-boot;boot ;almostcorrect;Wasser
+u-boot;schiffEnter;semantic_relation;Wasser
+u-boot;EEnter;unrelated_other;Wasser
+u-boot;U ;unrelated_other;Wasser
+u-boot;SCHIBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceBackspaceUBOOTEnter;first_letter_incorrect;Wasser
+u-boot;SCHIFF ;semantic_relation;Wasser
+u-boot;U-KBBackspaceBackspaceBOOT ;almostcorrect;Wasser
+yacht;YSBackspaceACHT ;almostcorrect;Wasser
+yacht;YACHT ;correct;Wasser
+yacht;YACHTEnter;correct;Wasser
+yacht;ABackspaceYACHTEnter;first_letter_incorrect;Wasser
+yacht;AYBackspaceBackspaceYACHTEnter;first_letter_incorrect;Wasser
+yacht;SBackspaceJBackspaceYACHT ;first_letter_incorrect;Wasser
+yacht;SCHBackspaceBackspaceBackspaceBackspaceYCHTBackspaceBackspaceBackspaceACHTEnter;first_letter_incorrect;Wasser
+yacht;ÜBackspaceYACHT ;first_letter_incorrect;Wasser
+yacht;ZABackspaceBackspaceYACHTEnter;first_letter_incorrect;Wasser
+yacht;;isna;Wasser
+yacht;BOOTEnter;almostcorrect;Wasser
+yacht;SCHIFF ;almostcorrect;Wasser
+yacht;SCHIFFEnter;almostcorrect;Wasser
+yacht;ABackspaceABackspaceYACHT ;first_letter_incorrect;Wasser

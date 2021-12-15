@@ -1,0 +1,335 @@
+---
+title: '03b CSI online aphasia: Typing - Automatic answer classification'
+author: "Kirsten Stark"
+date: "3/30/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+```{r load_packages}
+rm(list = ls())
+
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(stringdist)
+
+options( "encoding" = "UTF-8" )
+```
+
+## Load data
+
+```{r load_data}
+# input 
+input = "pretest_typing_patient_long.csv"
+
+# input synonym/alternative naming list
+alternatives = "naming_alternatives.csv"
+
+# load data
+df <- read.csv(here::here("data", "transient_data_files", input))
+
+# load alternatives
+alternatives <- read.csv(here::here("data", "supplementary_info", alternatives), 
+                         sep = ";")
+```
+
+## Load functions from Stark (2021); https://github.com/kirstenstark/stringmatch_typed_naming
+
+```{r load_classification_functions}
+#https://github.com/kirstenstark/stringmatch_typed_naming
+source(here::here("scripts","code","stringmatch_typed_naming.R"))
+```
+
+
+## Preprocess data, applying functions
+### 1) Clean word ending: Delete last characters of typed words if those are space or enter
+This function checks whether the last character(s) of the word entries is a space or is the typed word "Enter", and if so, deletes the last/the last five characters. If the last character(s) are neither of both, the word remains unchanged. The function can be used within dplyr's mutate function. 
+Additionally, the function has the option to delete an alternative ending, while keeping " " and "Enter" at the end of the word.  
+
+As entries, the delete_ending function takes the column with the word entries and, optionally, a custom ending.  
+
+We can repeat applying this function if we want to keep deleting if Enter or space is repeated several times at the end of the word. The while loops stops as soon as none of the words has a space or Enter (or custom ending) at the end. 
+
+```{r clean_word_ending}
+isnotequal <- 1
+df$word.c = currentupdate = df$word
+while (isnotequal > 0) {
+  df <- df %>% mutate(word.c = delete_ending(df$word.c))
+  isnotequal <- sum(currentupdate != df$word.c, na.rm = TRUE)
+  currentupdate <- df$word.c
+}
+```
+
+### 2) Replace special keys (e.g. backspace, shift, etc.) by other characters (e.g. numbers)
+Special characters such as Enter and Backspace are written as entire words. We want to replace these with identifiable numbers.  
+
+Function takes as entries the word entries, the keys to be changed, and the characters they should be replaced with.  
+
+With new data we may have to check whether participants used any other special keys.
+
+```{r replace_special_chars}
+oldnames <- c("Enter", "CapsLock", "Shift", "ArrowLeft", "ArrowRight", "Backspace", "Control")
+newnames <- c("1", "2", "3", "4", "5", "6", "7")
+df$word.c <- replace_special_chars(input = df$word.c, oldnames = oldnames, newnames = newnames)
+```
+
+### 3) Compute finally submitted words by applying all backspaces
+Function takes as input the word entries and, optionally, the backspace identifier. 
+
+```{r replace_backspace}
+df$word.c <- replace_backspace(df$word.c, backspace = "6")
+```
+
+### 4) Compute fuzzy string matching (string distance) between word entries and items/alternatives by relying on the stringdist()-package
+Calculate stringdistance between (backspace corrected) input word and item/alternative namings, and select the "best match", i.e. the item/alternative with the lowest distance and the first letter being correct.   
+The default method is the Jaro distance (Jaro-Winkler distance ("jw") with p = 0). Other methods, of the stringdist function (van der Loo, 2014) are possible as well, but further options of the stringdist function might be necessary to adapt as well.  
+
+*Compute Jaro distance* 
+
+```{r calculate_stringdist_jaro}
+#stringdist(toupper(df$word.c2[1:200]), toupper(df$item[1:200]), method = "jw")
+tictoc::tic()
+output <- calculate_stringdist(word = df$word.c, stims = df$item, 
+                               alternatives = alternatives, 
+                               method = "jw", p = 0,
+                               firstlettercorrect = TRUE)
+tictoc::toc()
+df$jaro <- output[,1]
+df$bestmatch_jaro <- output[,2]
+#df$jaro[1:200]
+```
+
+*Alternatively: Compute Levenshtein distance (with all transformations being equally weighted)*
+
+```{r calculate_stringdist_lv}
+#stringdist(toupper(df$word.c2[1:200]), toupper(df$item[1:200]), method = "lv")
+tictoc::tic()
+output <- calculate_stringdist(word = df$word.c, stims = df$item, 
+                               alternatives = alternatives, 
+                               method = "lv",
+                               weight = c(d = 1, i = 1, s = 1, t = 1),
+                               firstlettercorrect = TRUE)
+tictoc::toc()
+df$lv <- output[,1]
+df$bestmatch_lv <- output[,2]
+#df$lv[1:200]
+```
+
+*Special case of first pilot participant: We just check whether the first 3 characters were correct*
+
+```{r calculate_stringdist_lv}
+#stringdist(toupper(df$word.c2[1:200]), toupper(df$item[1:200]), method = "lv")
+tictoc::tic()
+output <- calculate_stringdist(word = substr(df$word.c,1,3), 
+                               stims = substr(df$item,1,3), 
+                               alternatives = alternatives, # for the real analyses the alternatives dataframe would also have to be adapted
+                               method = "lv",
+                               weight = c(d = 1, i = 1, s = 1, t = 1),
+                               firstlettercorrect = TRUE)
+tictoc::toc()
+df$lv <- output[,1]
+df$bestmatch_lv <- output[,2]
+#df$lv[1:200]
+```
+
+### 5) Classify word entries
+Function that classifies the word entries for correctness and different typing errors.  
+
+*Based on Jaro distance (d = 0.3)*  
+The d-value indicates how many errors can be made (see van der Loo, 2014) and may be adapted for other study populations.
+
+```{r classify_entries_jaro}
+df2 <- df %>% 
+  mutate(answer_auto_jaro = case_character_type(word, item, 
+          word.c, jaro, bestmatch_jaro, d = 0.3))
+```
+
+```{r classify_as_correct_jaro}
+df2 <- df2 %>% 
+  mutate(correct_auto_jaro = case_when(
+    answer_auto_jaro == "correct" ~ 1,
+    answer_auto_jaro == "correctedtocorrect" ~ 1,
+    answer_auto_jaro == "approx_correct" ~ 1,
+    answer_auto_jaro == "alternative" ~ 1,
+    answer_auto_jaro == "alternative_corrected" ~ 1,
+    answer_auto_jaro == "approx_alternative" ~ 1,
+    TRUE ~ 0))
+```
+
+*Based on Levenshtein distance (d = 1)*  
+The d-value indicates how many errors can be made (see van der Loo, 2014) and may be adapted for other study populations.
+
+```{r classify_entries_lv}
+df2 <- df2 %>% 
+  mutate(answer_auto_lv = case_character_type(word, item, 
+          word.c, lv, bestmatch_lv, d = 3))
+```
+
+```{r classify_as_correct_lv}
+df2 <- df2 %>% 
+  mutate(correct_auto_lv = case_when(
+    answer_auto_lv == "correct" ~ 1,
+    answer_auto_lv == "correctedtocorrect" ~ 1,
+    answer_auto_lv == "approx_correct" ~ 1,
+    answer_auto_lv == "alternative" ~ 1,
+    answer_auto_lv == "alternative_corrected" ~ 1,
+    answer_auto_lv == "approx_alternative" ~ 1,
+    TRUE ~ 0))
+```
+
+
+*Special case of first pilot participant: We just check whether the first 3 characters were correct*
+```{r classify_entries_lv}
+df2 <- df2 %>% 
+  mutate(answer_auto_lv = case_character_type(word, item, 
+          word.c, lv, bestmatch_lv, d = 0))
+```
+
+```{r classify_as_correct_lv}
+df2 <- df2 %>% 
+  mutate(correct_auto_lv = case_when(
+    answer_auto_lv == "correct" ~ 1,
+    answer_auto_lv == "correctedtocorrect" ~ 1,
+    answer_auto_lv == "approx_correct" ~ 1,
+    answer_auto_lv == "alternative" ~ 1,
+    answer_auto_lv == "alternative_corrected" ~ 1,
+    answer_auto_lv == "approx_alternative" ~ 1,
+    TRUE ~ 0))
+```
+
+### Inspect results
+Using the Jaro distance
+
+```{r inspect_jaro}
+table(df2$answer_auto_jaro)
+table(df2$correct_auto_jaro)
+(incorrect_jaro <-df2 %>% filter(correct_auto_jaro == 0) %>%
+    select(item, word, word.c, bestmatch_jaro, answer_auto_jaro))
+correct_jaro <-df2 %>% filter(correct_auto_jaro == 1) %>%
+    select(item, word, word.c, bestmatch_jaro, answer_auto_jaro)
+```
+
+Using the Levenshtein distance
+
+```{r inspect_lv}
+table(df2$answer_auto_lv)
+table(df2$correct_auto_lv)
+(incorrect_lv <-df2 %>% filter(correct_auto_lv == 0) %>%
+    select(item, word, word.c, bestmatch_lv, answer_auto_lv))
+correct_lv <-df2 %>% filter(correct_auto_lv == 1) %>%
+    select(item, word, word.c, bestmatch_lv, answer_auto_lv)
+```
+
+Comparing Jaro and Levensthein distance
+
+````{r comparison_jaro_lv}
+(differences <- df2 %>% 
+  filter((correct_auto_jaro==1&correct_auto_lv==0)|
+           (correct_auto_jaro==1&correct_auto_lv==0)) %>%
+  select(item, word, word.c, bestmatch_jaro, answer_auto_jaro, 
+         bestmatch_lv, answer_auto_lv, 
+         correct_auto_jaro, correct_auto_lv))
+nrow(differences)
+```
+
+
+## Typing error analyses based on automatic classification - JARO (d=0.3)
+
+Amount of trials classified as correct and incorrect
+```{r table_correct_incorrect_jaro}
+print("totaltrials:")
+nrow(df2)
+print("correct:")
+(correct = sum(df2$correct_auto_jaro == 1))
+print("incorrect:")
+(incorrect = sum(df2$correct_auto_jaro == 0))
+```
+
+Percentage of incorrect trials
+
+```{r percentage_incorrect_jaro}
+# incorrect/nrow(df2)*100
+# incorrect/30/160*100
+incorrect_per_subject <- 
+  as.data.frame(table(df2$subject, df2$correct_auto_jaro)) %>%
+  filter(Var2 == 0) %>% select(Var1, Freq) %>%
+  dplyr::rename(subject = Var1, perct_incorrect = Freq) %>%
+  mutate(perct_incorrect = perct_incorrect/160)
+
+print("Mean:")
+round(mean(incorrect_per_subject$perct_incorrect)*100,2)
+print("SD:")
+round(sd(incorrect_per_subject$perct_incorrect)*100,2)
+print("Range:")
+round(range(incorrect_per_subject$perct_incorrect)*100,2)
+
+
+```
+
+Correct/incorrect trials per participant: 
+
+```{r}
+print(as.data.frame(table(
+  df2$subject, df2$correct_auto_jaro == 1)) %>%
+    filter(Var2 == TRUE) %>%
+    dplyr::rename(subject = Var1, totaltrials = Var2, 
+                  correct_auto = Freq) %>%
+    mutate(totaltrials = 160) %>% 
+    mutate(percentagecorrect = correct_auto/totaltrials))
+```
+
+## Typing error analyses based on automatic classification - LEVENSHTEIN (d=3)
+
+Amount of trials classified as correct and incorrect
+```{r table_correct_incorrect_lv}
+print("totaltrials:")
+nrow(df2)
+print("correct:")
+(correct = sum(df2$correct_auto_lv == 1))
+print("incorrect:")
+(incorrect = sum(df2$correct_auto_lv == 0))
+```
+
+Percentage of incorrect trials
+
+```{r percentage_incorrect_lv}
+# incorrect/nrow(df2)*100
+# incorrect/30/160*100
+incorrect_per_subject <- 
+  as.data.frame(table(df2$subject, df2$correct_auto_lv)) %>%
+  filter(Var2 == 0) %>% select(Var1, Freq) %>%
+  dplyr::rename(subject = Var1, perct_incorrect = Freq) %>%
+  mutate(perct_incorrect = perct_incorrect/160)
+
+print("Mean:")
+round(mean(incorrect_per_subject$perct_incorrect)*100,2)
+print("SD:")
+round(sd(incorrect_per_subject$perct_incorrect)*100,2)
+print("Range:")
+round(range(incorrect_per_subject$perct_incorrect)*100,2)
+
+
+```
+
+Correct/incorrect trials per participant: 
+
+```{r}
+print(as.data.frame(table(
+  df2$subject, df2$correct_auto_lv == 1)) %>%
+    filter(Var2 == TRUE) %>%
+    dplyr::rename(subject = Var1, totaltrials = Var2, 
+                  correct_auto = Freq) %>%
+    mutate(totaltrials = 160) %>% 
+    mutate(percentagecorrect = correct_auto/totaltrials))
+```
+
+## Write data file for statistical analyses
+```{r}
+write.csv(df2, here::here("data","transient_data_files", "data_long_final.csv"))
+```
