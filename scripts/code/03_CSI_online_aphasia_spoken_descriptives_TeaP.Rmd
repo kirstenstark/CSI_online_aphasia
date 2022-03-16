@@ -1,0 +1,191 @@
+---
+title: '04 CSI online aphasia: Spoken - Descriptives'
+author: "Kirsten Stark"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+```{r load_packages}
+library(dplyr)
+library(tidyr)
+
+rm(list = ls())
+```
+
+
+## Load and preprocess data
+
+```{r load_data}
+options( "encoding" = "UTF-8" )
+
+# input
+input <- "aphasia_patient_TeaP.csv"
+
+# load data
+df <- read.csv(here::here("data", "transient_data_files", input), sep = ",",  na = "")
+```
+
+## Duration of the experiment
+
+```{r duration}
+print("Total duration, not outlier corrected")
+mean(df$timetotal, na.rm=TRUE) # 36,27 min
+sd(df$timetotal)
+range(df$timetotal) # 19 to 126 min
+
+print("Total duration, split by session")
+
+df %>% group_by(session) %>% summarise(mean = mean(timetotal),
+                                       sd = sd(timetotal), 
+                                       min = min(timetotal), 
+                                       max = max(timetotal))
+```
+
+
+## Description of participants
+
+Gender: 
+
+```{r gender}
+df <- df %>% mutate(gender_char = case_when(gender == 1 ~ "female", 
+                                     gender == 2 ~ "male"))
+table(df$gender_char)/160 # 1 = female, 2 = male, 3 = diverse
+
+print("percentage female:")
+sum(df$gender == 1)/nrow(df)
+```
+
+Age: 
+
+```{r age}
+print("mean:"); mean(df$age)
+print("sd:"); sd(df$age)
+print("range:"); range(df$age)
+```
+
+Handedness: 
+
+```{r handedness}
+# 1 = left handed, 2 = right handed, 3 = ambidexter/both
+df <- df %>% mutate(handedness_char = case_when(handedness == 1 ~ "left-handed", 
+                                     handedness == 2 ~ "right-handed"))
+table(df$handedness_char)/160 
+
+print("percentage right-handed:")
+sum(df$handedness == 2)/nrow(df)
+```
+
+
+Mother tongue (experiment was restricted to native German speakers): This seems to have worked
+
+```{r}
+table(df$language) # 1 = yes (mother tongue is German), 2 = no
+table(df$language.test) # 1 = der, 2 = die, 3 = das (das is correct)
+```
+
+
+
+## Attention checks
+*1) Item vs. non-item*
+
+```{r item vs non-item}
+## Item vs. non-item
+# CH01_01 (Taube), CH01_02 (Apfel), CH02_01 (Luftballon) and CH02_02 (Biene) are items and 2 should be selected,
+# CH02_03 (Radio), CH02_04 (Sparschwein), CH02_03 (Laptop) and CH02_04 (Wattestäbchen) are non-items and 1 should be selected
+## Did participants cheat
+# CH03 = 1 - yes, I worked through it till the end,
+# CH03 = 2 - no, I stopped or cheated midway
+# CH03 = -9 - no answer
+
+attcheck <- data.frame(subject = unique(df$subject)) 
+
+df <- df %>% mutate(itemvsnonitem1 = 
+                      case_when(CH01_01==2 & CH01_02==2 & CH01_03==1 & CH01_04==1 ~2,
+                                CH01_01==2 || CH01_02==2 ~1, 
+                                CH01_01!=2 & CH01_02!=2 ~0)) %>%
+  mutate(itemvsnonitem2 = 
+                      case_when(CH02_01==2 & CH02_02==2 & CH02_03==1 & CH02_04==1 ~2,
+                                CH02_01==2 || CH02_02==2 ~1, 
+                                CH02_01!=2 & CH02_02!=2 ~0))
+table(df$itemvsnonitem1)/160
+table(df$itemvsnonitem2)/160
+
+# attcheck <- data.frame(subject = unique(df$subject))
+# 
+# 
+# data <- data %>% mutate(attcheck =
+#                   ifelse(CH01_01 == 2 & CH01_02 == 2 & CH02_01 == 2 & CH02_02 == 2 &
+#                   CH01_03 == 1 & CH01_04 == 1 & CH02_03 == 1 & CH02_04 == 1, 1, 0)) %>%
+#                    mutate(cheat = ifelse(CH03 == 1,1,ifelse(CH03 == 2,2,0)))
+# data.frame(data$subject, )
+# table(data$attcheck)
+# table(data$cheat)
+# 
+# # get prolific IDs of participants who failed the attention check
+# #pretest %>% subset(attcheck == 0 & cheat == 2 ) %>%
+# #  pull(SD24_01) # SD24_01 is prolific ID
+# 
+# # subset to participants who passed only
+# valid <- pretest  %>% filter(attcheck == 1 & cheat != 2)
+# 
+# inspect <- data.frame(df$subject, df$word, df$fam_typed)
+
+```
+
+
+*2) Cheating*
+
+```{r cheating}
+df <- df %>% mutate(CH03 = case_when(CH03 == 1 ~ 
+                                       " Ja, ich habe alles bis zum Ende bearbeitet.",
+                                             CH03 == 2 ~ 
+                                       "Nein, ich habe zwischendurch aufgehoert oder geschummelt."))
+table(df$CH03)/160
+```
+
+## Comments
+Comments don't indicate any problems that should lead to participant exclusion: 
+
+```{r comments}
+table(df$comments)/160
+```
+
+
+
+## Fully anonymize data and reduce data frame
+
+```{r anonymize}
+df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") & 
+                               !starts_with("TIME") & 
+                               !starts_with("handedness") &
+                               !starts_with("fingers") &
+                               !starts_with("browser") & 
+                               !starts_with("operator_system") &
+                               !starts_with("system") &
+                                !starts_with("KB") &
+                               !starts_with("CH0") & !starts_with("X.") &
+                               !starts_with("screen") & !starts_with("os") &
+                               !starts_with("questionnaire") & !"OR01_01" & 
+                               !"comments" & 
+                               !"FINISHED" & !"Q_VIEWER" & 
+                               !"LASTPAGE" & !"MAXPAGE" & 
+                               !"DEG_TIME"& !"type" &  
+                               !"gender_char" & !"itemvsnonitem1" &
+                               !"itemvsnonitem2" & 
+                               !"QUESTNNR" & !"STARTED" & !"OR02_01" & 
+                                !"SD22_BID" & !starts_with("MC") &
+                                !"audio"& !"name" & !"audio_vot")
+```
+
+
+```{r write_anonymized_df}
+write.csv(df_a, here::here("data","data_long_anonymous.csv"))
+```
+
+
