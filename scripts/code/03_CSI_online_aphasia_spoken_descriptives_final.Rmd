@@ -1,5 +1,5 @@
 ---
-title: '04 CSI online aphasia: Spoken - Descriptives'
+title: '03 CSI online aphasia: Spoken - Descriptives'
 author: "Kirsten Stark"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -25,19 +25,20 @@ rm(list = ls())
 options( "encoding" = "UTF-8" )
 
 # input
-input <- "aphasia_patient_TeaP.csv"
+input <- "aphasia_patient_final.csv"
 
 # load data
-df <- read.csv(here::here("data", "transient_data_files", input), sep = ",",  na = "")
+df <- read.csv(here::here("data", "transient_data_files", input), 
+               sep = ",",  na = "")
 ```
 
 ## Duration of the experiment
 
 ```{r duration}
 print("Total duration, not outlier corrected")
-mean(df$timetotal, na.rm=TRUE) # 36,27 min
-sd(df$timetotal)
-range(df$timetotal) # 19 to 126 min
+mean(df$timetotal, na.rm=TRUE) # 33.13 min
+sd(df$timetotal) # 21.04 min
+range(df$timetotal) # 15 to 126 min
 
 print("Total duration, split by session")
 
@@ -55,7 +56,7 @@ Gender:
 ```{r gender}
 df <- df %>% mutate(gender_char = case_when(gender == 1 ~ "female", 
                                      gender == 2 ~ "male"))
-table(df$gender_char)/160 # 1 = female, 2 = male, 3 = diverse
+table(df$gender_char)/160/3 # 1 = female, 2 = male, 3 = diverse
 
 print("percentage female:")
 sum(df$gender == 1)/nrow(df)
@@ -162,25 +163,15 @@ table(df$comments)/160
 
 ```{r anonymize}
 df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") & 
-                               !starts_with("TIME") & 
                                !starts_with("handedness") &
-                               !starts_with("fingers") &
-                               !starts_with("browser") & 
-                               !starts_with("operator_system") &
-                               !starts_with("system") &
+                               !starts_with("fingers") & 
                                 !starts_with("KB") &
-                               !starts_with("CH0") & !starts_with("X.") &
-                               !starts_with("screen") & !starts_with("os") &
-                               !starts_with("questionnaire") & !"OR01_01" & 
-                               !"comments" & 
-                               !"FINISHED" & !"Q_VIEWER" & 
-                               !"LASTPAGE" & !"MAXPAGE" & 
-                               !"DEG_TIME"& !"type" &  
+                               !starts_with("CH0") & 
+                               !"comments" & !"type" &  
                                !"gender_char" & !"itemvsnonitem1" &
-                               !"itemvsnonitem2" & 
-                               !"QUESTNNR" & !"STARTED" & !"OR02_01" & 
-                                !"SD22_BID" & !starts_with("MC") &
-                                !"audio"& !"name" & !"audio_vot")
+                               !"itemvsnonitem2" &  
+                               !starts_with("MC") &
+                                !"name" & !"time_wo_outlier" )
 ```
 
 

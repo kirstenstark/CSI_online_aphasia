@@ -1,5 +1,5 @@
 ---
-title: '04 CSI online spoken: Spoken - Plotting and analysis'
+title: '04 CSI online spoken: Spoken - Plotting and analysis - final data'
 author: "Kirsten Stark"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -85,27 +85,65 @@ df$PosOr <- as.factor(df$PosOr)
 df$subject <- as.factor(df$subject)
 df$session <- as.factor(df$session)
 
-# define contrasts of sessin: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
+# define contrasts of session: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
 c<-contr.treatment(3)
 my.coding<-matrix(rep(1/3, 6), ncol=2)
 my.simple<-c-my.coding
 my.simple
 contrasts(df$session)<-my.simple
 levels(df$session)
+
+## As soon as we have the controls: Add factor group
+
+## Define Ordinal position as continuous predictor variable
+df$PosOr_cont <- as.numeric(scale(as.numeric(as.character(df$PosOr)),
+                                        center = T, scale = F))
 ```
 
 ## Classified errors and correct responses
 Correct responses start with 1.
 
-1 - exakt korrekt
-1.1 - alternative response
-1.2 - correct with phonematic paraphasia ≤25%
+1 - correct
+1.1 - correct with alternative response
+1.2 - correct with phonematic paraphasia (≤25% of the word)
 1.3 - correct with correct article [*]
+
+1.4 - correct, but VOT invalid
+
+0 - wrong
+0.1 - wrong with phonematic paraphrasia (> 25 % of the word)
+0.2 - wrong: semantic paraphrasia (word in the experiment)
+0.3 - wrong: semantic paraphrasia (word not in the experiment)
+0.4 - wrong: null reaction
+0.5 - wrong: replacement without connection to the word (word in the experiment) 
+0.6 - wrong: replacement without connection to the word (word not in the experiment)
+0.7 - superordinate word
+0.8 - neologism
+0.9 - etc.
+0.99 - TECHNICAL ERROR
+
 
 [*] Bei 1.3 wollten wir schauen wie oft die Artikel mitgenannt wurden, aber das können wir ja erstmal vernachlässigen. Für die exakten Ergebnisse wollten wir dann ja nochmal besprechen, weil die Bestimmung der VOT nicht 100% möglich ist mit Artikel.
 
 ```{r table_correctness}
+## Overall amount of correct answers
+sum(df$correct != 0, na.rm=T)
+sum(is.na(df$correct)) # these are the technical errors were no audio file was recorded
+
+## Overview of correct responses
 table(df$correct)
+df$VOT[df$correct==1.4] ### Was bedeutet das? VOT ist ja nicht immer NA
+
+# Overview of incorrect responses
+sum(df$correct==0, na.rm=T)
+
+sum(df$correct == 0 & !is.na(df$error)) # einmal fehlt die Fehlerklassifizierung!! 
+df[df$correct == 0 & is.na(df$error),]
+
+## add trials where no audio file was recorded to technical errors
+sum(is.na(df$VOT))
+df$correct[is.na(df$VOT)] <- 0
+df$error[is.na(df$VOT)] <- 99
 ```
 
 Errors 
@@ -122,6 +160,10 @@ table(df$PosOr[df$category != "Filler" & df$correct == 0],
       df$correct[df$category != "Filler" & df$correct == 0])
 table(df$PosOr[df$category != "Filler" & startsWith("1", df$correct)],
       df$correct[df$category != "Filler" & startsWith("1", df$correct)])
+
+## How many incorrrct trials that were not technical errors per ordinal position? 
+table(df$PosOr[df$category != "Filler" & df$correct == 0 & 
+                 df$error != 99])
 ```
 
 Show amount of incorrect trials per subject
@@ -129,17 +171,19 @@ Show amount of incorrect trials per subject
 ```{r}
 df %>% filter(category != "Filler") %>% 
   group_by(subject, session) %>%
-  count(correct) %>%  
-  mutate(prop=round(prop.table(n)*100, 2)) %>% 
+  dplyr::count(correct) %>%  
+  mutate(prop=round(n/160*100,2)) %>% #round(prop.table(n), 4)) %>% 
   filter(correct == "0") %>%
   dplyr::select(-c(correct, n))
 ```
+
 Total percentage of errors
 
 ```{r}
 sum(df$correct[df$category != "Filler"]=="0", na.rm=T)/nrow(df%>%filter(category != "Filler"))
 ```
 
+# --------
 # REACTION TIMES
 
 Drop incorrect trials: 
@@ -189,8 +233,55 @@ huxtable::quick_docx(huxt_word,
 
 ```
 
+Calculate increase mean by ordinal position, separately for each session (not controlled for random variances, weighted only per session):
+
+```{r}
+means_final$increase <- NA
+for(i in 1:length(unique(means_final$session))){
+  for(j in 2:length(unique(means_final$PosOr))) {
+    means_final$increase[means_final$session==i &
+                           means_final$PosOr==j] <- 
+     means_final$VOT[means_final$session==i &
+                           means_final$PosOr==j] - 
+      means_final$VOT[means_final$session==i &
+                           means_final$PosOr==j-1]
+  }
+}
+means_final
+
+## Calculate overall mean increase per session (weighted)
+mean(means_final$increase[means_final$session==1], na.rm=T)
+means_final$PosOr_effect <- NA
+means_final$PosOr_effect[means_final$PosOr==1] <- 1
+for(i in 1:length(unique(means_final$session))){
+  for(j in 2:length(unique(means_final$PosOr))) {
+    means_final$PosOr_effect[
+      means_final$session==i & means_final$PosOr==1] <-
+      means_final$PosOr_effect[
+      means_final$session==i & means_final$PosOr==1] + 
+      means_final$increase[means_final$session==i &
+                             means_final$PosOr==j]*
+      (means_final$N[means_final$session==i &
+                          means_final$PosOr==j]+
+        means_final$N[means_final$session==i &
+                          means_final$PosOr==j-1])
+  }
+  means_final$PosOr_effect[means_final$session==i &
+                             means_final$PosOr==1] <-
+    means_final$PosOr_effect[means_final$session==i &
+                               means_final$PosOr==1]/
+    (sum(means_final$N[means_final$session==i])+
+       sum(means_final$N[means_final$session==i &
+                           (means_final$PosOr==2 |
+                              means_final$PosOr==3 |
+                              means_final$PosOr==4)]))
+}
+means_final
+```
+
+
 ### RTs by ordinal position
-Line graph (only correct trials, without fillers)
+Line graph (only correct trials, without fillers). Across sessions
 
 ```{r plot_rt}
 (plot_vot <- means_final_wo_session %>% 
@@ -217,9 +308,10 @@ ggsave(plot_vot, filename =
 
 ```
 
-Line graph by repetition (only correct trials, without fillers)
+Line graph by repetition/session (only correct trials, without fillers)
 
 ```{r }
+override.linetype<-c("solid", "dashed", "dotted")
 (plot_rt_repetition <- means_final %>% 
     ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
     geom_point(size = 2)+
@@ -235,7 +327,11 @@ Line graph by repetition (only correct trials, without fillers)
   #         color="black", size = 8))
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
-    axis.title.x = element_text(margin = margin(10,0,0,0))))
+    axis.title.x = element_text(margin = margin(10,0,0,0)),
+    legend.key.width = unit(1, "cm"))+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none"))
 
 filename <- "CSI_online_aphasia_spoken_plot_rt_by_repetition_TeaP.pdf"
 ggsave(plot_rt_repetition, filename = 
@@ -335,7 +431,7 @@ All correct trials (Excluding filler)
   stat_summary(fun=mean,  geom="line", size = 1) +
   apatheme+
   labs(x="Trial ",y ="VOT (ms)")+
-  annotate(geom="text", x=20, y=200, label="n = 30", 
+  annotate(geom="text", x=20, y=200, label="n = 19", 
            color="black", size = 8))
 
 filename <- "CSI_online_aphasia__spoken_plot_rts_across_experiment.pdf"
@@ -413,18 +509,18 @@ gofstat(list(fit.gamma, fit.normal),
 ```
 
 **Conclusion:** .
-
+Gamma fits the data better than a normal model with uncontrolled data
 
 ### Inferential analyses: GLMM (Gamma distribution) with ordinal position as a continuous predictor
 
 
 ```{r GLMM_cont}
-m1 <- glmer(VOT ~ PosOr.cont*session + 
-               (PosOr.cont*session|subject) +
-              (PosOr.cont*session|category),
-             data = df_correct, 
-            family =Gamma(link ="identity"), 
-            control=glmerControl(optimizer = "bobyqa"))
+# m1 <- glmer(VOT ~ PosOr.cont*session + 
+#                (PosOr.cont*session|subject) +
+#               (PosOr.cont*session|category),
+#              data = df_correct, 
+#             family =Gamma(link ="identity"), 
+#             control=glmerControl(optimizer = "bobyqa"))
 
 ## This function provides a better convergence check for lme4 v>1.0 models, which have a nasty habit of throwing up false nonconvergence warnings.  It implements Ben Bolker's suggestion here (https://github.com/lme4/lme4/issues/120), referred to again here (http://stats.stackexchange.com/questions/97929/lmer-model-fails-to-converge).
 didLmerConverge = function(lmerModel){
@@ -438,16 +534,43 @@ didLmerConverge = function(lmerModel){
   }
 }
 
-didLmerConverge(m1)
+#didLmerConverge(m1)
+```
 
+Model fails to converge --> reduce
+
+```{r}
+# 1) Increase optimizer iterations
+# m1 <- glmer(VOT ~ PosOr.cont*session + 
+#                (PosOr.cont*session|subject) +
+#               (PosOr.cont*session|category),
+#              data = df_correct, 
+#             family =Gamma(link ="identity"), 
+#             control=glmerControl(optimizer = "bobyqa",
+#                                  optCtrl = list(maxfun = 2e5)))
+# 2) Set correlation parameters to zero
+m1 <- afex::lmer_alt(VOT ~ PosOr.cont*session + 
+               (PosOr.cont*session||subject) +
+              (PosOr.cont*session||category),
+             data = df_correct, 
+            family =Gamma(link ="identity"), 
+            control=glmerControl(optimizer = "bobyqa",
+                                 optCtrl = list(maxfun = 2e5)))
+didLmerConverge(m1)
+## The warnings can be safely ignored
+
+# inspect model
 summary(m1)
 anova(m1)
 
 # save model output
+saveRDS(m1, file = here::here("results", "tables",
+                          "CSI_online_aphasia_spoken_glmm_cont.RDS"))
 tab_model(m1,transform = NULL,
           show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
           title = "GLMM (Gamma distribution) of VOTs Predicted by Ordinal Position and Session",
-          pred.labels = c("(Intercept)", "Ordinal Position", "Session 2 vs 1", 
+          pred.labels = c("(Intercept)", "Ordinal Position", 
+                          "Session 2 vs 1",
                           "Session 3 vs 1", "Ord.Pos. x Session2-1",
                           "Ord.Pos. x Session3-1"),
           dv.labels = "Vocal Onset Time",
@@ -456,7 +579,7 @@ tab_model(m1,transform = NULL,
           file = here::here("results", "tables", "CSI_online_aphasia_spoken_glmm_cont.html"))
 ```
 
-### Comparison with transformed RTs
+### Control: Comparison with transformed RTs
 
 *Box-cox test*  
 (common transformations: -2 -> 1/(Y^2), -1 -> 1/y, -0.5 -> 1/(sqrt(y))), 
@@ -464,34 +587,58 @@ tab_model(m1,transform = NULL,
 
 ```{r}
 boxcox(df_correct$VOT ~ df_correct$PosOr*df_correct$session)
-#boxcox(df$rt1 ~ df$experiment/(df$task*df$naming))
 
-## Box-Cox suggests idoesn't really suggest a transformation, inversely transformed data seem to fit equally well as the raw RTs --> compute LMM with raw RTs
+## Box-Cox suggests log transformation --> compute with log-transformed RTs as s control analysis
 ## for the main analyses we will use a GLMM
-boxcox((1000/df_correct$VOT)~  df_correct$PosOr*df_correct$session)
-#boxcox((1000/df$rt1)~ df$experiment*df$task*df$naming)
-boxcox(1/sqrt(df_correct$VOT)~ df_correct$PosOr*df_correct$session)
+boxcox(log(df_correct$VOT)~  df_correct$PosOr*df_correct$session)
+
+df_correct$VOTlog <- log(df_correct$VOT)
 ```
 
 ```{r}
 library(lmerTest)
-m1_lmm <- lmer(VOT ~ PosOr.cont*session + 
-               (PosOr.cont*session|subject) +
-              (PosOr.cont*session|category),
-             data = df_correct, 
-            control=lmerControl(optimizer = "bobyqa"))
+# m1_lmm <- lmer(VOTlog ~ PosOr.cont*session + 
+#                (PosOr.cont*session|subject) +
+#               (PosOr.cont*session|category),
+#              data = df_correct, 
+#             control=lmerControl(optimizer = "bobyqa"))
+# didLmerConverge(m1_lmm)
+
+```
+
+Model fails to converge --> Reduce
+
+```{r}
+# 1) Increase optimizer iterations
+# m1_lmm <- lmer(VOTlog ~ PosOr.cont*session +
+#                (PosOr.cont*session|subject) +
+#               (PosOr.cont*session|category),
+#              data = df_correct,
+#             control=lmerControl(optimizer = "bobyqa",
+#                                  optCtrl = list(maxfun = 2e5)))
+# didLmerConverge(m1_lmm)
+
+# 2) Omit correlation parameters as model still fails to converge
+m1_lmm <- afex::lmer_alt(VOTlog ~ PosOr.cont*session +
+               (PosOr.cont*session||subject) +
+              (PosOr.cont*session||category),
+             data = df_correct,
+            control=lmerControl(optimizer = "bobyqa",
+                                 optCtrl = list(maxfun = 2e5)))
 didLmerConverge(m1_lmm)
+## Warnings can be ignored
 
 summary(m1_lmm)
 anova(m1_lmm)
 
+saveRDS(m1_lmm,  file = here::here("results", "tables", "CSI_online_aphasia_spoken_control_lmm_VOT.RDS"))
 tab_model(m1_lmm,transform = NULL,
           show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
           title = "LMM of VOTs Predicted by Ordinal Position and Session",
           pred.labels = c("(Intercept)", "Ordinal Position", "Session 2 vs 1", 
                           "Session 3 vs 1", "Ord.Pos. x Session2-1",
                           "Ord.Pos. x Session3-1"),
-          dv.labels = "Vocal Onset Time",
+          dv.labels = "Vocal Onset Time (log-transformed)",
           #string.pred = "",
           string.stat = "t-Value",
           file = here::here("results", "tables", "CSI_online_aphasia_spoken_control_lmm_VOT.html"))
@@ -499,25 +646,28 @@ tab_model(m1_lmm,transform = NULL,
 
 # ERROR RATES
 
+Only analyses errors that were made by the participants (exclude technical errors)
+
+```{r}
+df %>% mutate(errors = case_when(correct == 0 ~ 1,
+                                 correct != 0 ~ 0)) -> df
+df_errors <- df[df$error != 99 | is.na(df$error),]
+```
+
 ### Descriptives
 
 ```{r descriptives_errors}
-df %>% mutate(errors = case_when(correct == "0" ~ 1,
-                                 #is.na(correct) ~ NA, # these are the trials were the audio recordings are missing 
-                                 correct != "0" ~ 0)) -> df
-#df$VOT[is.na(df$correct)]
-
-(means_final_errors<- df %>% 
+(means_final_errors<- df_errors %>% 
    filter(category != "Filler") %>% 
    Rmisc::summarySEwithin(.,"errors",idvar = "subject",
                           withinvars = c("session", "PosOr"),
                           na.rm = T))
-(means_final_cat_errors <- df %>% 
+(means_final_cat_errors <- df_errors %>% 
    filter(category != "Filler") %>% 
    Rmisc::summarySEwithin(.,"errors",idvar = "category",
                           withinvars = c("session", "PosOr"),
                           na.rm = T))
-(means_final_wo_session_errors <- df %>% 
+(means_final_wo_session_errors <- df_errors %>% 
    filter(category != "Filler") %>% 
    Rmisc::summarySEwithin(.,"errors",idvar = "subject",
                           withinvars = c("PosOr"), na.rm = T))
@@ -532,6 +682,52 @@ huxtable::quick_docx(huxt_word,
 
 ```
 
+Calculate increase mean by ordinal position, separately for each session (not controlled for random variances, weighted only per session):
+
+```{r}
+means_final_errors$increase <- NA
+for(i in 1:length(unique(means_final_errors$session))){
+  for(j in 2:length(unique(means_final_errors$PosOr))) {
+    means_final_errors$increase[means_final_errors$session==i &
+                           means_final_errors$PosOr==j] <- 
+     means_final_errors$errors[means_final_errors$session==i &
+                           means_final_errors$PosOr==j] - 
+      means_final_errors$errors[means_final_errors$session==i &
+                           means_final_errors$PosOr==j-1]
+  }
+}
+#means_final_errors
+
+## Calculate overall mean increase per session (weighted)
+mean(means_final_errors$increase[means_final_errors$session==1], na.rm=T)
+means_final_errors$PosOr_effect <- NA
+means_final_errors$PosOr_effect[means_final_errors$PosOr==1] <- 1
+for(i in 1:length(unique(means_final_errors$session))){
+  for(j in 2:length(unique(means_final_errors$PosOr))) {
+    means_final_errors$PosOr_effect[
+      means_final_errors$session==i & means_final_errors$PosOr==1] <-
+      means_final_errors$PosOr_effect[
+      means_final_errors$session==i & means_final_errors$PosOr==1] + 
+      means_final_errors$increase[means_final_errors$session==i &
+                             means_final_errors$PosOr==j]*
+      (means_final_errors$N[means_final_errors$session==i &
+                          means_final_errors$PosOr==j]+
+        means_final_errors$N[means_final_errors$session==i &
+                          means_final_errors$PosOr==j-1])
+  }
+  means_final_errors$PosOr_effect[means_final_errors$session==i &
+                             means_final_errors$PosOr==1] <-
+    means_final_errors$PosOr_effect[means_final_errors$session==i &
+                               means_final_errors$PosOr==1]/
+    (sum(means_final_errors$N[means_final_errors$session==i])+
+       sum(means_final_errors$N[means_final_errors$session==i &
+                           (means_final_errors$PosOr==2 |
+                              means_final_errors$PosOr==3 |
+                              means_final_errors$PosOr==4)]))
+}
+means_final_errors
+```
+
 ### Plotting
 
 Errors by ordinal position
@@ -540,7 +736,8 @@ Errors by ordinal position
 (plot_errors <- means_final_wo_session_errors %>% 
     ggplot(., aes(x=PosOr, y=errors*100)) +
     geom_point(size = 2)+
-    geom_errorbar(aes(ymin=errors*100-se*100, ymax=errors*100+se*100),
+    geom_errorbar(aes(ymin=errors*100-se*100,
+                      ymax=errors*100+se*100),
                   width =.1) +
     stat_summary(fun=mean,  geom="line", size = 0.5, group=1, linetype="dashed")+
     apatheme+
@@ -573,9 +770,14 @@ Errors by ordinal position and repetition
    scale_linetype_manual(values=c("solid", "dashed", "dotted"))+
   scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
  # scale_y_continuous(breaks = seq(6, 14, by = 2), limits = c(5.5, 15))+
+  theme(
+    legend.key.width = unit(1, "cm"))+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none")+
   labs(x="Ordinal Position ",y ="Percentage of errors"))
 
-filename <- "CSI_online_spoken_plot_errors_by_repetition_TeaP.pdf"
+filename <- "CSI_online_spoken_plot_errors_by_repetition.pdf"
 ggsave(plot, filename = 
          here::here("results", "figures", filename),
        width = 18, height = 13, units = "cm", 
@@ -585,29 +787,51 @@ ggsave(plot, filename =
  
 ```
 
+### Control: Plot RTs accross the experiment
+
+```{r plot_RTs_all}
+(plot_RTs_all <- ggplot(data=df_errors, 
+                        aes(x=trial, y=errors, group=session,
+                            color=session)) +
+  stat_summary(fun=mean,  geom="point", size = 2)+
+  stat_summary(fun=mean,  geom="line", size = 1) +
+  apatheme+
+  labs(x="Trial ",y ="errors"))#+
+ # annotate(geom="text", x=20, y=200, label="n = 19", 
+  #         color="black", size = 8))
+
+filename <- "CSI_online_aphasia__spoken_plot_errors_across_experiment.pdf"
+ggsave(plot_RTs_all, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+```
+
 
 ### GLMM with binomial distribution
 
 *Center predictor variable*
 
 ```{r}
-df$PosOr.cont <- scale(as.numeric(as.character(df$PosOr)),
-                                        center = T, scale = F)
+df_errors$PosOr.cont <-
+  c(scale(as.numeric(as.character(df_errors$PosOr)),
+        center = T, scale = F))
 ```
 
 *GLMM*
-
 
 ```{r GLMM_errors}
 m1_error <- glmer(errors ~ PosOr.cont*session + 
                     (PosOr.cont*session|subject) +
                     (PosOr.cont*session|category) ,
-                  data =df, family = "binomial",
+                  data =df_errors, family = "binomial",
                   control=glmerControl(optimizer = "bobyqa"))
 didLmerConverge(m1_error)
 summary(m1_error)
 
 # save model output
+saveRDS(m1_error, file = here::here("results", "tables", "CSI_online_aphasia_spoken_glmm_errors.RDS"))
 tab_model(m1_error,transform = NULL,
           show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
           title = "GLMM (Binomial distribution) of Errors Predicted by Ordinal Position and Session",
@@ -619,6 +843,11 @@ tab_model(m1_error,transform = NULL,
           string.stat = "z-Value",
           file = here::here("results", "tables", "CSI_online_aphasia_spoken_glmm_errors.html"))
 ```
+
+
+
+
+
 
 
 # ---------------------------------------------

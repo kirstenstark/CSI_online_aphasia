@@ -1,0 +1,1140 @@
+---
+title: '04 CSI online spoken: Spoken - Plotting and analysis'
+author: "Kirsten Stark"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+```{r load_packages}
+#library(dplyr)
+library(tidyr)
+library(lme4)
+library(lmerTest)
+library(Rmisc)
+library(Cairo)
+#library(strengejacke)
+library(ggplot2)
+library(sjPlot)
+library(dplyr)
+
+options(scipen=999)
+
+rm(list = ls())
+options( "encoding" = "UTF-8" )
+set.seed(99)
+```
+
+
+## Load and preprocess data
+
+```{r load_data}
+# input 
+#input = "data_long_final.csv"
+input = "data_long_anonymous.csv"
+
+# load data
+df <- read.csv2(here::here("data", input), sep=",") #%>% select(-"X")
+```
+
+Check amount of participants and trials
+
+```{r checks}
+# no. of participants: 
+length(unique(df$subject))
+
+# no. of trials is 160 per participant? 
+nrow(df) == 3*160 * length(unique(df$subject))
+
+table(df$subject, df$session)
+
+# how many non-responses
+df %>% filter(VOT==0) %>% dplyr::group_by(subject, session) %>% 
+  dplyr::summarise(length(VOT))
+# table(df$VOT==0, df$subject, df$session)
+```
+
+## Drop filler trials
+
+```{r}
+df <- df %>% filter(category!="Filler") %>% droplevels()
+```
+
+## Add ordinal position
+
+```{r warning=FALSE}
+      # add position number
+df <- df %>% group_by(subject, session, category) %>% 
+      add_count() %>% 
+      dplyr::mutate(PosOr = seq(1:n)) %>% dplyr::select(-n)
+table(df$PosOr)
+#table(df$PosOr,df$session, df$subject)
+```
+
+## Factorize columns
+
+```{r transform_variables}
+# factorize columns
+df$VOT <- as.numeric(as.character(df$VOT))
+is.numeric(df$VOT)
+df$PosOr <- as.factor(df$PosOr)
+df$subject <- as.factor(df$subject)
+df$session <- as.factor(df$session)
+
+# define contrasts of sessin: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
+c<-contr.treatment(3)
+my.coding<-matrix(rep(1/3, 6), ncol=2)
+my.simple<-c-my.coding
+my.simple
+contrasts(df$session)<-my.simple
+levels(df$session)
+```
+
+## Classified errors and correct responses
+Correct responses start with 1.
+
+1 - exakt korrekt
+1.1 - alternative response
+1.2 - correct with phonematic paraphasia ≤25%
+1.3 - correct with correct article [*]
+
+[*] Bei 1.3 wollten wir schauen wie oft die Artikel mitgenannt wurden, aber das können wir ja erstmal vernachlässigen. Für die exakten Ergebnisse wollten wir dann ja nochmal besprechen, weil die Bestimmung der VOT nicht 100% möglich ist mit Artikel.
+
+```{r table_correctness}
+table(df$correct)
+```
+
+Errors 
+
+```{r}
+table(df$error)
+```
+
+Show amount of incorrect trials per ordinal position (excluding fillers):
+
+```{r}
+## How many incorrect (correct) non-filler trials per ordinal position?
+table(df$PosOr[df$category != "Filler" & df$correct == 0],
+      df$correct[df$category != "Filler" & df$correct == 0])
+table(df$PosOr[df$category != "Filler" & startsWith("1", df$correct)],
+      df$correct[df$category != "Filler" & startsWith("1", df$correct)])
+```
+
+Show amount of incorrect trials per subject
+
+```{r}
+df %>% filter(category != "Filler") %>% 
+  group_by(subject, session) %>%
+  count(correct) %>%  
+  mutate(prop=round(prop.table(n)*100, 2)) %>% 
+  filter(correct == "0") %>%
+  dplyr::select(-c(correct, n))
+```
+Total percentage of errors
+
+```{r}
+sum(df$correct[df$category != "Filler"]=="0", na.rm=T)/nrow(df%>%filter(category != "Filler"))
+```
+
+# REACTION TIMES
+
+Drop incorrect trials: 
+
+```{r}
+df_correct <- df %>% dplyr::filter(correct != 0)
+sum(!is.na(df_correct$error))
+```
+
+
+
+###  Plotting
+
+Make plots suitable for APA format, font sizes can be adjusted
+
+```{r apatheme}
+apatheme <- theme_bw()+
+  theme(plot.title=element_text(family="Arial",size=22,hjust = .5),
+        panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+        panel.border=element_blank(),axis.line=element_line(),
+        text=element_text(family="Arial",size=16))
+```
+
+### Descriptives
+
+```{r descriptives}
+(means_final<- df_correct %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("session", "PosOr"), na.rm = T))
+(means_final_cat<- df_correct %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "category",
+                          withinvars = c("session", "PosOr"), na.rm = T))
+(means_final_wo_session <- df_correct %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr"), na.rm = T))
+# Export as word file
+library(flextable)
+huxt_word <- huxtable::huxtable(means_final)
+huxt_word <- huxtable::set_number_format(huxt_word, round(2))
+huxtable::quick_docx(huxt_word, 
+                     file = here::here("results", "tables",
+                                       "CSI_online_subject_RT_by_session.docx"), 
+                                       open = FALSE)
+
+```
+
+### RTs by ordinal position
+Line graph (only correct trials, without fillers)
+
+```{r plot_rt}
+(plot_vot <- means_final_wo_session %>% 
+    ggplot(., aes(x=PosOr, y=VOT)) +
+    geom_point(size = 2)+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se), width =.1) +
+    stat_summary(fun=mean,  geom="line", size = 0.5, group=1, linetype="dashed")+
+    apatheme+
+    #scale_y_continuous(limits = c(1120, 1340), breaks =seq(1120,1340, by = 20)) +
+                       #breaks = c(1100, 1150, 1200, 1250, 1300, 1350)) + 
+    labs(x="Ordinal Position ",y ="VOT (ms)") + #+
+  # annotate(geom="text", x=1.5, y=1330, label="n = 30", 
+  #         color="black", size = 8))
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0))))
+
+filename <- "CSI_online_aphasia_spoken_plot_rt_Teap.pdf"
+ggsave(plot_vot, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+
+```
+
+Line graph by repetition (only correct trials, without fillers)
+
+```{r }
+(plot_rt_repetition <- means_final %>% 
+    ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
+    geom_point(size = 2)+
+    stat_summary(aes(linetype=session),fun=mean,  geom="line", size = 0.5) +
+    scale_linetype_manual(values=c("solid", "dashed", "dotted"))+
+    scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se, group = session), width =.1) +
+    apatheme+
+    #scale_y_continuous(limits = c(1120, 1340), breaks =seq(1120,1340, by = 20)) +
+                       #breaks = c(1100, 1150, 1200, 1250, 1300, 1350)) + 
+    labs(x="Ordinal Position ",y ="RT (ms)", colour="Session", linetype="Session") + #+
+  # annotate(geom="text", x=1.5, y=1330, label="n = 30", 
+  #         color="black", size = 8))
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0))))
+
+filename <- "CSI_online_aphasia_spoken_plot_rt_by_repetition_TeaP.pdf"
+ggsave(plot_rt_repetition, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+
+```
+
+
+Normalized boxplot 
+
+```{r boxplot_rt}
+means_subject <- df_correct %>% 
+   filter(category != "Filler") %>% 
+   summarySEwithin(.,"VOT",withinvars = c("subject","session", "PosOr"))
+(means_subject <- means_subject %>%
+  group_by(subject) %>%
+  dplyr::mutate(VOT_norm = VOT - first(VOT)))
+
+(boxplot <- 
+  ggplot() + 
+  ## boxplot
+  geom_boxplot(data=means_subject, aes(x = PosOr,y =VOT_norm),
+               colour = "grey", width = 0.3,fatten = 1)+
+  ### individual means
+  geom_jitter(data=means_subject, aes(x = PosOr,y =VOT_norm),
+              position = position_dodge(0.6),
+              shape=19,color = "dark grey", size=2)+
+  ### group means
+  stat_summary(data=means_subject, aes(x = PosOr,y =VOT_norm),
+               fun=mean, geom="point",colour = "black", shape=18, size=5)+
+  ### line
+  stat_summary(data=means_subject, aes(x = PosOr,y =VOT_norm),
+               fun=mean, geom="line",colour = "black", linetype = "longdash", group = 1)+
+  
+  ## other stuff
+  #scale_y_continuous(breaks = seq(600, 1300, by = 50))+
+  labs(x="Ordinal Position",y ="Normalized RTs (ms)")+
+  apatheme +
+  theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0))) +
+  coord_equal(ratio = 1/100))
+
+filename <- "CSI_online_aphasia_spoken_boxplot.pdf"
+ggsave(boxplot, filename = 
+         here::here("results", "figures", filename),
+       width = 13, height = 18, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+
+```
+
+### Export plot grid
+
+```{r plot_grid}
+# cowplot::plot_grid(plot_rt, boxplot,
+#           nrow = 1, labels = c("A", "B"), label_fontfamily = "Arial") %>%
+#   ggsave(filename = here::here("results", "figures",
+#                                "CSI_online_aphasia_typing_RTs_and_normalized_RTs"),
+#          width = 18, height = 13, units = "cm", dpi = 300, 
+#          device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", "CSI_online_typing_RTs_and_normalized_RTs"))
+
+```
+
+### ... with fillers for control
+
+```{r plot_rt_fillers}
+# (plot_rt_fillers <- df %>% 
+#     mutate(kind = case_when(category == "Filler" ~"Filler",
+#                           category != "Filler" ~"Experimental")) %>%
+#     ggplot(., aes(x=PosOr, y=timing.01, group=kind, color=kind)) +
+#     stat_summary(fun=mean,  geom="point", size = 2)+
+#     stat_summary(fun=mean,  geom="line", size = 1) +
+#     apatheme+
+#     labs(x="Ordinal Position ",y ="RT (ms)", color = "Trial type")+
+#   annotate(geom="text", x=1.5, y=1350, label="n = 30", 
+#            color="black", size = 8))
+# 
+# filename <- "CSI_online_typing_plot_rt_with_fillers.pdf"
+# ggsave(plot_rt_fillers, filename = 
+#          here::here("results", "figures", filename),
+#        width = 18, height = 13, units = "cm", 
+#        dpi = 300, device = cairo_pdf)
+# embedFonts(file = here::here("results", "figures", filename))
+```
+
+### Control: Plot RTs accross the experiment
+All correct trials (Excluding filler)
+
+```{r plot_RTs_all}
+(plot_RTs_all <- ggplot(data=df_correct, aes(x=trial, y=VOT, group=session, color=session)) +
+  stat_summary(fun=mean,  geom="point", size = 2)+
+  stat_summary(fun=mean,  geom="line", size = 1) +
+  apatheme+
+  labs(x="Trial ",y ="VOT (ms)")+
+  annotate(geom="text", x=20, y=200, label="n = 30", 
+           color="black", size = 8))
+
+filename <- "CSI_online_aphasia__spoken_plot_rts_across_experiment.pdf"
+ggsave(plot_RTs_all, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+```
+
+
+
+### Check distribution of data
+Are the data normally distributed or does a gamma distribution fit the data better?  
+
+*Center predictor variable*
+
+```{r}
+df_correct$PosOr.cont <- scale(as.numeric(as.character(df_correct$PosOr)),
+                                        center = T, scale = F)
+# table(df_valid$PosOr.cont)
+# mean(df_valid$PosOr.cont)
+```
+
+*Histogram of the reaction time data*
+
+```{r RT_hist}
+hist(df_correct$VOT)
+```
+
+*Exclude unrealistically short reaction times < 200 ms*
+
+```{r}
+sum(df_correct$VOT < 200)
+df_correct <- df_correct %>% filter(VOT >=200)
+```
+
+*Check fit of normal vs gamma distribution in histograms, q-q-plots and using objective criteria:*  
+1) Fit normal and gamma distributions to the reaction time data
+
+```{r load_fitdistrplus}
+library(fitdistrplus)
+```
+
+```{r fit.normal}
+fit.normal<- fitdist(df_correct$VOT, distr = "norm", method = "mle")
+summary(fit.normal)
+#plot(fit.normal)
+```
+
+```{r fit.gamma}
+fit.gamma <- fitdist(df_correct$VOT, distr = "gamma", method = "mle")
+summary(fit.gamma)
+#plot(fit.gamma)
+```
+
+2) Compare the fit of the two distributions  
+Visually compare fit of both distributions in histogram
+
+```{r density-comparison}
+denscomp(list(fit.gamma, fit.normal))
+```
+
+Visually compare fit of both distributions in Q-Q-plots
+
+```{r q-q-comparison}
+qqcomp(list(fit.gamma, fit.normal))
+```
+
+Compare information criteria
+
+```{r fit_criteria-comparison}
+gofstat(list(fit.gamma, fit.normal),
+        fitnames = c("Gamma", "Normal"))
+```
+
+**Conclusion:** .
+
+
+### Inferential analyses: GLMM (Gamma distribution) with ordinal position as a continuous predictor
+
+
+```{r GLMM_cont}
+m1 <- glmer(VOT ~ PosOr.cont*session + 
+               (PosOr.cont*session|subject) +
+              (PosOr.cont*session|category),
+             data = df_correct, 
+            family =Gamma(link ="identity"), 
+            control=glmerControl(optimizer = "bobyqa"))
+
+## This function provides a better convergence check for lme4 v>1.0 models, which have a nasty habit of throwing up false nonconvergence warnings.  It implements Ben Bolker's suggestion here (https://github.com/lme4/lme4/issues/120), referred to again here (http://stats.stackexchange.com/questions/97929/lmer-model-fails-to-converge).
+didLmerConverge = function(lmerModel){
+  relativeMaxGradient=signif(max(abs(with(
+    lmerModel@optinfo$derivs,solve(Hessian,gradient)))),3)
+  if (relativeMaxGradient < 0.001) {
+    cat(sprintf("\tThe relative maximum gradient of %s is less than our 0.001 criterion.\n\tYou can safely ignore any warnings about a claimed convergence failure.\n\n", relativeMaxGradient))
+  }
+  else {
+    cat(sprintf("The relative maximum gradient of %s exceeds our 0.001 criterion.\nThis looks like a real convergence failure; maybe try simplifying your model?\n\n", relativeMaxGradient))
+  }
+}
+
+didLmerConverge(m1)
+
+summary(m1)
+anova(m1)
+
+# save model output
+tab_model(m1,transform = NULL,
+          show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
+          title = "GLMM (Gamma distribution) of VOTs Predicted by Ordinal Position and Session",
+          pred.labels = c("(Intercept)", "Ordinal Position", "Session 2 vs 1", 
+                          "Session 3 vs 1", "Ord.Pos. x Session2-1",
+                          "Ord.Pos. x Session3-1"),
+          dv.labels = "Vocal Onset Time",
+          #string.pred = "",
+          string.stat = "t-Value",
+          file = here::here("results", "tables", "CSI_online_aphasia_spoken_glmm_cont.html"))
+```
+
+### Comparison with transformed RTs
+
+*Box-cox test*  
+(common transformations: -2 -> 1/(Y^2), -1 -> 1/y, -0.5 -> 1/(sqrt(y))), 
+0 -> log(y), 0.5 -> sqrt(y), *1 -> y*, 2 -> y^2, 3 -> y^3)
+
+```{r}
+boxcox(df_correct$VOT ~ df_correct$PosOr*df_correct$session)
+
+## Box-Cox suggests idoesn't really suggest a transformation, inversely transformed data seem to fit equally well as the raw RTs --> compute LMM with raw RTs
+## for the main analyses we will use a GLMM
+boxcox((1000/df_correct$VOT)~  df_correct$PosOr*df_correct$session)
+#boxcox((1000/df$rt1)~ df$experiment*df$task*df$naming)
+boxcox(1/sqrt(df_correct$VOT)~ df_correct$PosOr*df_correct$session)
+
+boxcox(log(df_correct$VOT)~ df_correct$PosOr*df_correct$session)
+
+df_correct$VOTsq <- 1/sqrt(df_correct$VOT)
+```
+
+```{r}
+library(lmerTest)
+m1_lmm <- lmer(VOTsq ~ PosOr.cont*session + 
+               (PosOr.cont*session|subject) +
+              (PosOr.cont*session|category),
+             data = df_correct, 
+            control=lmerControl(optimizer = "bobyqa"))
+didLmerConverge(m1_lmm)
+
+summary(m1_lmm)
+anova(m1_lmm)
+
+tab_model(m1_lmm,transform = NULL,
+          show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
+          title = "LMM of VOTs Predicted by Ordinal Position and Session",
+          pred.labels = c("(Intercept)", "Ordinal Position", "Session 2 vs 1", 
+                          "Session 3 vs 1", "Ord.Pos. x Session2-1",
+                          "Ord.Pos. x Session3-1"),
+          dv.labels = "Vocal Onset Time (log-transformed)",
+          #string.pred = "",
+          string.stat = "t-Value",
+          file = here::here("results", "tables", "CSI_online_aphasia_spoken_control_lmm_VOT.html"))
+```
+
+# ERROR RATES
+
+### Descriptives
+
+```{r descriptives_errors}
+df %>% mutate(errors = case_when(correct == "0" ~ 1,
+                                 #is.na(correct) ~ NA, # these are the trials were the audio recordings are missing 
+                                 correct != "0" ~ 0)) -> df
+#df$VOT[is.na(df$correct)]
+
+(means_final_errors<- df %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"errors",idvar = "subject",
+                          withinvars = c("session", "PosOr"),
+                          na.rm = T))
+(means_final_cat_errors <- df %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"errors",idvar = "category",
+                          withinvars = c("session", "PosOr"),
+                          na.rm = T))
+(means_final_wo_session_errors <- df %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"errors",idvar = "subject",
+                          withinvars = c("PosOr"), na.rm = T))
+# Export as word file
+library(flextable)
+huxt_word <- huxtable::huxtable(means_final_errors)
+huxt_word <- huxtable::set_number_format(huxt_word, round(2))
+huxtable::quick_docx(huxt_word, 
+                     file = here::here("results", "tables",
+                                       "CSI_online_subject_errors_by_session.docx"), 
+                                       open = FALSE)
+
+```
+
+### Plotting
+
+Errors by ordinal position
+
+```{r plot_errors}
+(plot_errors <- means_final_wo_session_errors %>% 
+    ggplot(., aes(x=PosOr, y=errors*100)) +
+    geom_point(size = 2)+
+    geom_errorbar(aes(ymin=errors*100-se*100, ymax=errors*100+se*100),
+                  width =.1) +
+    stat_summary(fun=mean,  geom="line", size = 0.5, group=1, linetype="dashed")+
+    apatheme+
+    #scale_y_continuous(limits = c(1120, 1340), breaks =seq(1120,1340, by = 20)) +
+                       #breaks = c(1100, 1150, 1200, 1250, 1300, 1350)) + 
+    labs(x="Ordinal Position ",y ="Percentage of errors") + #+
+  # annotate(geom="text", x=1.5, y=1330, label="n = 30", 
+  #         color="black", size = 8))
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0))))
+
+filename <- "CSI_online_aphasia_spoken_plot_errors_Teap.pdf"
+ggsave(plot_errors, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+
+```
+
+Errors by ordinal position and repetition
+
+```{r}
+(plot <- ggplot(data=means_final_errors, aes(x=PosOr, y=errors*100, group=session, color = session)) +
+  geom_point( size = 2)+
+  geom_errorbar(aes(ymin=errors*100-se*100, ymax=errors*100+se*100, group = session), width =.1) +
+  stat_summary(fun=mean,  aes(linetype=session), geom="line", size = 0.5) +
+  apatheme+
+   scale_linetype_manual(values=c("solid", "dashed", "dotted"))+
+  scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+ # scale_y_continuous(breaks = seq(6, 14, by = 2), limits = c(5.5, 15))+
+  labs(x="Ordinal Position ",y ="Percentage of errors"))
+
+filename <- "CSI_online_spoken_plot_errors_by_repetition_TeaP.pdf"
+ggsave(plot, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("data", "verbal_CSI", "Plots", filename))
+ 
+ 
+```
+
+
+### GLMM with binomial distribution
+
+*Center predictor variable*
+
+```{r}
+df$PosOr.cont <- scale(as.numeric(as.character(df$PosOr)),
+                                        center = T, scale = F)
+```
+
+*GLMM*
+
+
+```{r GLMM_errors}
+m1_error <- glmer(errors ~ PosOr.cont*session + 
+                    (PosOr.cont*session|subject) +
+                    (PosOr.cont*session|category) ,
+                  data =df, family = "binomial",
+                  control=glmerControl(optimizer = "bobyqa"))
+didLmerConverge(m1_error)
+summary(m1_error)
+
+# save model output
+tab_model(m1_error,transform = NULL,
+          show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
+          title = "GLMM (Binomial distribution) of Errors Predicted by Ordinal Position and Session",
+          pred.labels = c("(Intercept)", "Ordinal Position", "Session 2 vs 1", 
+                          "Session 3 vs 1", "Ord.Pos. x Session2-1",
+                          "Ord.Pos. x Session3-1"),
+          dv.labels = "Error Rate",
+          #string.pred = "",
+          string.stat = "z-Value",
+          file = here::here("results", "tables", "CSI_online_aphasia_spoken_glmm_errors.html"))
+```
+
+
+# ---------------------------------------------
+# Additional plots
+### RTs by subject
+Line graph for each participant: 
+
+```{r, warning=FALSE}
+modeloutput <- coef(m1)$subject
+(means_final_subject <- df_correct %>% 
+   summarySEwithin(.,"VOT",withinvars = c("subject","PosOr", "session")))
+(means_final<- df_correct %>%  
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr", "session"),
+                          na.rm = T))
+(means_grand<- df_correct %>%  
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr", "session"),
+                          na.rm = T))
+for(i in 1:nrow(means_final_subject)) {
+  means_final_subject$grandmean[i] <- means_grand$VOT[
+    means_grand$PosOr == means_final_subject$PosOr[i]] - means_grand$VOT[means_grand$PosOr== 1]
+  means_final_subject$normalizedRT[i] <- means_final_subject$VOT[i] -
+    means_final_subject$VOT[
+      means_final_subject$subject ==
+        means_final_subject$subject[i] & 
+        means_final_subject$PosOr == 1 &
+        means_final_subject$session ==
+        means_final_subject$session[i]]
+  # prepare for ordering
+  means_final_subject$effect[i] <- modeloutput$PosOr.cont[means_final_subject$subject[i]]
+}
+#means_final_subject$order <-order(means_final_subject$effect)-1
+#means_final_subject$order <- means_final_subject$order %/% 5
+means_final_subject <- means_final_subject[order(desc(means_final_subject$effect)),] 
+means_final_subject$effect <- as.factor(round(means_final_subject$effect, 2))
+means_final_subject$effect <- factor(means_final_subject$effect, levels=rev(levels(means_final_subject$effect )))
+
+# add participant number
+means_final_subject <- means_final_subject %>% 
+  mutate(subject_en = paste0("Participant ",subject,"\n(",effect,")",sep='')) 
+means_final_subject <- means_final_subject %>% 
+  mutate(subject_en = as.factor(subject_en)) %>% 
+  # mutate(subject_en = case_when(subject_en=="Participant 23\n(25.1)" ~
+  #                                   "Participant 23\n(25.10)",
+  #                                 subject_en=="Participant 19\n(37.5)" ~
+  #                                   "Participant 19\n(37.50)",
+  #                                 subject_en=="Participant 12\n(38.3)" ~
+  #                                   "Participant 12\n(38.30)",
+  #                                 TRUE~subject_en)) %>%
+  mutate(subject_en=factor(subject_en,levels=c(
+    "Participant 7\n(67.44)","Participant 5\n(58.82)",
+    "Participant 4\n(51.99)","Participant 1\n(37.85)",
+    "Participant 2\n(36.36)","Participant 3\n(21.43)",
+    "Participant 6\n(3.51)")))
+
+# Plotting
+(plot_rt_subject <- means_final_subject %>% 
+    ggplot(., aes(x=PosOr,y=normalizedRT, 
+                  group=session, color = session, na.rm=T)) +
+    geom_point(size =1) +
+    geom_line(aes(x=PosOr,y=normalizedRT,
+                  color=session, linetype=session),
+              #group = 1,
+              size = 0.5) +
+    geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"), 
+              group = 1,size = 0.8)+
+    geom_errorbar(aes(ymin=normalizedRT-se, ymax=normalizedRT+se,
+                       group=session, color=session), width =.1) +
+    scale_color_manual(name="",
+                       values=c("1"="#000000", "2"="#E69F00",
+                                "3"="#0072B2", "b"="dark gray"),
+                       labels=c("Session 1", "Session 2", 
+                                "Session 3",  
+                                "Mean across participants"))+
+    scale_linetype_manual(name="",
+                          values=c("1"="dashed", "2"="dotted", 
+                                   "3" = "longdash","d"="solid"),
+                          labels=c("Session 1", "Session 2", 
+                                "Session 3", 
+                                   "Mean across participants"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Normalized RTs (ms)") +
+    facet_wrap(means_final_subject$subject_en, scales='free',  ncol=4)+
+    scale_y_continuous(limits = c(-450, 800),
+                       breaks = c(-400,-200, 0,200,400,600)) +
+    # scale_x_discrete(breaks=c(1,2,3,4,5))+
+    theme(legend.position = "bottom"))
+#plot_rt <- lemon::reposition_legend(plot_rt, "bott1.1.om right",panel='panel-5-5')
+
+filename <- "CSI_online_aphasia_RT_effect_by_participant.pdf"
+ggsave(plot_rt_subject, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+     #embedFonts(file = here::here("results", "figures", filename))
+
+```
+
+
+### RTs by category
+Line graph for each category: 
+
+```{r plot_by_size_category, warning=FALSE}
+modeloutput <- coef(m1)$category
+(means_final_category <- df_correct %>% 
+   summarySEwithin(.,"VOT",withinvars = c("category","PosOr", "session")))
+(means_final<- df_correct %>%  
+   Rmisc::summarySEwithin(.,"VOT",idvar = "category",
+                          withinvars = c("PosOr", "session"), na.rm = T))
+(means_grand<- df_correct %>%  
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr", "session"),
+                          na.rm = T))
+
+for(i in 1:nrow(means_final_category)) {
+  means_final_category$grandmean[i] <- means_grand$VOT[
+    means_grand$PosOr == means_final_category$PosOr[i]] - means_grand$VOT[means_grand$PosOr== 1]
+  means_final_category$normalizedRT[i] <- means_final_category$VOT[i] -
+    means_final_category$VOT[
+      means_final_category$category == means_final_category$category[i] & means_final_category$PosOr == 1 &
+        means_final_category$session ==
+        means_final_category$session[i]]
+  # prepare for ordering
+  means_final_category$effect[i] <- modeloutput$PosOr.cont[means_final_category$category[i]] 
+}
+
+#means_final_category$order <-order(means_final_category$effect)-1
+#means_final_category$order <- means_final_category$order %/% 5
+means_final_category <- means_final_category[
+  order(desc(means_final_category$effect)),] 
+means_final_category$effect <- as.factor(
+  round(means_final_category$effect, 2))
+means_final_category$effect <- factor(
+  means_final_category$effect, levels=rev(levels(means_final_category$effect )))
+
+
+# order category levels by effect size
+means_final_category$category <- factor(
+  means_final_category$category, levels=c( "Sitzen", "Heimwerker", "Kochen", "Obst", "Körperteile", "Schmuck", "Instrumente", "Jacken", "Raubtiere", "Trinkgefässe", "Insekten", "Huftiere", "Küche", "Fische", "Strasse",
+                                           "Bauernhof", "Wasser", "Aufbewahrung", "Süssigkeiten", "Gebäude",
+                                           "Blumen", "Gemüse", "Vögel", "Büro"))
+# give categories English names and combine with effect size
+means_final_category <- means_final_category %>% 
+  mutate(category_en = case_when(
+    category == "Aufbewahrung" ~ paste0(
+      "Storage\n\n(", effect, ")", sep=''), 
+    category == "Bauernhof" ~ paste0(
+      "Farming\ntools\n(", effect, ")", sep=''), 
+    category == "Blumen" ~ paste0(
+      "Flowers\n\n(", effect, ")", sep=''),
+    category == "Büro" ~ paste0(
+      "Office\ntools\n(", effect, ")", sep=''),
+    category == "Fische" ~ paste0(
+      "Fish\n\n(", effect, ")", sep=''),
+    category == "Gebäude" ~ paste0(
+      "Buildings\n\n(", effect, ")", sep=''),
+    category == "Gemüse" ~ paste0(
+      "Vegetables\n\n(", effect, ")", sep=''),
+    category == "Heimwerker" ~ paste0(
+      "Carpenter.s\ntools\n(", effect, ")", sep=''),
+    category == "Huftiere" ~ paste0(
+      "Hoofed\nanimals\n(", effect, ")", sep=''),
+    category == "Insekten" ~ paste0(
+      "Insects\n\n(", effect, ")", sep=''),
+    category == "Instrumente" ~ paste0(
+      "Instruments\n\n(", effect, ")", sep=''),
+    category == "Jacken" ~ paste0(
+      "Jackets\n\n(", effect, ")", sep=''),
+    category == "Kochen" ~ paste0(
+      "Cooking\nequipment\n(", effect, ")", sep=''),
+    category == "Körperteile" ~ paste0(
+      "Body parts\n\n(", effect, ")", sep=''),
+    category == "Küche" ~ paste0(
+      "Kitchen\nfurniture\n(", effect, ")", sep=''),
+    category == "Obst" ~ paste0(
+      "Fruits\n\n(", effect, ")", sep=''),
+    category == "Raubtiere" ~ paste0(
+      "Predators\n\n(", effect, ")", sep=''),
+    category == "Schmuck" ~ paste0(
+      "Jewelry\n\n(", effect, ")", sep=''),
+    category == "Sitzen" ~ paste0(
+      "Seating\nfurniture\n(", effect, ")", sep=''),
+    category == "Strasse" ~ paste0(
+      "Street\nvehicles\n(", effect, ")", sep=''),
+    category == "Süssigkeiten" ~ paste0(
+      "Sweets\n\n(", effect, ")", sep=''),
+    category == "Trinkgefässe" ~ paste0(
+      "Drinking\nvessels\n(", effect, ")", sep=''),
+    category == "Vögel" ~ paste0(
+      "Birds\n\n(", effect, ")", sep=''),
+    category == "Wasser" ~ paste0(
+      "Water\nvehicles\n(", effect, ")", sep=''))) %>%
+  # mutate(category_en = case_when(category_en=="Instruments\n\n(18.3)" ~
+  #                                   "Instruments\n\n(18.30)",
+  #                                 category_en=="Body parts\n\n(35.4)" ~
+  #                                   "Body parts\n\n(35.40)",
+  #                                 TRUE~category_en)) %>%
+  mutate(category_en=factor(category_en,levels=c(
+    "Seating\nfurniture\n(57.08)", "Carpenter.s\ntools\n(55.71)", "Cooking\nequipment\n(55.56)", 
+    "Fruits\n\n(55.43)", "Body parts\n\n(50.43)", "Jewelry\n\n(50.16)", "Instruments\n\n(49.02)",
+    "Jackets\n\n(47.56)", "Predators\n\n(46.9)", "Drinking\nvessels\n(46.22)", "Insects\n\n(45.87)",
+    "Hoofed\nanimals\n(43.77)", "Kitchen\nfurniture\n(40.27)", "Fish\n\n(38.34)",
+    "Street\nvehicles\n(36.67)", "Farming\ntools\n(35.89)", "Water\nvehicles\n(35.71)",
+    "Storage\n\n(34.04)", "Sweets\n\n(31.56)","Buildings\n\n(25.92)",
+    "Flowers\n\n(25.32)","Vegetables\n\n(25.26)","Birds\n\n(23.41)","Office\ntools\n(18.11)")))    
+
+
+# Plotting
+(plot_rt_category <- means_final_category %>% 
+    ggplot(., aes(x=PosOr,y=normalizedRT, 
+                  group=session, color = session, na.rm=T)) +
+    geom_point(size =1) +
+    geom_line(aes(x=PosOr,y=normalizedRT,
+                  color=session, linetype=session),
+              size = 0.5) +
+    geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"), 
+              group = 1,size = 0.8)+
+    geom_errorbar(aes(ymin=normalizedRT-se, ymax=normalizedRT+se,
+                       group=session, color=session), width =.1) +
+    scale_color_manual(name="",
+                       values=c("1"="#000000", "2"="#E69F00",
+                                "3"="#0072B2", "b"="dark gray"),
+                       labels=c("Session 1", "Session 2", 
+                                "Session 3",  
+                                "Mean across participants"))+
+    scale_linetype_manual(name="",
+                          values=c("1"="dashed", "2"="dotted", 
+                                   "3" = "longdash","d"="solid"),
+                          labels=c("Session 1", "Session 2", 
+                                "Session 3", 
+                                   "Mean across participants"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Normalized RTs (ms)") +
+    facet_wrap(means_final_category$category_en, scales='free', ncol=6)+
+    scale_y_continuous(limits = c(-800, 1000), 
+                        breaks = c(-800,-400, 0,400,800)) + 
+    scale_x_discrete(breaks=c(1,2,3,4,5))+
+    theme(legend.position = "bottom"))
+#plot_rt <- lemon::reposition_legend(plot_rt, "bott1.1.om right",panel='panel-5-5')
+
+filename <- "CSI_online_aphasia_RT_effect_by_category.pdf"
+ggsave(plot_rt_category, filename = 
+         here::here("results", "figures", filename),
+       width = 26, height = 21.5, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+      #embedFonts(file = here::here("results", "figures", filename))
+```
+
+Make plot grid
+
+```{r}
+# filename <- "CSI_online_typing_effects_by_subject_and_category.pdf"
+# cowplot::plot_grid(plot_rt_subject, plot_rt_category,
+#           nrow = 2, rel_heights = c(1.1, 0.9), labels = c("A", "B"),
+#           label_fontfamily = "Helvetica", label_size=22) %>%
+#   ggsave(filename = here::here("results", "figures",filename),
+#          width = 26, height = 42, units = "cm", 
+#          dpi = 300, device = cairo_pdf)
+# embedFonts(file = here::here("results", "figures", filename))
+```
+
+
+### Errors by subject
+
+Amount of errors by subject (across categories): 
+
+```{r plot_by_size}
+modeloutput <- coef(m1_error)$subject
+(means_final_subject <- df %>% 
+   summarySEwithin(.,"errors",withinvars = c("subject","PosOr", "session"), na.rm=T))
+(means_final<- df %>%  
+   Rmisc::summarySEwithin(.,"errors",idvar = "subject",
+                          withinvars = c("PosOr", "session"), na.rm = T))
+(means_grand<- df %>%  
+   Rmisc::summarySEwithin(.,"errors",idvar = "subject",
+                          withinvars = c("PosOr", "session"),
+                          na.rm = T))
+
+for(i in 1:nrow(means_final_subject)) {
+  means_final_subject$grandmean[i] <- 
+    means_grand$errors[
+      means_grand$PosOr == means_final_subject$PosOr[i]] -
+    means_grand$errors[means_grand$PosOr== "1"]
+  means_final_subject$normalized_errors[i] <-
+    means_final_subject$errors[i] - means_final_subject$errors[
+      means_final_subject$subject == means_final_subject$subject[i] &
+        means_final_subject$PosOr == 1 &
+      means_final_subject$session ==
+        means_final_subject$session[i]] 
+  # prepare for ordering
+   means_final_subject$error_effect[i] <-
+     modeloutput$PosOr.cont[means_final_subject$subject[i]] 
+}
+means_final_subject <- means_final_subject[order(desc(means_final_subject$error_effect)),] 
+means_final_subject$error_effect <- as.factor(round(means_final_subject$error_effect*100, 1))
+means_final_subject$error_effect <- factor(means_final_subject$error_effect, levels=rev(levels(means_final_subject$error_effect )))
+
+
+# add participant number
+# means_final_subject <- means_final_subject %>% 
+#   mutate(subject_en = factor(paste0("Participant ",subject, sep='')))
+means_final_subject <- means_final_subject %>% 
+  mutate(subject_en = paste0("Participant ",subject,"\n(",error_effect,")",sep='')) 
+means_final_subject <- means_final_subject %>% 
+  mutate(subject_en = as.factor(subject_en)) %>% 
+  mutate(subject_en=factor(subject_en,levels=c(
+    "Participant 7\n(13.7)","Participant 2\n(11.7)","Participant 1\n(10.5)",
+    "Participant 5\n(9.1)","Participant 3\n(7.7)","Participant 4\n(6.1)",
+    "Participant 6\n(5.5)")))
+
+# Plotting
+(plot_error_subject <- means_final_subject %>% 
+    ggplot(., aes(x=PosOr,y=normalized_errors, 
+                  color=session, group=session,na.rm=T)) +
+    geom_point(size =1) +
+    geom_line(aes(x=PosOr,y=normalized_errors, color=session, linetype=session),
+              size = 0.5) +
+    geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"), 
+              group = 1,size = 0.8)+
+    geom_errorbar(aes(ymin=normalized_errors-se, ymax=normalized_errors+se,
+                      group=session, color=session), 
+                  width =.1) +
+    scale_color_manual(name="",
+                       values=c("1"="#000000", "2"="#E69F00",
+                                "3"="#0072B2", "b"="dark gray"),
+                       labels=c("Session 1", "Session 2", 
+                                "Session 3",  
+                                "Mean across participants"))+
+    scale_linetype_manual(name="",
+                          values=c("1"="dashed", "2"="dotted", 
+                                   "3" = "longdash","d"="solid"),
+                          labels=c("Session 1", "Session 2", 
+                                "Session 3", 
+                                   "Mean across participants"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Normalized No. of Errors") +
+    facet_wrap(means_final_subject$subject_en, scales='free', ncol=4)+
+    scale_y_continuous(limits = c(-0.3, 0.5),
+                       breaks = c(-0.20, -0.10, 0, 0.10, 0.20, 0.3, 0.4, 0.5)) +
+    scale_x_discrete(breaks=c(1,2,3,4,5))+
+    theme(legend.position = "bottom"))
+#plot_rt <- lemon::reposition_legend(plot_rt, "bott1.1.om right",panel='panel-5-5')
+
+
+filename <- "CSI_online_aphasia_errors_effect_by_participant.pdf"
+ggsave(plot_error_subject, filename = 
+         here::here("results", "figures", filename),
+       width = 18, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+     #embedFonts(file = here::here("results", "figures", filename))
+```
+
+### Errors by category
+Line graph for each category: 
+
+```{r plot_by_size_subcat, warning=FALSE}
+modeloutput <- coef(m1_error)$category
+(means_final_category <- df %>% 
+   summarySEwithin(.,"errors",withinvars = c("category","PosOr", "session"), na.rm=T))
+(means_final<- df %>%  
+   Rmisc::summarySEwithin(.,"errors",idvar = "category",
+                          withinvars = c("PosOr", "session"), na.rm = T))
+(means_grand<- df %>%  
+   Rmisc::summarySEwithin(.,"errors",idvar = "category",
+                          withinvars = c("PosOr", "session"),
+                          na.rm = T))
+
+
+for(i in 1:nrow(means_final_category)) {
+  means_final_category$grandmean[i] <- means_grand$errors[
+    means_grand$PosOr == means_final_category$PosOr[i]] -
+    means_grand$errors[means_grand$PosOr== 1]
+  means_final_category$normalizederror[i] <- means_final_category$errors[i] -
+    means_final_category$errors[
+        means_final_category$category == means_final_category$category[i] & means_final_category$PosOr == 1 &
+        means_final_category$session ==
+        means_final_category$session[i]]
+  # prepare for ordering
+  means_final_category$effect[i] <-
+    modeloutput$PosOr.cont[means_final_category$category[i]] 
+}
+
+
+means_final_category <- means_final_category[
+  order(desc(means_final_category$effect)),] 
+means_final_category$effect <- as.factor(
+  round(means_final_category$effect*100, 2))
+means_final_category$effect <- factor(
+  means_final_category$effect, levels=rev(levels(means_final_category$effect )))
+
+
+# order category levels by effect size
+means_final_category$category <- factor(
+  means_final_category$category, levels=c("Bauernhof","Huftiere","Körperteile", "Büro","Obst",
+"Gebäude","Süssigkeiten","Instrumente","Jacken","Fische",
+"Gemüse","Wasser","Sitzen","Blumen","Heimwerker","Vögel",
+"Schmuck","Trinkgefässe", "Strasse","Kochen","Küche",
+"Insekten","Raubtiere","Aufbewahrung"))
+
+# give categories English names and combine with effect size
+means_final_category <- means_final_category %>% 
+  mutate(category_en = case_when(
+    category == "Aufbewahrung" ~ paste0(
+      "Storage\n\n(", effect, ")", sep=''), 
+    category == "Bauernhof" ~ paste0(
+      "Farming\ntools\n(", effect, ")", sep=''), 
+    category == "Blumen" ~ paste0(
+      "Flowers\n\n(", effect, ")", sep=''),
+    category == "Büro" ~ paste0(
+      "Office\ntools\n(", effect, ")", sep=''),
+    category == "Fische" ~ paste0(
+      "Fish\n\n(", effect, ")", sep=''),
+    category == "Gebäude" ~ paste0(
+      "Buildings\n\n(", effect, ")", sep=''),
+    category == "Gemüse" ~ paste0(
+      "Vegetables\n\n(", effect, ")", sep=''),
+    category == "Heimwerker" ~ paste0(
+      "Carpenter.s\ntools\n(", effect, ")", sep=''),
+    category == "Huftiere" ~ paste0(
+      "Hoofed\nanimals\n(", effect, ")", sep=''),
+    category == "Insekten" ~ paste0(
+      "Insects\n\n(", effect, ")", sep=''),
+    category == "Instrumente" ~ paste0(
+      "Instruments\n\n(", effect, ")", sep=''),
+    category == "Jacken" ~ paste0(
+      "Jackets\n\n(", effect, ")", sep=''),
+    category == "Kochen" ~ paste0(
+      "Cooking\nequipment\n(", effect, ")", sep=''),
+    category == "Körperteile" ~ paste0(
+      "Body parts\n\n(", effect, ")", sep=''),
+    category == "Küche" ~ paste0(
+      "Kitchen\nfurniture\n(", effect, ")", sep=''),
+    category == "Obst" ~ paste0(
+      "Fruits\n\n(", effect, ")", sep=''),
+    category == "Raubtiere" ~ paste0(
+      "Predators\n\n(", effect, ")", sep=''),
+    category == "Schmuck" ~ paste0(
+      "Jewelry\n\n(", effect, ")", sep=''),
+    category == "Sitzen" ~ paste0(
+      "Seating\nfurniture\n(", effect, ")", sep=''),
+    category == "Strasse" ~ paste0(
+      "Street\nvehicles\n(", effect, ")", sep=''),
+    category == "Süssigkeiten" ~ paste0(
+      "Sweets\n\n(", effect, ")", sep=''),
+    category == "Trinkgefässe" ~ paste0(
+      "Drinking\nvessels\n(", effect, ")", sep=''),
+    category == "Vögel" ~ paste0(
+      "Birds\n\n(", effect, ")", sep=''),
+    category == "Wasser" ~ paste0(
+      "Water\nvehicles\n(", effect, ")", sep=''))) %>%
+    mutate(category_en=factor(category_en,levels=c(
+    "Farming\ntools\n(21.79)","Hoofed\nanimals\n(19.27)","Body parts\n\n(16.25)",
+    "Office\ntools\n(14.8)","Fruits\n\n(14.39)","Buildings\n\n(14.35)",
+    "Sweets\n\n(13.91)","Instruments\n\n(12.64)","Jackets\n\n(11.62)",
+    "Fish\n\n(10.6)","Vegetables\n\n(10.4)","Water\nvehicles\n(10.01)",
+    "Seating\nfurniture\n(8.59)","Flowers\n\n(6.08)","Carpenter.s\ntools\n(5.67)",
+    "Birds\n\n(5.61)","Jewelry\n\n(5.42)","Drinking\nvessels\n(5.4)",
+    "Street\nvehicles\n(5.13)","Cooking\nequipment\n(5.11)",
+    "Kitchen\nfurniture\n(4.61)","Insects\n\n(0)","Predators\n\n(-3.15)",
+    "Storage\n\n(-4.33)")))
+
+# Plotting
+(plot_error_category <- means_final_category %>% 
+    ggplot(., aes(x=PosOr,y=normalizederror,
+                  group=session, color = session, na.rm=T)) +
+    geom_point(size =1) +
+    geom_line(aes(x=PosOr,y=normalizederror,
+                  color=session, linetype=session),
+              size = 0.5) +
+    geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"), 
+              group = 1,size = 0.8)+
+    geom_errorbar(aes(ymin=normalizederror-se, ymax=normalizederror+se, 
+                       group=session, color=session), width =.1) +
+    scale_color_manual(name="",
+                       values=c("1"="#000000", "2"="#E69F00",
+                                "3"="#0072B2", "b"="dark gray"),
+                       labels=c("Session 1", "Session 2", 
+                                "Session 3",  
+                                "Mean across participants"))+
+    scale_linetype_manual(name="",
+                          values=c("1"="dashed", "2"="dotted", 
+                                   "3" = "longdash","d"="solid"),
+                          labels=c("Session 1", "Session 2", 
+                                "Session 3", 
+                                   "Mean across participants"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Normalized No. of Errors") +
+    facet_wrap(means_final_category$category_en, scales='free', ncol=6)+
+    scale_y_continuous(limits = c(-0.9, 1.0),
+                       breaks = c(-0.8, -0.4, 0, 0.4, 0.8)) +
+    scale_x_discrete(breaks=c(1,2,3,4,5))+
+    theme(legend.position = "bottom"))
+#plot_rt <- lemon::reposition_legend(plot_rt, "bott1.1.om right",panel='panel-5-5')
+
+filename <- "CSI_online_aphasia_errors_by_category.pdf"
+ggsave(plot_error_category, filename = 
+         here::here("results", "figures", filename),
+       width = 26, height = 23, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("data", "verbal_CSI", "Plots", filename))
+```
+
+Make plot grid
+
+```{r warnings=FALSE, message=FALSE, echo=FALSE}
+# filename <- "CSI_online_spoken_errors_by_subject_and_subcat.pdf"
+# cowplot::plot_grid(plot_error_subject, plot_error_subcat,
+#           nrow = 2, rel_heights = c(1, 1), labels = c("A", "B"),
+#           label_fontfamily = "Helvetica", label_size=22) %>%
+#   ggsave(filename = here::here("data", "verbal_CSI", "Plots",filename),
+#          width = 26, height = 42, units = "cm",
+#          dpi = 300, device = cairo_pdf)
+# embedFonts(file = here::here("data", "verbal_CSI", "Plots", filename))
+```
+
