@@ -2,6 +2,9 @@
 data/
 data/raw/
 data/power-analysis/
+data/transent_data_files/
+results/
+/results/
 
 .DS_Store
 

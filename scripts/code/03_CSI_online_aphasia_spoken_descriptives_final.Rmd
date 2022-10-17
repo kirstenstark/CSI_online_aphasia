@@ -25,7 +25,7 @@ rm(list = ls())
 options( "encoding" = "UTF-8" )
 
 # input
-input <- "aphasia_patient_final.csv"
+input <- "aphasia_final.csv"
 
 # load data
 df <- read.csv(here::here("data", "transient_data_files", input), 
@@ -42,7 +42,8 @@ range(df$timetotal) # 15 to 126 min
 
 print("Total duration, split by session")
 
-df %>% group_by(session) %>% summarise(mean = mean(timetotal),
+df %>% group_by(type,session) %>% summarise(mean = mean(timetotal),
+                                            median=median(timetotal),
                                        sd = sd(timetotal), 
                                        min = min(timetotal), 
                                        max = max(timetotal))
@@ -54,9 +55,11 @@ df %>% group_by(session) %>% summarise(mean = mean(timetotal),
 Gender: 
 
 ```{r gender}
-df <- df %>% mutate(gender_char = case_when(gender == 1 ~ "female", 
-                                     gender == 2 ~ "male"))
-table(df$gender_char)/160/3 # 1 = female, 2 = male, 3 = diverse
+(df %>% mutate(gender_char = case_when(gender == 1 ~ "female", 
+                                     gender == 2 ~ "male")) %>% 
+  group_by(type, gender_char) %>% count(gender_char) %>% 
+   mutate(n=n/160/3) -> gender)
+ # 1 = female, 2 = male, 3 = diverse
 
 print("percentage female:")
 sum(df$gender == 1)/nrow(df)
@@ -65,21 +68,25 @@ sum(df$gender == 1)/nrow(df)
 Age: 
 
 ```{r age}
-print("mean:"); mean(df$age)
-print("sd:"); sd(df$age)
-print("range:"); range(df$age)
+print('age:')
+df %>% group_by(type) %>% 
+  summarise(mean=round(mean(age),2), sd=round(sd(age),2), min=min(age), max=max(age))
 ```
 
 Handedness: 
 
 ```{r handedness}
 # 1 = left handed, 2 = right handed, 3 = ambidexter/both
-df <- df %>% mutate(handedness_char = case_when(handedness == 1 ~ "left-handed", 
-                                     handedness == 2 ~ "right-handed"))
-table(df$handedness_char)/160 
+(handedness <- df %>% mutate(handedness_char = case_when(handedness == 1 ~ "left-handed", 
+                                     handedness == 2 ~ "right-handed", 
+                                     handedness==3 ~ "ambidexter/both")) %>% 
+  group_by(type) %>% count(handedness_char))
 
 print("percentage right-handed:")
-sum(df$handedness == 2)/nrow(df)
+print('PWA')
+sum(df$handedness[df$type=="PWA"] == 2)/nrow(df[df$type=="PWA",])
+print('control')
+sum(df$handedness[df$type=="control"] == 2)/nrow(df[df$type=="control",])
 ```
 
 
@@ -87,7 +94,6 @@ Mother tongue (experiment was restricted to native German speakers): This seems 
 
 ```{r}
 table(df$language) # 1 = yes (mother tongue is German), 2 = no
-table(df$language.test) # 1 = der, 2 = die, 3 = das (das is correct)
 ```
 
 
@@ -98,7 +104,7 @@ table(df$language.test) # 1 = der, 2 = die, 3 = das (das is correct)
 ```{r item vs non-item}
 ## Item vs. non-item
 # CH01_01 (Taube), CH01_02 (Apfel), CH02_01 (Luftballon) and CH02_02 (Biene) are items and 2 should be selected,
-# CH02_03 (Radio), CH02_04 (Sparschwein), CH02_03 (Laptop) and CH02_04 (Wattestäbchen) are non-items and 1 should be selected
+# CH01_03 (Radio), CH01_04 (Sparschwein), CH02_03 (Laptop) and CH02_04 (Wattestäbchen) are non-items and 1 should not be selected
 ## Did participants cheat
 # CH03 = 1 - yes, I worked through it till the end,
 # CH03 = 2 - no, I stopped or cheated midway
@@ -107,38 +113,21 @@ table(df$language.test) # 1 = der, 2 = die, 3 = das (das is correct)
 attcheck <- data.frame(subject = unique(df$subject)) 
 
 df <- df %>% mutate(itemvsnonitem1 = 
-                      case_when(CH01_01==2 & CH01_02==2 & CH01_03==1 & CH01_04==1 ~2,
-                                CH01_01==2 || CH01_02==2 ~1, 
-                                CH01_01!=2 & CH01_02!=2 ~0)) %>%
+                      case_when(CH01_01==2 & CH01_02==2 & CH01_03==1 & CH01_04==1 ~2, # all correct
+                                CH01_01==2 || CH01_02==2 ~1, # one correct
+                                CH01_01!=2 & CH01_02!=2 ~0)) %>% # none correct
   mutate(itemvsnonitem2 = 
                       case_when(CH02_01==2 & CH02_02==2 & CH02_03==1 & CH02_04==1 ~2,
                                 CH02_01==2 || CH02_02==2 ~1, 
                                 CH02_01!=2 & CH02_02!=2 ~0))
-table(df$itemvsnonitem1)/160
-table(df$itemvsnonitem2)/160
-
-# attcheck <- data.frame(subject = unique(df$subject))
-# 
-# 
-# data <- data %>% mutate(attcheck =
-#                   ifelse(CH01_01 == 2 & CH01_02 == 2 & CH02_01 == 2 & CH02_02 == 2 &
-#                   CH01_03 == 1 & CH01_04 == 1 & CH02_03 == 1 & CH02_04 == 1, 1, 0)) %>%
-#                    mutate(cheat = ifelse(CH03 == 1,1,ifelse(CH03 == 2,2,0)))
-# data.frame(data$subject, )
-# table(data$attcheck)
-# table(data$cheat)
-# 
-# # get prolific IDs of participants who failed the attention check
-# #pretest %>% subset(attcheck == 0 & cheat == 2 ) %>%
-# #  pull(SD24_01) # SD24_01 is prolific ID
-# 
-# # subset to participants who passed only
-# valid <- pretest  %>% filter(attcheck == 1 & cheat != 2)
-# 
-# inspect <- data.frame(df$subject, df$word, df$fam_typed)
+df %>% group_by(type, session) %>% count(itemvsnonitem1) %>% mutate(n=n/160)
+df %>% group_by(type, session) %>% count(itemvsnonitem2) %>% mutate(n=n/160)
+# table(df$itemvsnonitem1)/160
+# table(df$itemvsnonitem2)/160
 
 ```
 
+All had at leas one item selected correctly in the attention test
 
 *2) Cheating*
 
@@ -147,6 +136,7 @@ df <- df %>% mutate(CH03 = case_when(CH03 == 1 ~
                                        " Ja, ich habe alles bis zum Ende bearbeitet.",
                                              CH03 == 2 ~ 
                                        "Nein, ich habe zwischendurch aufgehoert oder geschummelt."))
+df %>% group_by(type, session) %>% count(CH03) %>% mutate(n=n/160)
 table(df$CH03)/160
 ```
 
@@ -157,26 +147,41 @@ Comments don't indicate any problems that should lead to participant exclusion:
 table(df$comments)/160
 ```
 
+## Arrays
 
+```{r}
+table(df$array)/160
+x <- df %>% group_by(subject, session) %>% count(array) %>% mutate(n=n/160)
+array_rep = 0
+for(i in 2:nrow(x)){
+  if(x$subject[i-1] == x$subject[i] & x$array[i-1] == x$array[i]){
+    array_rep = array_rep+1
+  }
+}
+print(paste0(array_rep, " time an array was repeated within the same participant")) 
+
+df %>% group_by(type, session) %>% count(array) %>% mutate(n=n/160) %>% arrange(array)
+df %>% count(array) %>% mutate(n=n/160)
+```
 
 ## Fully anonymize data and reduce data frame
 
 ```{r anonymize}
-df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") & 
-                               !starts_with("handedness") &
-                               !starts_with("fingers") & 
-                                !starts_with("KB") &
-                               !starts_with("CH0") & 
-                               !"comments" & !"type" &  
-                               !"gender_char" & !"itemvsnonitem1" &
-                               !"itemvsnonitem2" &  
-                               !starts_with("MC") &
-                                !"name" & !"time_wo_outlier" )
+# df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") & 
+#                                !starts_with("handedness") &
+#                                !starts_with("fingers") & 
+#                                 !starts_with("KB") &
+#                                !starts_with("CH0") & 
+#                                !"comments" & !"type" &  
+#                                !"gender_char" & !"itemvsnonitem1" &
+#                                !"itemvsnonitem2" &  
+#                                !starts_with("MC") &
+#                                 !"name" & !"time_wo_outlier" )
 ```
 
 
 ```{r write_anonymized_df}
-write.csv(df_a, here::here("data","data_long_anonymous.csv"))
+# write.csv(df_a, here::here("data","data_long_anonymous.csv"))
 ```
 
 
