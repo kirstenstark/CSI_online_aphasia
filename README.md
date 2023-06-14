@@ -1,4 +1,3 @@
-# CSI_online_aphasia
 # People with Aphasia show stable Cumulative Semantic Interference (CSI) when tested repeatedly in a web-based paradigm
 
 Word selection is one pillar of linguistic competence, which is regularly impaired in people with aphasia (PWA). Intuitively, one might think that semantic context might ease the retrieval of the correct word. However, categorical semantic relations have been shown to slow down picture naming linearly when members of the same category were embedded in a sequence of seemingly unrelated pictures to be named. This effect has been called cumulative semantic interference (CSI). Extensive research in neurotypical participants has detailed this complex interplay of spreading activation, inhibitory and facilitatory effects, but studies in PWA are rare. This is the more surprising since semantic paraphasias by PWA (producing ‘dog’ when intending ‘cat’) support models of lexical interference (Abdel Rahman & Melinger, 2019; Dell, 1986).
