@@ -5,6 +5,9 @@ data/power-analysis/
 data/transent_data_files/
 results/
 /results/
+results/figures/
+scripts/code/old/
+scripts/power/
 
 .DS_Store
 

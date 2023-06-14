@@ -36,7 +36,8 @@ df <- read.csv(here::here("data", "transient_data_files", input),
 
 ```{r duration}
 print("Total duration, not outlier corrected")
-mean(df$timetotal, na.rm=TRUE) # 33.13 min
+# mean(df$timetotal, na.rm=TRUE) # 33.13 min
+mean(df$time_correct)
 sd(df$timetotal) # 21.04 min
 range(df$timetotal) # 15 to 126 min
 
@@ -184,4 +185,6 @@ df %>% count(array) %>% mutate(n=n/160)
 # write.csv(df_a, here::here("data","data_long_anonymous.csv"))
 ```
 
+
+# Item list description
 

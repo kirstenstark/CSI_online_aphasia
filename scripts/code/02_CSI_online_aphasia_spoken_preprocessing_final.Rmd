@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load packages
 
-```{r load_packages}
+```{r load_packages, message=FALSE}
 rm(list = ls())
 
 # install.packages("remotes") # uncomment if installation is needed (only once)
@@ -59,26 +59,25 @@ for(i in 1:length(type)){
 
 
 ```{r load_additional files}
-options( "encoding" = "UTF-8" )
-
-# output
-output <- c("aphasia_final.csv") # data file for spoken data
+# output file name 
+output <- c("aphasia_final.csv")
 
 # arrays
-arrays <- "arrays_umlaut.csv"
+arrays <- "arrays_umlaut.csv" # experimental arrays
 ```
 
 ```{r load_data, warning=FALSE}
 for(i in 1:length(type)){
   ##### SOSCI FILES
-  # reorder soscifiles
-  eval(parse(text=paste0("sosci_files_", type[i], 
-  "<- c(sosci_files_", type[i], "[substr(sosci_files_", type[i],
-  ", 2,2)=='.'] %>% sort(),",
-  "sosci_files_", type[i], "[substr(sosci_files_", type[i],
-  ", 2,2)!='.'] %>% sort())")))
+  # reorder sosci files
+  eval(parse(text=paste0(
+    "sosci_files_", type[i], 
+    "<- c(sosci_files_", type[i], "[substr(sosci_files_", type[i],
+    ", 2,2)=='.'] %>% sort(),",  
+    "sosci_files_", type[i], "[substr(sosci_files_", type[i],
+    ", 2,2)!='.'] %>% sort())")))
   
-  # load soscifile data
+  # load sosci file data
   eval(parse(text=paste0("datafiles_", type[i], "<- list()")))
   eval(parse(text=paste0("for(j in 1:length(sosci_files_", type[i],")) {",
         "datafiles_", type[i], "[[j]] <- 
@@ -92,7 +91,7 @@ for(i in 1:length(type)){
                              type[i],"[[1]][1,]")))
   }
   
-  # perform some transformations on each dataframe
+  # perform some transformations on each data frame
   eval(parse(text=paste0("for(j in 1:length(sosci_files_",type[i],")){",
     # add original name
     "datafiles_", type[i], "[[j]]$name","<- sosci_files_",type[i],"[j];",
@@ -218,7 +217,7 @@ for(i in 1:(length(sosci_files_PWA)+length(sosci_files_control))){
 #-------------------------------------------------------------
 # Prepare long data frame
       ### AUDIO FILES
-      # In some of the datafiles, two columns seem to be missing and the order of the columns is corrupted - adjust this ( in the TeaP data only row 3 of participant1)
+      # In some of the data files, two columns seem to be missing and the order of the columns is corrupted - adjust this ( in the TeaP data only row 3 of participant1)
       for (j in nrow(datafiles[[i]])) {
         if (!grepl("AR01", datafiles[[i]]$AR01x02[j], fixed=TRUE)) {
           for (k in 407:20){
@@ -246,11 +245,9 @@ for(i in 1:(length(sosci_files_PWA)+length(sosci_files_control))){
       df1$session <- stringr::str_sub(df1$audio, start = -11)
       df1 %>% 
         arrange(session, trial) %>% 
-        mutate(trial = as.numeric(as.character(stringr::str_sub(trial, 3,4))))-> df1
-      # df1 %>% 
-      #   arrange(session, trial) %>% 
-      #   mutate(trial = rep(seq(1,80),
-      #                       times = length(unique(df1$session))))-> df1
+        mutate(trial = 
+                 as.numeric(as.character(stringr::str_sub(trial, 3,4))))-> df1
+    
       # Audio files of last 1-80 trials
       df2 <- datafiles[[i]] %>% 
               select('subject', starts_with("AU")&contains("x")) %>% 
@@ -263,18 +260,18 @@ for(i in 1:(length(sosci_files_PWA)+length(sosci_files_control))){
       df2$session <- stringr::str_sub(df2$audio, start = -11)
       df2 %>%
         arrange(session, trial) %>%
-        mutate(trial = as.numeric(as.character(stringr::str_sub(trial, 3,4)))+80)-> df2
-      # df2 %>% 
-      #   arrange(session, trial) %>% 
-      #   mutate(trial = rep(seq(81,160),
-      #                       times = length(unique(df1$session))))-> df2
+        mutate(trial = 
+                 as.numeric(as.character(
+                   stringr::str_sub(trial, 3,4)))+80)-> df2
+      
       # bind first 80 and last 80 trials together
       df_audio <- bind_rows(df1, df2) %>%
             arrange(subject, session, trial)
       
-      if(nrow(df_audio) != 480) { print('error - audio files dont have correct length')}
+      if(nrow(df_audio) != 480) { 
+        print('error - audio files dont have correct length')}
       
-      # delete audiofile columns from wide data frame
+      # delete audio file columns from wide data frame
       datafiles[[i]] <- datafiles[[i]] %>% 
           select(!starts_with(c("AR", "AU")))
       
@@ -391,25 +388,6 @@ mutate(MC01 = as.numeric(as.character(MC01))) %>%
   mutate(LASTPAGE = as.numeric(as.character(LASTPAGE))) %>%
   mutate(MAXPAGE = as.numeric(as.character(MAXPAGE))) %>%
   mutate(DEG_TIME = as.numeric(as.character(DEG_TIME)))
-
-
-#-------------------------------------------------------------
-# Convert numeric variables from string to integer:
-#str(df)
-# if(type[i] == "pilot_patient"){
-#   datafiles[[i]] <-  datafiles[[i]] %>% 
-#   mutate_at(vars(!c("type", contains("KB0"))), as.numeric)
-# }else if(type[i] == "main") {
-#   datafiles[[i]] <-  datafiles[[i]] %>% 
-#   mutate_at(vars(!c( "browser_other", 
-#                     "word", "comments", "type",
-#                     "array_no", "TIME_RSI", contains("KB0"))), as.numeric)
-# } else if(type[i] == "replacement") {
-#     datafiles[[i]] <- datafiles[[i]] %>% 
-#    mutate_at(vars(!c("operator_system_other", 
-#                      "word", "comments", "type", 
-#                     "array_no", contains("KB0"))), as.numeric)
-# }
 }
 ```
 
@@ -430,27 +408,41 @@ for(i in 1:(length(vot_files_PWA)+length(vot_files_control))){
 
 for(i in 1:length(unique(vot$subject))){
   for(j in 1:length(unique(vot$session))){
-    for(k in 1:(nrow(vot[vot$subject == unique(vot$subject)[i] & vot$session == unique(vot$session)[j],])-1)){
-      x1 <- vot$trial[vot$subject == unique(vot$subject)[i] & vot$session == unique(vot$session)[j]][k]
-      x2 <- vot$trial[vot$subject == unique(vot$subject)[i] & vot$session == unique(vot$session)[j]][k+1]
-      id <- vot$OR02_01[vot$subject == unique(vot$subject)[i] & vot$session == unique(vot$session)[j]][k]
+    for(k in 1:(nrow(vot[vot$subject == unique(vot$subject)[i] & 
+                         vot$session == unique(vot$session)[j],])-1)){
+      x1 <- vot$trial[vot$subject == unique(vot$subject)[i] & 
+                        vot$session == unique(vot$session)[j]][k]
+      x2 <- vot$trial[vot$subject == unique(vot$subject)[i] & 
+                        vot$session == unique(vot$session)[j]][k+1]
+      id <- vot$OR02_01[vot$subject == unique(vot$subject)[i] & 
+                          vot$session == unique(vot$session)[j]][k]
       if(length(x1)== 0 | length(x1)==0){
-        print(paste0('Trial number not recorded in subject ', unique(vot$subject)[i], ' (', 
-                     id, '), session ', unique(vot$session[j]), ' row ', k, ' or ', k+1, '.'))
+        print(paste0('Trial number not recorded in subject ',
+                     unique(vot$subject)[i], ' (', 
+                     id, '), session ', unique(vot$session[j]), ' row ', k, 
+                     ' or ', k+1, '.'))
       } else if (is.na(x1) | is.na(x2)){
-        print(paste0('Trial number not recorded in subject ', unique(vot$subject)[i], '(', 
-                     id, '), session ',unique(vot$session[j]), ' row ', k, ' or ', k+1, '.'))
+        print(paste0('Trial number not recorded in subject ',
+                     unique(vot$subject)[i], '(', 
+                     id, '), session ',unique(vot$session[j]), ' row ', 
+                     k, ' or ', k+1, '.'))
       } else if (x1 == x2) {
-        print(paste0('Trial number not recorded in subject ', unique(vot$subject)[i], ' (', id, '), session ', 
-                     unique(vot$session[j]), ' row ', k, ' and ', k+1, '(trial number ', x1, ' and ', x2, ').'))
+        print(paste0('Trial number not recorded in subject ',
+                     unique(vot$subject)[i], ' (', id, '), session ', 
+                     unique(vot$session[j]), ' row ', k, ' and ', k+1, 
+                     '(trial number ', x1, ' and ', x2, ').'))
       } else if (x1 != x2-1) {
         print(paste0('Trial number missing between row ', k, ' and ', k+1, 
                      ' (trial numbers ', x1, ' and ', x2, ') in subject ',
-                     unique(vot$subject)[i], ' (', id, '), session ', unique(vot$session[j]), '.'))
-      } else if (k == (nrow(vot[vot$subject == unique(vot$subject)[i] & vot$session == unique(vot$session)[j],]))-1 & 
+                     unique(vot$subject)[i], ' (', id, '), session ',
+                     unique(vot$session[j]), '.'))
+      } else if (k == (nrow(vot[vot$subject == unique(vot$subject)[i] &
+                                vot$session == unique(vot$session)[j],]))-1 & 
                  x2 != 164){
-        print(paste0('Last trials are missing in subject ', unique(vot$subject)[i], ' (', id, '), session ', 
-                     unique(vot$session[j]), '(last trial numbers in row ', k, ' and ', k+1, ' are ', x1, ' and ', x2, ').'))
+        print(paste0('Last trials are missing in subject ',
+                     unique(vot$subject)[i], ' (', id, '), session ', 
+                     unique(vot$session[j]), '(last trial numbers in row ', 
+                     k, ' and ', k+1, ' are ', x1, ' and ', x2, ').'))
       }
     }
     }
@@ -462,40 +454,54 @@ for(i in 1:(length(sosci_files_PWA)+length(sosci_files_control))){
   if(i == 1){
    sosci <- datafiles[[i]] %>% select(session, subject, trial,OR02_01)
   } else {
-    sosci <- rbind(sosci, datafiles[[i]] %>% select(session, subject, trial, OR02_01))
+    sosci <- rbind(sosci, datafiles[[i]] %>% 
+                     select(session, subject, trial, OR02_01))
   }
 }
 
 for(i in 1:length(unique(sosci$subject))){
   for(j in 1:length(unique(sosci$session))){
-    for(k in 1:(nrow(sosci[sosci$subject == unique(sosci$subject)[i] & sosci$session == unique(sosci$session)[j],])-1)){
-      x1 <- sosci$trial[sosci$subject == unique(sosci$subject)[i] & sosci$session == unique(sosci$session)[j]][k]
-      x2 <- sosci$trial[sosci$subject == unique(sosci$subject)[i] & sosci$session == unique(sosci$session)[j]][k+1]
-      id <- sosci$OR02_01[sosci$subject == unique(sosci$subject)[i] & sosci$session == unique(sosci$session)[j]][k]
+    for(k in 1:(nrow(sosci[sosci$subject == unique(sosci$subject)[i] &
+                           sosci$session == unique(sosci$session)[j],])-1)){
+      x1 <- sosci$trial[sosci$subject == unique(sosci$subject)[i] &
+                          sosci$session == unique(sosci$session)[j]][k]
+      x2 <- sosci$trial[sosci$subject == unique(sosci$subject)[i] &
+                          sosci$session == unique(sosci$session)[j]][k+1]
+      id <- sosci$OR02_01[sosci$subject == unique(sosci$subject)[i] &
+                            sosci$session == unique(sosci$session)[j]][k]
       if(length(x1)== 0 | length(x1)==0){
         print(paste0('Trial number not recorded in subject ', unique(sosci$subject)[i], ' (', 
-                     id, '), session ', unique(sosci$session[j]), ' row ', k, ' or ', k+1, '.'))
+                     id, '), session ', unique(sosci$session[j]), ' row ', 
+                     k, ' or ', k+1, '.'))
       } else if (is.na(x1) | is.na(x2)){
-        print(paste0('Trial number not recorded in subject ', unique(sosci$subject)[i], '(', 
-                     id, '), session ',unique(sosci$session[j]), ' row ', k, ' or ', k+1, '.'))
+        print(paste0('Trial number not recorded in subject ',
+                     unique(sosci$subject)[i], '(', 
+                     id, '), session ',unique(sosci$session[j]), ' row ', 
+                     k, ' or ', k+1, '.'))
       } else if (x1 == x2) {
         print(paste0('Trial number not recorded in subject ', unique(sosci$subject)[i], ' (', id, '), session ', 
-                     unique(sosci$session[j]), ' row ', k, ' and ', k+1, '(trial number ', x1, ' and ', x2, ').'))
+                     unique(sosci$session[j]), ' row ', k, ' and ', 
+                     k+1, '(trial number ', x1, ' and ', x2, ').'))
       } else if (x1 != x2-1) {
         print(paste0('Trial number missing between row ', k, ' and ', k+1, 
                      ' (trial numbers ', x1, ' and ', x2, ') in subject ',
-                     unique(sosci$subject)[i], ' (', id, '), session ', unique(sosci$session[j]), '.'))
-      } else if (k == (nrow(sosci[sosci$subject == unique(sosci$subject)[i] & sosci$session == unique(sosci$session)[j],]))-1 & 
+                     unique(sosci$subject)[i], ' (', id, '), session ',
+                     unique(sosci$session[j]), '.'))
+      } else if (k == (nrow(sosci[sosci$subject == unique(sosci$subject)[i] &
+                                  sosci$session ==
+                                    unique(sosci$session)[j],]))-1 & 
                  x2 != 160){
-        print(paste0('Last trials are missing in subject ', unique(sosci$subject)[i], ' (', id, '), session ', 
-                     unique(sosci$session[j]), '(last trial numbers in row ', k, ' and ', k+1, ' are ', x1, ' and ', x2, ').'))
+        print(paste0('Last trials are missing in subject ',
+                     unique(sosci$subject)[i], ' (', id, '), session ', 
+                     unique(sosci$session[j]), '(last trial numbers in row ',
+                     k, ' and ', k+1, ' are ', x1, ' and ', x2, ').'))
       }
     }
     }
   }
 ```
 
-# Add array (actual stimuli) for each participant
+# Add array (actual stimuli in actual order) for each participant
 For the spoken data, this is just to double check that everything went fine upon merging the files and to add the categories.
 
 ```{r add_arrays, warning = FALSE  }
@@ -510,12 +516,15 @@ for (i in 1:(length(sosci_files_PWA)+length(sosci_files_control))) {
   
   ### Create a new dataframe with the fitting array
   for(j in 1:nlevels(as.factor(x$session))){
-    eval(parse(text=paste0("y",j,"<- arrays[, unique(x$array[x$session == j])]")))
+    eval(parse(text=paste0("y",j,"<- 
+                           arrays[, unique(x$array[x$session == j])]")))
     
     ## Add stable columns
     eval(parse(text=paste0("y",j,"<- data.frame(
-                           subject=rep(x$subject[x$session == j][1], each=nrow(y", j,")),
-                           session=rep(x$session[x$session == j][1], each=nrow(y", j,")),
+                           subject=rep(x$subject[x$session == j][1],
+                           each=nrow(y", j,")),
+                           session=rep(x$session[x$session == j][1],
+                           each=nrow(y", j,")),
                            trial=rep(1:160),
                            item=y",j,")"
                            )))
@@ -524,7 +533,8 @@ for (i in 1:(length(sosci_files_PWA)+length(sosci_files_control))) {
                            y", j,"$category[k] <- 
                               arrays$categorie[arrays$item == y",j,"$item[k]]; 
                            y", j,"$supercategory[k] <- 
-                              arrays$supercategorie[arrays$item == y",j,"$item[k]];
+                              arrays$supercategorie[arrays$item ==
+                              y",j,"$item[k]];
                            }")))
     ## Add further stable columns
     for (m in 1:length(colnames(x[x$session == j,]))){
@@ -537,7 +547,8 @@ for (i in 1:(length(sosci_files_PWA)+length(sosci_files_control))) {
                        ' is not stable'))
         } else{
               eval(parse(text=paste0("y",j,"<- data.frame(y",j,", ", 
-              colnames(x[x$session == j,])[m], "= rep(x[x$session==j,m][[1]][1], 
+              colnames(x[x$session == j,])[m], 
+              "= rep(x[x$session==j,m][[1]][1], 
               each=nrow(y", j,")))")))
         } 
       }
@@ -571,11 +582,13 @@ for(i in 1:length(datafiles)){
   x <- as.data.frame(datafiles[[i]])
   for(j in 1:nrow(x)){
       y <- x$audio[j]
-        if(tolower(strsplit(y, ".", fixed=TRUE)[[1]][1]) != x$item[j] | is.na(y)){
+        if(tolower(strsplit(y, ".", fixed=TRUE)[[1]][1]) != x$item[j] |
+           is.na(y)){
           print(paste0('Audiofiles and Items dont fit in subject ', 
                        x$subject[1], ', session ', x$session[j], ', 
                        trial ', x$trial[j], '. The audiofilename is ', 
-                       x$audio[j], ', but the item should be ', x$item[j], '.'))
+                       x$audio[j], ', but the item should be ', 
+                       x$item[j], '.'))
         }
   }
 }
@@ -621,7 +634,7 @@ df <- df %>% mutate(OR02_01 = toupper(OR02_01))
 unique(df$OR02_01) %in% unique(vot$OR02_01)
 unique(vot$OR02_01) %in% unique(df$OR02_01)
 
-# Fix file name ending in both dataframes
+# Fix file name ending in both data frames
 df %>% mutate(audio2=case_when(endsWith(audio, ".webm") ~ 
                                  stringr::str_sub(audio, 1, -18),
                                endsWith(audio, ".ogg") ~
@@ -675,8 +688,10 @@ for(i in 1:nrow(vot)){
 
 
 # Check whether merging worked properly
-sum(!is.na(df$File_name)) == nrow(vot) # all File names were transmitted to the big df
-x <- df %>% filter(is.na(File_name)) # four Files are missing = technical errors
+sum(!is.na(df$File_name)) == nrow(vot) 
+  # all file names were transmitted to the big df
+x <- df %>% filter(is.na(File_name)) 
+  # four files are missing = technical errors
 (x %>% select(subject, session, trial, item, audio, File_name) -> x)
 table(df$audio[is.na(df$File_name)])
 ```
@@ -725,15 +740,116 @@ for(i in 1:nrow(overview)){
 }
 
 # export
-write.csv(df, here::here("data", "transient_data_files", "matching_overview.csv"), 
+write.csv(df, here::here("data", "transient_data_files",
+                         "matching_overview.csv"), 
             row.names = FALSE)
 ```
 
-# Export prepared data frame
-Anonmyse data frame
+# Double-check time taken
 
 ```{r}
-df <- df %>% select(-c("QUESTNNR", "STARTED", "OR01_01", "OR02_01")) %>%
+range(as.numeric(as.character(df$TIME003))) # welcome page
+range(as.numeric(as.character(df$TIME004))) # consent
+range(as.numeric(as.character(df$TIME005))) # demographics
+range(as.numeric(as.character(df$TIME006))) # general instructions
+range(as.numeric(as.character(df$TIME007)), na.rm=T) # array loading (not visible for participant)
+range(as.numeric(as.character(df$TIME008))) # familiarization instructions
+range(as.numeric(as.character(df$TIME009)), na.rm=T) # familiarization
+
+# Some participants already open the link prior to the experiment. Therefore, well only consider the time starting from the demographics page
+for(i in 1:nrow(df)){
+  df$time_correct[i] <- sum(df[i,] %>% 
+        select(starts_with("TIME")), na.rm=T)/60
+}
+
+# Get an overview
+df %>% group_by(subject, session) %>% count(time_correct)
+df %>% 
+  summarise(m = mean(time_correct),
+                 sd = sd(time_correct), 
+                 min = min(time_correct),
+                 max = max(time_correct))
+df %>% group_by(type) %>% 
+  summarise(m = mean(time_correct),
+                 sd = sd(time_correct), 
+                 min = min(time_correct),
+                 max = max(time_correct))
+df %>% group_by(type, session) %>% 
+  summarise(m = mean(time_correct),
+                 sd = sd(time_correct), 
+                 min = min(time_correct),
+                 max = max(time_correct))
+```
+
+# Calculate mean semantic similarity per group 
+
+```{r}
+### Semantic similarity
+# install.packages("LSAfun")
+# install.packages("Rmisc")
+# install.packages("tidyverse")
+# install.packages("here")
+# install.packages("cowplot")
+library(LSAfun)
+
+##  load dewak dataframe
+load(here::here("data", "dewak",
+  "dewak100k_lsa.rda"))
+
+
+## Within each category, calculate pairwise semantic similarity and calculate mean and sd
+df %>% group_by(category, item) %>% count() %>%
+  select(category, item) -> stims
+stims$min_cat <- NA
+stims$max_cat <- NA
+stims$mean_cat <- NA
+stims$sd_cat <- NA
+vectors <- data.frame(category=NA, stims1=NA, stims2=NA)
+for(i in 1:length(unique(df$category))){
+  subset <- stims %>% filter(category==unique(df$category)[i])
+  subset2 <- rbind(subset[1,], subset[1,], subset[1,], subset[1,],
+                  subset[2,], subset[2,], subset[2,],
+                  subset[3,], subset[3,],
+                  subset[4,])
+  subset2$item2 <- c(subset$item[2], subset$item[3], subset$item[4], subset$item[5],
+                     subset$item[3], subset$item[4], subset$item[5],
+                     subset$item[4], subset$item[5],
+                     subset$item[5])
+  for(j in 1:nrow(subset2)){
+      subset2$cosine[j] <- 
+    LSAfun::pairwise(subset2$item[j], subset2$item2[j],tvectors = dewak100k_lsa)
+  }
+  min <- min(subset2$cosine)
+  max <- 
+  mean <- mean(subset2$cosine)
+  sd <- sd(subset2$cosine)
+  stims$min_cat[stims$category==unique(df$category)[i]] <- min(subset2$cosine, na.rm=T)
+  stims$max_cat[stims$category==unique(df$category)[i]] <- max(subset2$cosine, na.rm=T)
+  stims$mean_cat[stims$category==unique(df$category)[i]] <- mean(subset2$cosine, na.rm=T)
+  stims$sd_cat[stims$category==unique(df$category)[i]] <- sd(subset2$cosine, na.rm=T) 
+}
+
+stims %>% group_by(category,mean_cat, sd_cat, min_cat, max_cat) %>% count()
+
+# Average semantic similarity in experimental categories
+paste0('Mean semantic similarity per category: ', 
+       round(mean(stims$mean_cat[stims$category != "Filler"], na.rm=T),3), " SD: ",
+       round(mean(stims$sd_cat[stims$category != "Filler"], na.rm=T), 3), 
+       " (caution: Some stimuli are not in the dewak database)")
+
+# Average semantic similarity in fillers
+paste0('Mean semantic similarity across fillers: ', 
+       round(mean(stims$mean_cat[stims$category == "Filler"], na.rm=T),3), " SD: ",
+       round(mean(stims$sd_cat[stims$category == "Filler"], na.rm=T), 3), 
+       " (caution: Some stimuli are not in the dewak database)")
+```
+
+
+# Export prepared data frame
+Anonymize data frame
+
+```{r}
+df <- df %>% select(-c("QUESTNNR", "STARTED", "OR01_01")) %>% #, "OR02_01")) %>%
   # drop unnecessary columns
   select(-c("os_system", "SD22_BID", "browser_automatic",
             "system_format", "screen_width", "screen_height",
@@ -749,12 +865,14 @@ Reduce data frame to relevant columns
 # head(df)
 df %>% select(type, subject, session, trial, item, category, supercategory, 
               VOT, correct, AR, error, gender, age,language, handedness, 
-              starts_with("CH"), array, comments, timetotal) -> d
+              starts_with("CH"), array, comments, timetotal, time_correct,
+              OR02_01) -> d
 ```
 
 ```{r export_data}
 write.csv(d, here::here("data", "transient_data_files", output), 
             row.names = FALSE)
-write.csv(df, here::here("data", "transient_data_files", "aphasia_final_complete.csv"), 
+write.csv(df, here::here("data", "transient_data_files",
+                         "aphasia_final_complete.csv"), 
             row.names = FALSE)
 ```
