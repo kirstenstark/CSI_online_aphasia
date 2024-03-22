@@ -114,13 +114,13 @@ table(df$language) # 1 = yes (mother tongue is German), 2 = no
 attcheck <- data.frame(subject = unique(df$subject)) 
 
 df <- df %>% mutate(itemvsnonitem1 = 
-                      case_when(CH01_01==2 & CH01_02==2 & CH01_03==1 & CH01_04==1 ~2, # all correct
-                                CH01_01==2 || CH01_02==2 ~1, # one correct
-                                CH01_01!=2 & CH01_02!=2 ~0)) %>% # none correct
-  mutate(itemvsnonitem2 = 
-                      case_when(CH02_01==2 & CH02_02==2 & CH02_03==1 & CH02_04==1 ~2,
-                                CH02_01==2 || CH02_02==2 ~1, 
-                                CH02_01!=2 & CH02_02!=2 ~0))
+    case_when(CH01_01==2 & CH01_02==2 & CH01_03==1 & CH01_04==1 ~2, # all correct
+              CH01_01==2 | CH01_02==2 ~1, # one correct
+              CH01_01!=2 & CH01_02!=2 ~0)) %>% # none correct
+  dplyr::mutate(itemvsnonitem2 = 
+    case_when(CH02_01==2 & CH02_02==2 & CH02_03==1 & CH02_04==1 ~2,
+              CH02_01==2 | CH02_02==2 ~1, 
+              CH02_01!=2 & CH02_02!=2 ~0))
 df %>% group_by(type, session) %>% count(itemvsnonitem1) %>% mutate(n=n/160)
 df %>% group_by(type, session) %>% count(itemvsnonitem2) %>% mutate(n=n/160)
 # table(df$itemvsnonitem1)/160
@@ -184,7 +184,3 @@ df %>% count(array) %>% mutate(n=n/160)
 ```{r write_anonymized_df}
 # write.csv(df_a, here::here("data","data_long_anonymous.csv"))
 ```
-
-
-# Item list description
-
