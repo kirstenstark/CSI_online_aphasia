@@ -1135,6 +1135,64 @@ for(i in 1:length(unique(means_final_errors$session))){
 means_final_errors
 ```
 
+Different kinds of errors per ordinal position
+
+```{r}
+table(df_errors$error)
+(df_errors %>% group_by(group, session, error, PosOr) %>% 
+    count() -> z)
+w <- data.frame(group=rep(c("control", "PWA"), each=3*10*5), 
+                 session=rep(c("1","2","3"), each=10, times=2*5), 
+                 error=rep(seq(1:10), each=5, times=2*3), 
+                 PosOr=rep(seq(1:5), timed=10*3*2), 
+                n=NA)
+for(i in 1:nrow(w)){
+  l <- z %>% filter(group==w$group[i]&session==w$session[i]&
+                      error==w$error[i]&PosOr==w$PosOr[i])
+  if(nrow(l)!=0) {
+    w$n[i] <- l$n
+  }
+}
+# mean increase per error type and ordinal position
+ y <- data.frame(group=rep(c("control", "PWA"), each=3*10), 
+                 session=rep(c("1","2","3"), each=10, times=2), 
+                 error=rep(seq(1:10), times=2*3), 
+                 m_increase=NA)
+ w$error[is.na(w$error)] <- 10
+ for(i in 1:nrow(y)){
+   a1 <- w$n[w$group==y$group[i]& w$error==y$error[i] & 
+                          w$session==y$session[i] & w$PosOr==1]
+   a2 <- w$n[w$group==y$group[i]& w$error==y$error[i] & 
+                          w$session==y$session[i] & w$PosOr==2]
+   a3 <- w$n[w$group==y$group[i]& w$error==y$error[i] & 
+                          w$session==y$session[i] & w$PosOr==3]
+   a4 <- w$n[w$group==y$group[i]& w$error==y$error[i] & 
+                          w$session==y$session[i] & w$PosOr==4]
+   a5 <- w$n[w$group==y$group[i]& w$error==y$error[i] & 
+                          w$session==y$session[i] & w$PosOr==5]
+   if(!is.na(a2)&!is.na(a1)){ y$m_increase[i] <- a2-a1 } 
+   if(!is.na(a3)&!is.na(a2)){ y$m_increase[i] <-
+     y$m_increase[i]+a3-a2 } 
+   if(!is.na(a4)&!is.na(a3)){ y$m_increase[i] <-
+     y$m_increase[i]+a4-a3} 
+   if(!is.na(a5)&!is.na(a4)){ y$m_increase[i] <-
+     y$m_increase[i]+a5-a4 } 
+   n <- sum(!is.na(c(a1,a2,a3,a4,a5)))-1
+   y$m_increase[i] <- y$m_increase[i]/n
+ }
+ y
+ # mean across sessions
+(y %>% group_by(group, error) %>% 
+  summarise(n=sum(m_increase), isnotna=sum(!is.na(m_increase)),
+            mean_increase=mean(m_increase, na.rm=T)) ->
+    increase_errors)
+ increase_errors %>% filter(group=="PWA") %>% count()
+ y %>% filter(group=="PWA") %>% 
+   filter(!(error %in% c(4,9,10))) %>%
+   group_by(session) %>%
+   summarise(mean=mean(m_increase, na.rm=T))
+```
+
 ### Plotting
 
 #### Errors by ordinal position and repetition
@@ -3620,7 +3678,7 @@ means_final_subject <- means_final_subject %>%
      "PWA 18\n(23.59)","PWA 06\n(23.31)", "PWA 09\n(19.86)",
      "PWA 14\n(18.04)","PWA 11\n(16.91)","PWA 17\n(16.18)",
      "PWA 10\n(12.79)","PWA 19\n(10.94)","PWA 02\n(4.11)",
-     "PWA 01\n(0.72)","PWA 15\n(0.02)","Control 09\n(44.58)",
+     "PWA 01\n(0.71)","PWA 15\n(0.02)","Control 09\n(44.58)",
      "Control 17\n(41.22)","Control 10\n(34.06)","Control 20\n(29.22)",
      "Control 02\n(26.54)","Control 07\n(26.11)","Control 01\n(23.97)",
      "Control 05\n(22.77)","Control 03\n(22.53)","Control 15\n(21.83)",
@@ -3740,7 +3798,7 @@ means_final_category <- means_final_category %>%
     category == "Insekten" ~ paste0(
       "Insects\n\n(", effect, ")", sep=''),
     category == "Instrumente" ~ paste0(
-      "Instruments\n\n(", effect, ")", sep=''),
+      "Instru-\nments\n(", effect, ")", sep=''),
     category == "Jacken" ~ paste0(
       "Jackets\n\n(", effect, ")", sep=''),
     category == "Kochen" ~ paste0(
@@ -3780,9 +3838,9 @@ means_final_category <- means_final_category %>%
      "Kitchen\nfurniture\n(25.76)", "Fish\n\n(23.97)",
      "Storage\n\n(23.56)","Office\ntools\n(23.13)",
      "Farming\ntools\n(22.55)","Predators\n\n(21.51)",
-     "Hoofed\nanimals\n(21.18)","Vegetables\n\n(20.74)" ,
+     "Hoofed\nanimals\n(21.18)","Vegetables\n\n(20.73)" ,
      "Body parts\n\n(19.93)","Birds\n\n(19.33)",
-     "Instruments\n\n(18.27)","Flowers\n\n(15.53)",
+     "Instru-\nments\n(18.27)","Flowers\n\n(15.53)",
      "Buildings\n\n(13.56)","Jewelry\n\n(12.87)",
      "Street\nvehicles\n(12.76)","Sweets\n\n(11.11)")))
 
