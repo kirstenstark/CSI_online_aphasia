@@ -62,6 +62,7 @@ df %>% filter(VOT==0) %>% dplyr::group_by(type, subject,session) %>%
 ## Drop filler trials
 
 ```{r}
+all_data <- df
 df <- df %>% filter(category!="Filler") %>% droplevels()
 ```
 
@@ -2680,7 +2681,7 @@ tab_model(m1_glmm_PWA_tt,transform = NULL,
 
 ###### Plot errors and Tests
 
-```{r }
+```{r}
 (means_final<- df_errors_PWA %>% 
    filter(category != "Filler") %>% 
    Rmisc::summarySEwithin(.,"error_class",idvar = "category",
@@ -2711,7 +2712,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", colour="Session",
          linetype="Session",
-         title = "Session 1") + 
+         title = "Day 1") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2741,7 +2742,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", 
          colour="Session", linetype="Session",
-         title = "Session 2") + 
+         title = "Day 2") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2772,7 +2773,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", colour="Naming\npercentile",
         # linetype="Session",
-         title = "Session 3") + 
+         title = "Day 8") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2801,7 +2802,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", colour="Session",
          linetype="Session",
-         title = "Session 1") + 
+         title = "Day 1") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2831,7 +2832,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", 
          colour="Session", linetype="Session",
-         title = "Session 2") + 
+         title = "Day 2") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2862,7 +2863,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", colour="Token test\npercentile",
         # linetype="Session",
-         title = "Session 3") + 
+         title = "Day 8") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2888,7 +2889,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", colour="Session",
          linetype="Session",
-         title = "Session 1") + 
+         title = "Day 1") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2913,7 +2914,7 @@ override.linetype<-c("dashed")
                         breaks =seq(0,0.5, by = 0.1)) +
     labs(x="Ordinal Position ",y ="Errors", 
          colour="Session", linetype="Session",
-         title = "Session 2") +
+         title = "Day 2") +
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2940,7 +2941,7 @@ override.linetype<-c("dashed")
     labs(x="Ordinal Position ",y ="Errors", 
          colour="Spontaneous\nspeech\nscore",
         # linetype="Session",
-         title = "Session 3") + 
+         title = "Day 8") + 
     theme(
     axis.title.y = element_text(margin = margin(0,10,0,0)),
     axis.title.x = element_text(margin = margin(10,0,0,0)),
@@ -2970,6 +2971,11 @@ ggsave(plots, filename =
          here::here("results", "figures", filename),
        width = 25, height = 39, units = "cm", 
        dpi = 300, device = cairo_pdf)
+filename_png <- "CSI_online_aphasia_spoken_plot_PWA_Error_Test_scores.png"
+ggsave(plots, filename = 
+         here::here("results", "figures", filename_png),
+       width = 25, height = 39, units = "cm", 
+       dpi = 300)
 #embedFonts(file = here::here("results", "figures", filename))
 # 
 # # Naming percenile scores: median split of means final 
@@ -3062,10 +3068,192 @@ ggsave(plots, filename =
 
 ```
 
+##### Plot mean CSI effect by Session and test
+
+
+```{r}
+# library(sjPlot)
+# library(sjmisc)
+# library(ggplot2)
+# Change labels of sessions and re-compute model
+override.linetypea<-c("longdash", "dashed")
+override.linetypeb<-c("longdash", "dashed", "dotted")
+df_errors_PWA <- df_errors_PWA %>%
+  mutate(session_day = case_when(session=="1" ~ "Day 1",
+                                 session=="2" ~ "Day 2",
+                                 session=="3" ~ "Day 8")) %>%
+  mutate(session_day=factor(session_day, levels=c("Day 1", "Day 2", "Day 8")))
+c<-contr.treatment(3)
+my.coding<-matrix(rep(1/3, 6), ncol=2)
+my.simple<-c-my.coding
+my.simple
+contrasts(df_errors_PWA$session_day)<-my.simple
+levels(df_errors_PWA$session_day)
+contrasts(df_errors_PWA$session_day)
+m1_glmm_PWA_all <- 
+  afex::lmer_alt(error_class ~
+  PosOr.cont*session_day*
+    (TokenTest_c+AAT_c+AAT_spontansprache_c+LHoverall_c) +
+  (PosOr.cont |subject) + (1|category),
+  df_errors_PWA, family = "binomial",
+  control=glmerControl(optimizer = "bobyqa",
+                       optCtrl = list(maxfun = 2e5)))
+# df_errors_PWA # data frame
+# summary(m1_glmm_PWA_all)
+
+## Plot the significant interaction effects
+# PosOr.cont:AAT_spontansprache_c 
+plot1 <- plot_model(m1_glmm_PWA_all, 
+           type = "pred", 
+           #transform=NULL,
+           terms = c("PosOr.cont", "AAT_spontansprache_c"),
+           mrt.values="all",
+           title=c("Model prediction of 2-way interaction:\nOrdinal position X spontaneous speech (SEM in AAT)"),
+           linetype=override.linetypea) +
+    scale_x_continuous(breaks = c(-1.99860685427696,
+                                -0.998606854276957,
+                                0.00139314572304272,
+                                1.00139314572304,
+                                2.00139314572304),
+                     labels= c(1,2,3,4,5))  + 
+  xlab("Ordinal position") +
+  ylab("Percentage of errors") +
+  scale_colour_manual(name = "Centered\nSEM score",
+                        labels=c("-1.23", " 0.81"),
+                        values=c("cornflowerblue", "deeppink4")) +
+  
+  scale_fill_manual(name = "Centered\nSEM score",
+                        labels=c("-1.23", " 0.81"),
+                        values=c("cornflowerblue", "deeppink4")) +
+   # guides(color=guide_legend(
+   #   override.aes=list(linetype=override.linetypea)))+
+  theme_bw()+
+  theme(plot.title=element_text(size=22,hjust = .5),
+        # panel.grid.major=element_blank(),
+        # panel.grid.minor=element_blank(),
+        #panel.border=element_blank(),
+        #axis.line=element_line(),
+        text=element_text(size=16),
+        axis.title.y = element_text(margin = margin(0,10,0,0)),
+        axis.title.x = element_text(margin = margin(10,0,0,0)),
+        legend.key.width = unit(1, "cm"),
+        legend.position="right")
+ggsave(plot1, filename =
+         here::here("results", "figures", 
+                    "CSI_online_aphasia_spoken_plot_error_by_OrdPos_by_SEM.pdf"),
+       width = 15,#25 
+       height = 13, units = "cm",
+       dpi = 300, device = cairo_pdf)
+
+# PosOr.cont:session_day3:TokenTest_c
+plot2 <- plot_model(m1_glmm_PWA_all, 
+           type = "pred", 
+           #transform=NULL,
+           terms = c("PosOr.cont", "TokenTest_c", "session_day"),
+           mrt.values="quart",
+           title=c("Model prediction of 3-way interaction:\nOrdinal position X token test (TT in AAT)")) +
+    scale_x_continuous(breaks = c(-1.99860685427696,
+                                -0.998606854276957,
+                                0.00139314572304272,
+                                1.00139314572304,
+                                2.00139314572304),
+                     labels= c(1,2,3,4,5))  + 
+  xlab("Ordinal position") +
+  ylab("Percentage of errors") +
+  scale_colour_manual(name = "Centered\nTT score",
+                       # labels=c("-1.23", " 0.81"),
+                        values=c("deeppink", "cyan3",
+                                 "darkslategray")) +
+  scale_fill_manual(name = "Centered\nTT score",
+                       # labels=c("-1.23", " 0.81"),
+                        values=c("deeppink", "cyan3",
+                                 "darkslategray")) +
+  theme_bw()+
+  theme(plot.title=element_text(size=22,hjust = .5),
+        # panel.grid.major=element_blank(),
+        # panel.grid.minor=element_blank(),
+        #panel.border=element_blank(),
+        #axis.line=element_line(),
+        text=element_text(size=16),
+        axis.title.y = element_text(margin = margin(0,10,0,0)),
+        axis.title.x = element_text(margin = margin(10,0,0,0)),
+        legend.key.width = unit(1, "cm"),
+        legend.position="right")
+plot2
+ggsave(plot2, filename =
+         here::here("results", "figures", 
+                    "CSI_online_aphasia_spoken_plot_error_by_OrdPos_by_Session_by_TT.pdf"),
+       width = 25, 
+       height = 13, units = "cm",
+       dpi = 300, device = cairo_pdf)
+
+# PosOr.cont:session_day3:AAT_c
+plot3 <- plot_model(m1_glmm_PWA_all, 
+           type = "pred", 
+           #transform=NULL,
+           terms = c("PosOr.cont", "AAT_c", "session_day"),
+           mrt.values="quart", ci.lvl = .95,
+           title=c("Model prediction of 3-way interaction:\nOrdinal position X overall naming (NAM in AAT)")) +
+    scale_x_continuous(breaks = c(-1.99860685427696,
+                                -0.998606854276957,
+                                0.00139314572304272,
+                                1.00139314572304,
+                                2.00139314572304),
+                     labels= c(1,2,3,4,5))  + 
+  xlab("Ordinal position") +
+  ylab("Percentage of errors") +
+  scale_colour_manual(name = "Centered\nTT score",
+                       # labels=c("-1.23", " 0.81"),
+                        values=c("aquamarine3", "blue",
+                                 "brown3")) +
+  scale_fill_manual(name = "Centered\nTT score",
+                       # labels=c("-1.23", " 0.81"),
+                        values=c("aquamarine3", "blue",
+                                 "brown3")) +
+  theme_bw()+
+  theme(plot.title=element_text(size=22,hjust = .5),
+        # panel.grid.major=element_blank(),
+        # panel.grid.minor=element_blank(),
+        #panel.border=element_blank(),
+        #axis.line=element_line(),
+        text=element_text(size=16),
+        axis.title.y = element_text(margin = margin(0,10,0,0)),
+        axis.title.x = element_text(margin = margin(10,0,0,0)),
+        legend.key.width = unit(1, "cm"),
+        legend.position="right")
+plot3
+ggsave(plot3, filename =
+         here::here("results", "figures", 
+                    "CSI_online_aphasia_spoken_plot_error_by_OrdPos_by_Session_by_NAM.pdf"),
+       width = 25, 
+       height = 13, units = "cm",
+       dpi = 300, device = cairo_pdf)
+
+plotgrid <- cowplot::plot_grid(plot1, plot3, plot2,
+          nrow = 3, ncol=1,  rel_widths = c(0.3,1,1), 
+          margin(1,1,1,1),
+          labels = c("A", "B", "C"),label_size = 34,
+          label_y = 1.01,
+          label_x=-0.01)
+#plotgrid
+ggsave(plotgrid, filename =
+         here::here("results", "figures", 
+                    "CSI_online_aphasia_spoken_plot_error_by_covariates_plotgrid.pdf"),
+       width = 25, 
+       height = 25, units = "cm",
+       dpi = 300, device = cairo_pdf)
+ggsave(plotgrid, filename =
+         here::here("results", "figures", 
+                    "CSI_online_aphasia_spoken_plot_error_by_covariates_plotgrid.png"),
+       width = 25, 
+       height = 25, units = "cm",
+       dpi = 300)
+```
+
 # --------------------------------------------
 ## Additional (pre-planned) analyses
 ### Preregistered analyses with GLMM
-We deviated from our preregistered analyses because SEs seemed suspicously small.  
+We deviated from our preregistered analyses because SEs seemed suspiciously small.  
 
 *Check fit of normal vs gamma distribution in histograms, q-q-plots and using objective criteria:*  
 1) Fit normal and gamma distributions to the reaction time data
@@ -4198,7 +4386,367 @@ sessionInfo()
 
 # -------------------------
 # Exploratory analyses
-We conducted several exploratory analyses to assess the stability of our effects, especially because we deviated from the pre-planned GLMMs for RT analyses
+We conducted several exploratory analyses to assess the stability of our effects, especially because we deviated from the pre-planned GLMMs for RT analyses. 
+
+Here, we report additional analyses that were suggested by reviewers
+
+### Absence of CSI effect for fillers?
+#### Preparation
+
+```{r}
+# load preprocessed data
+input = "aphasia_final.csv"
+d <- read.csv2(here::here("data","transient_data_files", input), sep=",") #%>% select(-"X")
+
+# select only fillers 
+d <- d %>% filter(category=="Filler")
+
+## Add filler subcategories
+# "The 24 categories were distributed across eight blocks of
+# three categories each. To each block, five filler items
+# were added, resulting in eight blocks of 20 items."
+d <- d %>% 
+  mutate(filler_block = case_when(
+    trial <= 20 ~ "block1",
+    trial > 20 & trial <= 40  ~ "block2",
+    trial > 40 & trial <= 60  ~ "block3",
+    trial > 60 & trial <= 80  ~ "block4",
+    trial > 80 & trial <= 100  ~ "block5",
+    trial > 100 & trial <= 120  ~ "block6",
+    trial > 120 & trial <= 140  ~ "block7",
+    trial > 140 & trial <= 160  ~ "block8"))
+table(d$filler_block)
+## Add ordinal position
+d <- d %>% group_by(subject, session,filler_block) %>% 
+      add_count() %>% 
+      dplyr::mutate(PosOr = seq(1:n)) %>% 
+  dplyr::select(-n)
+table(df$PosOr)
+# d %>% group_by(subject, session,filler_block) %>% count(PosOr)
+# table(df$PosOr,df$session, df$subject)
+
+# factorize columns
+d$VOT <- as.numeric(as.character(d$VOT))
+is.numeric(d$VOT)
+d$PosOr <- as.factor(d$PosOr)
+d$group <- as.factor(d$type)
+d$subject <- as.factor(d$subject)
+d$session <- as.factor(d$session)
+
+# define contrasts of session: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
+c<-contr.treatment(3)
+my.coding<-matrix(rep(1/3, 6), ncol=2)
+my.simple<-c-my.coding
+my.simple
+contrasts(d$session)<-my.simple
+levels(d$session)
+
+## Define contrast of group
+contrasts(d$group) <- MASS::contr.sdif(2)
+levels(d$group)
+
+## Define Ordinal position as continuous predictor variable
+d$PosOr_cont <- as.numeric(scale(as.numeric(
+  as.character(d$PosOr)),
+  center = T, scale = F))
+
+## Errors and correct responses
+# Correct responses start with 1.  We will consider all responses in 1.1-1.3 for analyses of response times and responses 1.1-1.4 and 0.1-0.9 (not 1.4 and 0.99) fir analyses of error rates.  
+d$error[is.na(d$VOT)] <- "99"
+d$correct[is.na(d$VOT)] <- "0"
+
+## Two trials were forgotten to be classified, but AR == 99 --> technical error?
+d$error[is.na(d$correct) & d$AR == "99"] <- "99"
+d$correct[is.na(d$correct) & d$AR == "99"] <- "0"
+sum(is.na(d$correct))
+
+## NR and 0.4 are the same -> replace this
+d$error[d$error=="NR"] <- "4"
+
+## Rename broken names
+# unique(df$error)
+d$error <- stringr::str_replace(d$error, ";;;;;;", "")
+d$error <- stringr::str_replace(d$error, "ok", "") # subject 113, session 2, trial 121 (Couch)
+df$error <- gsub("?",NA,df$error, fixed = TRUE)
+# unique(df$error)
+
+# unique(df$correct)
+d$correct <- stringr::str_replace(d$correct, ";;;;;;", "")
+# unique(df$correct)
+
+d$error[d$correct == 0 & is.na(d$error)] <- 1 # phonet. paraphrasia > 25 % 
+
+## Subset data for reaction time and error analyses and delete fillers
+# As correct reaction times will be considered:  
+# 1 - correct.  
+# 1.1 - correct with alternative response.  
+# 1.2 - correct with phonematic paraphasia (<=25% of the word).
+# 1.3 - correct with correct article [*].  
+d %>% mutate(correct_class = case_when(
+  correct == 1 ~ 1, 
+  correct ==1.1 ~ 1,
+  correct == 1.2 ~ 1,
+  correct == 1.3 ~ 1,
+  correct == 1.4 ~ 0,
+  correct == 0 ~ 0)) -> d
+
+### Save data frame for RT analyses: Only correct responses
+d_RTs <- d %>% filter(correct_class == 1)
+print(paste0("Amount of trials that went into RT analyses of Filler trials: ",
+             nrow(d_RTs)))
+table(d_RTs$group)
+
+# Subset data frame for error analyses
+# As errors on the participant side will be considered:   
+# 1 - wrong with phonematic paraphrasia (> 25 % of the word).  
+# 2 - wrong: semantic paraphrasia (word in the experiment).  
+# 3 - wrong: semantic paraphrasia (word not in the experiment).  
+# 4 - wrong: null reaction.  
+# 5 - wrong: replacement without connection to the word (word in the experiment).   
+# 6 - wrong: replacement without connection to the word (word not in the experiment).  
+# 7 - superordinate word.  
+# 8 - neologism.  
+# 9 - etc.    
+
+d %>% mutate(error_class = case_when(
+  error ==1 | error == 2 |error == 3 |
+    error==4 | error==5 | error == 6 | error == 7 |
+    error == 8 | error == 9 ~ 1, 
+  error == 99 | is.na(error) ~ 0)) -> d
+
+#### Subset data for error analyses: All trials excluding technical errors, invalid RTs and fillers
+d_errors <- d %>% filter((error != "99" | is.na(error)))
+
+print(paste0("Amount of trials that went into error analyses: ",
+             nrow(d_errors)))
+print(paste0("Amount of these trials with errors analyses: ",
+             nrow(d_errors[d_errors$error_class==1,])))
+table(d_errors$group)
+```
+
+#### Plotting of VOTs
+
+```{r }
+(means_final<-
+   d %>% filter(correct_class == 1) %>%
+   filter(category == "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("session", "PosOr"),
+                          betweenvars = "group", na.rm = T))
+
+override.linetype<-c("longdash", "dashed", "dotted")
+(plot_rt_repetition_PWA <- means_final %>% filter(group=="PWA") %>%
+    mutate(session=case_when(session == "1" ~ "day 1", 
+                                 session == "2" ~ "day 2",
+                                 session == "3" ~ "day 8")) %>% 
+    ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
+    geom_point(size = 2)+
+    stat_summary(aes(linetype=session),fun=mean,  
+                 geom="line", size = 0.5) +
+    scale_linetype_manual(values=c("longdash", "dashed", "dotted"))+
+    scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se, group = session), 
+                  width =.1) +
+    apatheme+
+    scale_y_continuous(limits = c(1020, 1450), 
+                       breaks =seq(1050,1450, by = 50)) +
+    labs(x="Ordinal Position ",y ="VOT (ms)", colour="Session",
+         linetype="Session",
+         title = "Filler Trials of PWA") + 
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0)),
+    legend.key.width = unit(1, "cm"),
+    legend.position="none")+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none"))
+
+(plot_rt_repetition_control <- means_final %>% 
+    filter(group=="control") %>% 
+    mutate(session=case_when(session == "1" ~ "day 1", 
+                                 session == "2" ~ "day 2",
+                                 session == "3" ~ "day 8")) %>% 
+    ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
+    geom_point(size = 2)+
+    stat_summary(aes(linetype=session),fun=mean,  
+                 geom="line", size = 0.5) +
+    scale_linetype_manual(values=c("longdash", "dashed", "dotted"))+
+    scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se, group = session), 
+                  width =.1) +
+    apatheme+
+    scale_y_continuous(limits = c(1020, 1450), 
+                       breaks =seq(1050,1450, by = 50)) +
+    labs(x="Ordinal Position ",y ="VOT (ms)", colour="Session", linetype="Session",
+         title = "Filler Trials of Control Group") + 
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0)),
+    legend.key.width = unit(1, "cm"))+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none"))
+
+plots <- cowplot::plot_grid(
+  plot_rt_repetition_PWA,plot_rt_repetition_control,
+  nrow = 1, ncol=2,  rel_widths = c(0.81,1), #rel_height = c(1,1),
+  margin(1,1,1,1),
+  labels = c("A", "B"),label_size = 34,
+  label_fontfamily = "Helvetica", label_y = 1.01,
+  label_x=-0.03)
+filename <- "CSI_online_aphasia_spoken_plot_rt_by_repetition_FILLERS.pdf"
+ggsave(plots, filename = 
+         here::here("results", "figures", filename),
+       width = 25, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+```
+
+
+
+
+#### Inferential statistics of VOTs
+Preparation
+
+```{r}
+d_RTs$PosOr.cont <-
+  scale(as.numeric(as.character(d_RTs$PosOr)),
+        center = T, scale = F)
+# *Compute further contrasts*
+# define contrasts of session: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
+c<-contr.treatment(3)
+my.coding<-matrix(rep(1/3, 6), ncol=2)
+my.simple<-c-my.coding
+my.simple
+contrasts(d_RTs$session)<-my.simple
+levels(d_RTs$session)
+
+## Define contrast of group
+contrasts(d_RTs$group) <- MASS::contr.sdif(2)
+levels(d_RTs$group)
+
+# *didLMERconverge function*
+## This function provides a better convergence check for lme4 v>1.0 models, which have a nasty habit of throwing up false nonconvergence warnings.  It implements Ben Bolker's suggestion here (https://github.com/lme4/lme4/issues/120), referred to again here (http://stats.stackexchange.com/questions/97929/lmer-model-fails-to-converge).
+didLmerConverge = function(lmerModel){
+  relativeMaxGradient=signif(max(abs(with(
+    lmerModel@optinfo$derivs,solve(Hessian,gradient)))),3)
+  if (relativeMaxGradient < 0.001) {
+    cat(sprintf("\tThe relative maximum gradient of %s is less than our 0.001 criterion.\n\tYou can safely ignore any warnings about a claimed convergence failure.\n\n", relativeMaxGradient))
+  }
+  else {
+    cat(sprintf("The relative maximum gradient of %s exceeds our 0.001 criterion.\nThis looks like a real convergence failure; maybe try simplifying your model?\n\n", relativeMaxGradient))
+  }
+}
+
+#### Transform RTs: log transformation as in main analyses
+d_RTs$lVOT <- log(d_RTs$VOT)
+```
+
+*Compute full model, then compute step-wise reduction*
+
+```{r}
+library(lmerTest)
+# m2_lmm <- lmer(lVOT ~ PosOr.cont*session*group +
+#                (PosOr.cont*session|subject),
+#              data = d_RTs,
+#             control=lmerControl(optimizer = "bobyqa"))
+# didLmerConverge(m2_lmm)
+
+# Model fails to converge --> Reduce
+# 1) Increase optimizer iterations
+# m2_lmm <- lmer(lVOT ~ PosOr.cont*session*group +
+#                (PosOr.cont*session|subject),
+#              data = d_RTs,
+#             control=lmerControl(optimizer = "bobyqa",
+#                                  optCtrl = list(maxfun = 2e5)))
+# didLmerConverge(m2_lmm)
+
+# 2) Omit correlation parameters as model still fails to converge
+# m2_lmm <- afex::lmer_alt(lVOT ~ PosOr.cont*session*group +
+#                (PosOr.cont*session||subject),
+#              data = d_RTs,
+#             control=lmerControl(optimizer = "bobyqa",
+#              optCtrl = list(maxfun = 2e5)))
+
+# 3) Model fit is still singular -> Further reduce the model 
+# m2_lmm <- afex::lmer_alt(lVOT ~ PosOr.cont*session*group +
+#                (PosOr.cont+session||subject),
+#              data = d_RTs,
+#             control=lmerControl(optimizer = "bobyqa",
+#              optCtrl = list(maxfun = 2e5)))
+# m2_lmm <- afex::lmer_alt(lVOT ~ PosOr.cont*session*group +
+#                (session||subject),
+#              data = d_RTs,
+#             control=lmerControl(optimizer = "bobyqa",
+#              optCtrl = list(maxfun = 2e5)))
+# 4) Does the model also converge when correlation parameters are included - yes! 
+m2_lmm <- lmer(lVOT ~ PosOr.cont*session*group +
+               (session|subject),
+             data = d_RTs,
+            control=lmerControl(optimizer = "bobyqa",
+                       optCtrl = list(maxfun = 2e5)))
+# rePCA(m2_lmm)
+didLmerConverge(m2_lmm)
+## Warnings can be ignored
+
+summary(m2_lmm)
+anova(m2_lmm)
+
+saveRDS(m2_lmm,  file = here::here("results", "tables", "CSI_online_aphasia_PosOrSessionxGroup_lmm_VOT_FILLERS.RDS"))
+tab_model(m2_lmm,transform = NULL,
+          show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
+          title = "LMM of VOTs of Filler trials Predicted by Ordinal Position and Session",
+          dv.labels = "Vocal Onset Time (log-transformed)",
+          #string.pred = "",
+          df.method = "satterthwaite",
+          string.stat = "t-Value",
+          file = here::here(
+            "results", "tables",
+            "CSI_online_aphasia_spoken_SessionxGroup_lmm_VOT_FILLERS.html"))
+
+## Check model
+# performance::check_model(m2_lmm) 
+# ggResidpanel::resid_panel(m2_lmm, smoother = TRUE, 
+                          # qqbands = TRUE, type = "pearson")
+```
+
+
+#### Main model with category block as covariate
+Add "block" variable for trials of individual participants
+
+```{r}
+df_RTs <- df_RTs %>% 
+  mutate(filler_block = case_when(
+    trial <= 20 ~ 1,
+    trial > 20 & trial <= 40  ~ 2,
+    trial > 40 & trial <= 60  ~ 3,
+    trial > 60 & trial <= 80  ~ 4,
+    trial > 80 & trial <= 100  ~ 5,
+    trial > 100 & trial <= 120  ~ 6,
+    trial > 120 & trial <= 140  ~ 7,
+    trial > 140 & trial <= 160  ~ 8))
+# use as centered continuous variable
+df_RTs$filler_block_c <- 
+  scale(df_RTs$filler_block, center=T, scale=F)
+```
+
+Add to converging model
+
+```{r}
+m2_lmm_control <- lmer(lVOT ~ 
+                 PosOr.cont*session*group*filler_block_c +
+               (PosOr.cont+session|subject) +
+              (PosOr.cont+group|category),
+             data = df_RTs,
+            control=lmerControl(optimizer = "bobyqa",
+                                 optCtrl = list(
+                                   maxfun = 2e5)))
+summary(m2_lmm_control)
+```
+
+#### Other code
+
 
 <!-- ### Intercept-only models -->
 <!-- #### RTs -->
