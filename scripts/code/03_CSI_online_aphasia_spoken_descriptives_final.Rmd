@@ -165,19 +165,209 @@ df %>% group_by(type, session) %>% count(array) %>% mutate(n=n/160) %>% arrange(
 df %>% count(array) %>% mutate(n=n/160)
 ```
 
+## Get an overview of the computer setups
+Information was read-out automatically from SoSci Survey
+SD22_PRV (provider):
+1 = Android
+2 = Apple
+3 = BlackBerry
+4 = PlayBook
+5 = Kindle
+6 = Microsoft
+-1 = Sonstige oder unbekannt
+
+SD22_OS (OS):
+10 = Windows NT
+11 = Windows Vista
+12 = Windows 7
+13 = Windows 8
+15 = Windows 10
+20 = Linux
+30 = MaxOS X
+40 = iOS
+50 = Android
+-1 = Sonstiges
+-2 = unbekannt
+
+SD22_BID (Browser-Identification (HTTP_USER_AGENT))
+
+SD22_BNM (Browser)
+1 = Android WebView
+2 = Chrome
+3 = Chromium
+4 = Coast
+5 = Firefox
+6 = IE
+7 = Opera
+8 = Safari
+9 = Edge
+10 = Safari WebView
+11 = IE (mobile)
+12 = Edge (mobile)
+-1 = Sonstiges
+-2 = Default Browser
+-3 = unbekannt
+
+SD22_BVS (Browser-version)
+
+SD22_FmF (Format)
+1 = Computer
+2 = Fernsehgerät
+3 = Tablet
+4 = Mobilgerät
+5 = Smartphone
+-2 = unbekannt
+
+SD22_ScW (screen width [Pixel])
+SD22_ScH (screen [Pixel]
+
+SD22_QnW (questionnaire width [Pixel])
+
+
+```{r}
+#colnames(df)
+
+df <- df %>% mutate(SD22_OS=as.character(as.numeric(SD22_OS))) %>%
+  mutate(os_system = case_when(
+  SD22_OS==10  ~ "Windows NT",
+  SD22_OS==11  ~ "Windows Vista",
+  SD22_OS==12  ~ "Windows 7",
+  SD22_OS==13  ~ "Windows 8",
+  SD22_OS==15  ~ "Windows 10",
+  SD22_OS==20  ~ "Linux",
+  SD22_OS==30  ~ "MaxOS X",
+  SD22_OS==40  ~ "iOS",
+  SD22_OS==50  ~ "Android",
+  SD22_OS==-1  ~ "other",
+  SD22_OS==-2  ~ "unknown")) %>%
+  mutate(os_system_raw=case_when(
+  SD22_OS==10  ~ "Windows",
+  SD22_OS==11  ~ "Windows",
+  SD22_OS==12  ~ "Windows",
+  SD22_OS==13  ~ "Windows",
+  SD22_OS==15  ~ "Windows",
+  SD22_OS==20  ~ "Linux",
+  SD22_OS==30  ~ "Apple",
+  SD22_OS==40  ~ "Apple",
+  SD22_OS==50  ~ "Android",
+  SD22_OS==-1  ~ "other",
+  SD22_OS==-2  ~ "unknown"))
+df %>% group_by(os_system) %>% count() %>% mutate(n=n/40/3) 
+df %>% group_by(os_system_raw) %>% count() %>% mutate(n=n/40/3) 
+
+# df <- df %>% mutate(SD22_PRV=as.character(as.numeric(SD22_PRV))) %>%
+#   mutate(provider = case_when(
+#   SD22_PRV==1  ~ "Android",
+#   SD22_PRV==2  ~ "Apple",
+#   SSD22_PRV==3  ~ "BlackBerry",
+#   SD22_PRV==4  ~ "PlayBook",
+#   SD22_PRV==5  ~ "Kindle",
+#   SD22_PRV==6  ~ "Microsoft",
+#   SD22_PRV==-1  ~ "other or unknown")) 
+# df %>% group_by(provider) %>% count() %>% mutate(n=n/40/3) 
+
+
+#df %>% group_by(SD22_BID) %>% count() %>% mutate(n=n/40/3) 
+
+df <- df %>% mutate(SD22_BNM=as.character(as.numeric(SD22_BNM))) %>%
+  mutate(browser = case_when(
+  SD22_BNM==1  ~ "Android WebView",
+  SD22_BNM==2  ~ "Chrome",
+  SD22_BNM==3  ~ "Chromium",
+  SD22_BNM==4  ~ "Coast",
+  SD22_BNM==5  ~ "Firefox",
+  SD22_BNM==6  ~ "IE",
+  SD22_BNM==7  ~ "Opera",
+  SD22_BNM==8  ~ "Safari",
+  SD22_BNM==9  ~ "Edge",
+  SD22_BNM==10  ~ "Safari WebView",
+  SD22_BNM==11  ~ "IE (mobile)",
+  SD22_BNM==12  ~ "Edge (mobile)",
+  SD22_BNM==-1  ~ "other",
+  SD22_BNM==-2  ~ "default browser",
+  SD22_BNM==-3  ~ "unknown"))
+
+#df %>% group_by(SD22_BVS) %>% count() %>% mutate(n=n/40/3) # browser version
+
+df <- df %>% mutate(SD22_FmF=as.character(as.numeric(SD22_FmF))) %>%
+  mutate(system_format = case_when(
+  SD22_FmF==1  ~ "Computer",
+  SD22_FmF==2  ~ "Television",
+  SD22_FmF==3  ~ "Tablet",
+  SD22_FmF==4  ~ "Mobile device",
+  SD22_FmF==5  ~ "Smartphone",
+  SD22_BNM==-2  ~ "unknown"))
+df %>% group_by(system_format) %>% count() %>% mutate(n=n/40/3) 
+
+df <- df %>% mutate(screen_width=as.character(as.numeric(SD22_ScW)))
+df %>% group_by(screen_width) %>% count() %>% mutate(n=n/40/3) 
+df <- df %>% mutate(screen_height=as.character(as.numeric(SD22_ScH)))
+df %>% group_by(screen_height) %>% count() %>% mutate(n=n/40/3) 
+df <- df %>% mutate(questionnaire_width=as.character(as.numeric(SD22_QnW)))
+df %>% group_by(questionnaire_width) %>% count() %>% mutate(n=n/40/3) 
+
+
+
+(df %>% group_by(subject, session) %>% select(SD22_BID, os_system_raw,
+                                             os_system, browser,
+                                             system_format,
+                                             screen_width, screen_height,
+                                             questionnaire_width) %>%
+  unique() -> setup_overview)
+
+## save this table and anonymize by hand
+write.csv(setup_overview,here::here("data", "transient_data_files", "setup_overview_all.csv"), 
+            row.names = FALSE)
+
+```
+
+Load manually cleaned overview and create table
+
+```{r}
+setups <- read.csv2(here::here("data", "transient_data_files", 
+                              "setup_overview_cleaned.csv"))
+setups %>% group_by(OS) %>% count()
+setups %>%
+  mutate(group=case_when(subject<200 ~ "PWA", subject >200 ~"Control")) %>%
+  group_by(group,browser) %>% count()
+setups %>% group_by(system_format) %>% count()
+setups %>% group_by(test_location) %>% count()
+setups %>% group_by(screen_width) %>% count()
+setups %>% 
+  mutate(screen_width=case_when(screen_width=="1366 (1280 on day 8)" ~ 1366,
+                                TRUE ~ as.numeric(as.character(screen_width)))) %>%
+  summarise(min=min(screen_width), max=max(screen_width),
+            mean=mean(screen_width), sd=sd(screen_width))
+setups %>% group_by(screen_height) %>% count()
+setups %>% 
+  mutate(screen_height=case_when(screen_height=="768 (720  on day8)" ~ 768,
+                                TRUE ~ as.numeric(as.character(screen_height)))) %>%
+  summarise(min=min(screen_height), max=max(screen_height),
+            mean=mean(screen_height), sd=sd(screen_height))
+setups %>% group_by(questionnaire_width) %>% count()
+```
+
 ## Fully anonymize data and reduce data frame
 
 ```{r anonymize}
-# df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") & 
+# df_a <- df %>% dplyr::select(!"gender" & !starts_with("language") &
 #                                !starts_with("handedness") &
-#                                !starts_with("fingers") & 
+#                                !starts_with("fingers") &
 #                                 !starts_with("KB") &
-#                                !starts_with("CH0") & 
-#                                !"comments" & !"type" &  
-#                                !"gender_char" & !"itemvsnonitem1" &
-#                                !"itemvsnonitem2" &  
+#                                !starts_with("CH0") &
+#                                !"comments" & !"type" &
+#                                #!"gender_char" & 
+#                                !"itemvsnonitem1" &
+#                                !"itemvsnonitem2" &
 #                                !starts_with("MC") &
-#                                 !"name" & !"time_wo_outlier" )
+#                                !starts_with("SD") & 
+#                                !c("os_system", "os_system_raw", 
+#                                   "browser", "screen_width",
+#                                   "system_format",
+#                                   "questionnaire_width", 
+#                                   "screen_height", "OR02_01", "array")
+#                              # !"name" & !"time_wo_outlier" 
+#                                )
 ```
 
 

@@ -265,6 +265,38 @@ huxtable::quick_docx(
     "results", "tables",
     "CSI_online_aphasia_classification_summary.docx"), 
   open = FALSE)
+
+# by ordinal position
+x <- df %>% group_by(group, session, PosOr) %>% count(error) %>%
+  mutate(error=as.character(error)) %>% 
+  mutate(error=case_when(
+    error == "1" ~ 
+      "wrong with phonematic paraphrasia (> 25 % of the word)",
+    error == "2" ~ 
+      "wrong: semantic paraphrasia (word in the experiment)",
+    error == "3" ~ 
+      "wrong: semantic paraphrasia (word not in the experiment)",
+    error == "4" ~ 
+      "wrong: null reaction",
+    error == "5" ~ 
+      "wrong: replacement without connection to the word (word in the experiment) ",
+    error == "6" ~ 
+    "wrong: replacement without connection to the word (word not in the experiment)",
+    error == "7" ~ "wrong: superordinate word",
+    error == "8" ~ "wrong: neologism",
+    error == "9" ~ "wrong: etc.",
+    error == "99" ~ "TECHNICAL ERROR",
+    is.na(error) ~ "sum correct")) %>%
+  rename(classification = error)
+(x %>% filter(group=="PWA") %>%
+  arrange(group, session, PosOr))
+
+## correct responses, but VOT invalid
+  # 1.4 - correct, but VOT invalid.
+(df %>% filter(group=="PWA" & correct=="1.4") %>%
+    group_by(group, session, PosOr) %>%
+    count(correct) %>%
+    arrange(group, session, PosOr))
 ```
 
 
@@ -305,6 +337,14 @@ df_RTs %>% group_by(group, session) %>% count()
 print(paste0("Amount of trials that went into RT analyses: ",
              nrow(df_RTs)))
 table(df_RTs$group)
+
+# by ordinal position
+(df_RTs %>% filter(group=="PWA") %>% group_by(group, session, PosOr) %>% 
+    mutate(correct=case_when(correct=="1" ~ "correct",
+                             correct=="1.1" ~ "correct with alternative response",
+                             correct=="1.2" ~ "correct with phonematic paraphasia (<=25% of the word)",
+                             correct=="1.3" ~ "correct with correct article")) %>% 
+    count(correct) -> x)
 ```
 
 As errors on the participant side will be considered:   
@@ -389,9 +429,9 @@ x <- df_RTs %>%
                           withinvars = "PosOr", #c("session", "PosOr"), 
                          # betweenvars = "group",
                          na.rm = T)
-((x$VOT[1]-x$VOT[2])+(x$VOT[2]-x$VOT[3])+(x$VOT[3]-x$VOT[4])+
-    (x$VOT[4]-x$VOT[5]))/4
-((x$VOT[1]-x$VOT[5]))/4
+((x$VOT[2]-x$VOT[1])+(x$VOT[3]-x$VOT[2])+(x$VOT[4]-x$VOT[3])+
+    (x$VOT[5]-x$VOT[4]))/4
+((x$VOT[5]-x$VOT[1]))/4
 
 ## session effect
 x <- df_RTs %>% 
@@ -413,70 +453,75 @@ x <- df_RTs %>%
 (x$VOT[2]-x$VOT[1])
 ```
 
-Calculate increase mean by ordinal position, separately for each session (not controlled for random variances, weighted only per session):
+
+Calculate mean and SD of ordinal position effects
 
 ```{r}
-means_final$increase <- NA
-for(k in 1:length(unique(means_final$group))){
-  for(i in 1:length(unique(means_final$session))){
-    for(j in 2:length(unique(means_final$PosOr))) {
-      means_final$increase[means_final$session==unique(means_final$session)[i] &
-                             means_final$PosOr==unique(means_final$PosOr)[j] & 
-                             means_final$group == unique(means_final$group)[k]] <- 
-       means_final$VOT[means_final$session==unique(means_final$session)[i] &
-                             means_final$PosOr==unique(means_final$PosOr)[j] & 
-                             means_final$group == unique(means_final$group)[k]] - 
-        means_final$VOT[means_final$session==unique(means_final$session)[i] &
-                             means_final$PosOr==unique(means_final$PosOr)[j-1] & 
-                             means_final$group == unique(means_final$group)[k]]
+# First calculate the OrdPos effect for each subject and each category separately
+df_RTs$OrdPos_manual <- NA_real_
+isEmptyNumeric <- function(x) {
+    return(identical(x, numeric(0)))
+}
+
+
+for (i in unique(df_RTs$subject)) {
+  for(j in unique(df_RTs$category)) {
+    for(l in unique(df_RTs$session)) {
+      for (k in 2:5) {
+        x <- df_RTs$VOT[df_RTs$subject==i &
+                             df_RTs$category==j & 
+                             df_RTs$session==l &
+                             df_RTs$PosOr==k]
+        xM1 <- df_RTs$VOT[df_RTs$subject==i &
+                             df_RTs$category==j & 
+                             df_RTs$session==l &
+                             df_RTs$PosOr==k-1]
+      if(!isEmptyNumeric(x) & !isEmptyNumeric(xM1)){
+        if(!is.na(x) &  !is.na(xM1)){
+              df_RTs$OrdPos_manual[df_RTs$subject==i &
+                             df_RTs$category==j & 
+                             df_RTs$session==l &
+                             df_RTs$PosOr==k] <- x - xM1
+      }
+      }
+      }
     }
-}}
-# means_final
-
-## Calculate overall mean increase per session (weighted)
-## PWA
-mean(means_final$increase[means_final$session==1 & means_final$group == "PWA"], na.rm=T)
-## control
-mean(means_final$increase[means_final$session==1 & means_final$group == "control"], na.rm=T)
-
-means_final$PosOr_effect <- NA
-means_final$PosOr_effect[means_final$PosOr==1] <- 1
-for(k in 1:length(unique(means_final$group))){
-for(i in 1:length(unique(means_final$session))){
-  for(j in 2:length(unique(means_final$PosOr))) {
-    means_final$PosOr_effect[
-      means_final$session==unique(means_final$session)[i] & 
-        means_final$PosOr==unique(means_final$PosOr)[1] & 
-        means_final$group == unique(means_final$group)[k]] <-
-      means_final$PosOr_effect[
-      means_final$session==unique(means_final$session)[i] & 
-        means_final$PosOr==unique(means_final$PosOr)[1] & 
-        means_final$group == unique(means_final$group)[k]] + 
-      means_final$increase[means_final$session==unique(means_final$session)[i] &
-                             means_final$PosOr==unique(means_final$PosOr)[j]& 
-                             means_final$group == unique(means_final$group)[k]]*
-      (means_final$N[means_final$session==unique(means_final$session)[i] &
-                          means_final$PosOr==unique(means_final$PosOr)[j]& 
-                             means_final$group == unique(means_final$group)[k]]+
-        means_final$N[means_final$session==unique(means_final$session)[i] &
-                          means_final$PosOr==unique(means_final$PosOr)[j-1]& 
-                             means_final$group == unique(means_final$group)[k]])
   }
-  means_final$PosOr_effect[means_final$session==unique(means_final$session)[i] &
-                             means_final$PosOr==unique(means_final$PosOr)[1]& 
-                             means_final$group == unique(means_final$group)[k]] <-
-    means_final$PosOr_effect[means_final$session==unique(means_final$session)[i] &
-                               means_final$PosOr==unique(means_final$PosOr)[1]& 
-                             means_final$group == unique(means_final$group)[k]]/
-    (sum(means_final$N[means_final$session==unique(means_final$session)[i]& 
-                             means_final$group == unique(means_final$group)[k]])+
-       sum(means_final$N[means_final$session==unique(means_final$session)[i] &
-                           (means_final$PosOr=="2" |
-                              means_final$PosOr=="3" |
-                              means_final$PosOr=="4")& 
-                             means_final$group == unique(means_final$group)[k]]))
-}}
-means_final
+}
+
+# return summarySEwithin
+ df_RTs %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"OrdPos_manual",
+                          idvar = "subject",
+                          withinvars = c("session"), 
+                          betweenvars = "group", 
+                          na.rm = T)
+ # without session
+  df_RTs %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySE(.,measurevar="OrdPos_manual",
+                          groupvars = "group", 
+                          na.rm = T)
+  df_RTs %>% 
+   filter(category != "Filler") %>% 
+   filter(session=="1") %>%
+   Rmisc::summarySE(.,measurevar="OrdPos_manual",
+                          groupvars = "group", 
+                          na.rm = T)
+   # Rmisc::summarySEwithin(.,"OrdPos_manual",
+   #                        idvar = "subject",
+   #                        withinvars = c("session"), 
+   #                        betweenvars = "group", 
+   #                        na.rm = T)
+  # without group
+   df_RTs %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"OrdPos_manual",
+                          idvar = "subject",
+                          withinvars = c("session"), 
+                          #betweenvars = "group", 
+                          na.rm = T)
 ```
 
 ### Trial types within correct responses
@@ -535,6 +580,11 @@ ggsave(plot_vot, filename =
 #### RTs by Group, session, and ordinal position
 
 ```{r }
+means_final<- df_RTs %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr", "session"), 
+                          betweenvars = "group", na.rm = T)
 override.linetype<-c("longdash", "dashed", "dotted")
 (plot_rt_repetition_PWA <- means_final %>% filter(group=="PWA") %>%
     mutate(session=case_when(session == "1" ~ "day 1", 
@@ -873,7 +923,8 @@ anova(m2_lmm)
 
 saveRDS(m2_lmm,  file = here::here("results", "tables", "CSI_online_aphasia_SessionxGroup_control_lmm_VOT.RDS"))
 tab_model(m2_lmm,transform = NULL,
-          show.re.var = F, show.stat = T,show.r2 = F,show.icc = F,
+          show.re.var = F,#T, 
+          show.stat = T,show.r2 = T,show.icc = T,
           title = "LMM of VOTs Predicted by Ordinal Position and Session",
           dv.labels = "Vocal Onset Time (log-transformed)",
           #string.pred = "",
@@ -884,9 +935,10 @@ tab_model(m2_lmm,transform = NULL,
             "CSI_online_aphasia_spoken_SessionxGroup_lmm_VOT.html"))
 
 ## Check model
-# performance::check_model(m2_lmm) 
-# ggResidpanel::resid_panel(m2_lmm, smoother = TRUE, 
-                          # qqbands = TRUE, type = "pearson")
+#performance::check_model(m2_lmm) 
+# ggResidpanel::resid_panel(m2_lmm, smoother = TRUE,
+#                            qqbands = TRUE, type = "pearson")
+performance::model_performance(m2_lmm)
 ```
 
 ###### PWA only
@@ -986,6 +1038,12 @@ tab_model(m1_lmm_PWA,transform = NULL,
           file = here::here(
             "results", "tables",
             "CSI_online_aphasia_PWA_control_lmm_VOT.html"))
+
+## check model fit
+#performance::check_model(m1_lmm_PWA) 
+# ggResidpanel::resid_panel(m1_lmm_PWA, smoother = TRUE,
+#                            qqbands = TRUE, type = "pearson")
+performance::model_performance(m1_lmm_PWA)
 ```
 
 # -------------------------------------
@@ -1058,7 +1116,6 @@ huxtable::quick_docx(huxt_word,
                          "results", "tables",
                           "CSI_online_PWA_errors_by_session.docx"), 
                      open = FALSE)
-
 ```
 
 Calculate increase mean by ordinal position, separately for each session (not controlled for random variances, weighted only per session):
@@ -1192,6 +1249,59 @@ for(i in 1:nrow(w)){
    filter(!(error %in% c(4,9,10))) %>%
    group_by(session) %>%
    summarise(mean=mean(m_increase, na.rm=T))
+```
+
+Calculate mean and SD of ordinal position effects in PWA group
+
+```{r}
+# First calculate the OrdPos effect for each subject and each category separately
+df_errors_PWA <- df_errors %>% filter(category!="Filler" & 
+                                        group=="PWA")
+df_errors_PWA$OrdPos_manual <- NA_real_
+isEmptyNumeric <- function(x) {
+    return(identical(x, numeric(0)))
+}
+
+for (i in unique(df_errors_PWA$subject)) {
+  for(j in unique(df_errors_PWA$category)) {
+    for(l in unique(df_errors_PWA$session)) {
+      for (k in 2:5) {
+        x <- df_errors_PWA$error_class[df_errors_PWA$subject==i &
+                             df_errors_PWA$category==j & 
+                             df_errors_PWA$session==l &
+                             df_errors_PWA$PosOr==k]
+        xM1 <- df_errors_PWA$error_class[df_errors_PWA$subject==i &
+                             df_errors_PWA$category==j & 
+                             df_errors_PWA$session==l &
+                             df_errors_PWA$PosOr==k-1]
+      if(!isEmptyNumeric(x) & !isEmptyNumeric(xM1)){
+        if(!is.na(x) &  !is.na(xM1)){
+              df_errors_PWA$OrdPos_manual[df_errors_PWA$subject==i &
+                             df_errors_PWA$category==j & 
+                             df_errors_PWA$session==l &
+                             df_errors_PWA$PosOr==k] <- x - xM1
+      }
+      }
+      }
+    }
+  }
+}
+
+# return summarySEwithin
+ df_errors_PWA %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"OrdPos_manual",
+                          idvar = "subject",
+                          withinvars = c("session"), 
+                          betweenvars = c("subject", "group"), 
+                          na.rm = T)
+  df_errors_PWA %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"error_class",
+                          idvar = "subject",
+                          withinvars = c("session"), 
+                          betweenvars = "group", 
+                          na.rm = T)
 ```
 
 ### Plotting
@@ -1392,12 +1502,21 @@ Compute the full model with the maximal random structure. If model fails to conv
 #                   data =df_errors, family = "binomial",
 #                   control=glmerControl(optimizer = "bobyqa",
 #                                  optCtrl = list(maxfun = 2e5)))
-m2_error <- afex::lmer_alt(error_class ~ PosOr.cont*session*group +
-                    (PosOr.cont||subject) +
-                    (group||category) ,
+# m2_error <- afex::lmer_alt(error_class ~ PosOr.cont*session*group +
+#                     (PosOr.cont||subject) +
+#                     (group||category) ,
+#                   data =df_errors, family = "binomial",
+#                   control=glmerControl(optimizer = "bobyqa",
+#                                  optCtrl = list(maxfun = 2e5)))
+
+# does the model also converge when correlation parameters are included? -> yes! 
+m2_error <- glmer(error_class ~ PosOr.cont*session*group +
+                    (PosOr.cont|subject) +
+                    (group|category) ,
                   data =df_errors, family = "binomial",
                   control=glmerControl(optimizer = "bobyqa",
                                  optCtrl = list(maxfun = 2e5)))
+
 # rePCA(m2_error)
 didLmerConverge(m2_error)
 summary(m2_error)
@@ -1416,6 +1535,11 @@ tab_model(m2_error,transform = NULL,
             here::here(
               "results", "tables",
               "CSI_online_aphasia_SessionxGroup_glmm_errors.html"))
+
+#performance::check_model(m2_error) 
+# ggResidpanel::resid_panel(m2_error, smoother = TRUE,
+#                            qqbands = TRUE, type = "pearson")
+performance::model_performance(m2_error)
 ```
 
 Make the estimates interpretable 
@@ -1492,6 +1616,11 @@ tab_model(m1_error,transform = NULL,
           file = here::here(
             "results", "tables",
             "CSI_online_aphasia_PWA_glmm_errors.html"))
+
+#performance::check_model(m1_error) 
+ggResidpanel::resid_panel(m1_error, smoother = TRUE,
+                           qqbands = TRUE, type = "pearson")
+performance::model_performance(m1_error)
 ```
 
 Make the estimates interpretable 
@@ -1761,7 +1890,8 @@ didLmerConverge(m1_lmm_PWA_tt)
 Does the model with Token test fit the data better? -> yes! 
 
 ```{r}
-#summary(m1_lmm_PWA)
+# summary(m1_lmm_PWA)
+# performance::model_performance(m1_lmm_PWA)
 anova(m1_lmm_PWA, m1_lmm_PWA_tt)
 ```
 
@@ -1866,7 +1996,7 @@ didLmerConverge(m1_lmm_PWA_aat)
 #             "CSI_online_aphasia_PWA_control_lmm_VOT_AachenAphase.html"))
 ```
 
-Does the model with Token test fit the data better? -> yes! 
+Does the model with Naming test fit the data better? -> yes! 
 
 ```{r}
 #summary(m1_lmm_PWA)
@@ -2142,7 +2272,7 @@ didLmerConverge(m1_glmm_PWA_lemo)
 #             "CSI_online_aphasia_PWA_control_glmm_error_Lemo.html"))
 ```
 
-Does the model with LEMO test fit the data better? -> no! 
+Does the model with LEMO test fit the data better? -> no
 
 ```{r}
 #summary(m1_lmm_PWA)
@@ -2157,7 +2287,8 @@ Add into converging model
 df_RTs_PWA$PosOr.cont <- scale(as.numeric(as.character(df_RTs_PWA$PosOr)),
                                         center = T, scale = F)
 table(df_RTs_PWA$PosOr.cont)
-mean(df_RTs_PWA$PosOr.cont); sd(df_RTs_PWA$PosOr.cont)
+mean(df_RTs_PWA$PosOr.cont)
+sd(df_RTs_PWA$PosOr.cont)
 
 # define contrasts of session: compare 1 to 2 and 1 to 3, intercept is the grand mean => simple coding (https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/#SIMPLE)
 c<-contr.treatment(3)
@@ -2389,6 +2520,7 @@ didLmerConverge(m1_lmm_PWA_tt_aat)
 
 summary(m1_lmm_PWA_tt_aat)
 anova(m1_lmm_PWA_tt_aat)
+performance::model_performance(m1_lmm_PWA_tt_aat)
 
 saveRDS(m1_lmm_PWA_tt_aat,  file = here::here("results", "tables",
  "CSI_online_aphasia_PWA_lmm_VOT_plus-TokenTest-plus-AachenAphhasie.RDS"))
@@ -2665,6 +2797,7 @@ didLmerConverge(m1_glmm_PWA_all)
 
 summary(m1_glmm_PWA_all)
 anova(m1_glmm_PWA_all)
+performance::model_performance(m1_glmm_PWA_all)
 
 saveRDS(m1_glmm_PWA_all,  file = here::here("results", "tables", "CSI_online_aphasia_PWA_lmm_error_TokenTest_Naming_Lesionsize.RDS"))
 tab_model(m1_glmm_PWA_tt,transform = NULL,
@@ -2677,6 +2810,13 @@ tab_model(m1_glmm_PWA_tt,transform = NULL,
           file = here::here(
             "results", "tables",
             "CSI_online_aphasia_PWA_control_glmm_error_TokenTest_Naming_Lesionsize.html"))
+
+# Odds Ratio:
+x <- data.frame(summary(m1_glmm_PWA_all)$coefficients)
+x$Odds_Ratio <- plogis(x$Estimate)
+x %>% dplyr::select(Estimate, Odds_Ratio) %>% 
+  mutate(Estimate=round(Estimate,2),
+         Odds_Ratio=round(Odds_Ratio,2))
 ```
 
 ###### Plot errors and Tests
@@ -3120,11 +3260,11 @@ plot1 <- plot_model(m1_glmm_PWA_all,
   ylab("Percentage of errors") +
   scale_colour_manual(name = "Centered\nSEM score",
                         labels=c("-1.23", " 0.81"),
-                        values=c("cornflowerblue", "deeppink4")) +
+                        values=c("#6495ed", "#8b0a50")) +
   
   scale_fill_manual(name = "Centered\nSEM score",
                         labels=c("-1.23", " 0.81"),
-                        values=c("cornflowerblue", "deeppink4")) +
+                        values=c("#6495ed", "#8b0a50")) +
    # guides(color=guide_legend(
    #   override.aes=list(linetype=override.linetypea)))+
   theme_bw()+
@@ -3151,7 +3291,7 @@ plot2 <- plot_model(m1_glmm_PWA_all,
            #transform=NULL,
            terms = c("PosOr.cont", "TokenTest_c", "session_day"),
            mrt.values="quart",
-           title=c("Model prediction of 3-way interaction:\nOrdinal position X token test (TT in AAT)")) +
+           title=c("Model prediction of 3-way interaction:\nOrdinal position X token test (TT in AAT) X session")) +
     scale_x_continuous(breaks = c(-1.99860685427696,
                                 -0.998606854276957,
                                 0.00139314572304272,
@@ -3162,12 +3302,12 @@ plot2 <- plot_model(m1_glmm_PWA_all,
   ylab("Percentage of errors") +
   scale_colour_manual(name = "Centered\nTT score",
                        # labels=c("-1.23", " 0.81"),
-                        values=c("deeppink", "cyan3",
-                                 "darkslategray")) +
+                        values=c("#ff1493", "#00cdcd",
+                                 "#2f4f4f")) +
   scale_fill_manual(name = "Centered\nTT score",
                        # labels=c("-1.23", " 0.81"),
-                        values=c("deeppink", "cyan3",
-                                 "darkslategray")) +
+                        values=c("#ff1493", "#00cdcd",
+                                 "#2f4f4f")) +
   theme_bw()+
   theme(plot.title=element_text(size=22,hjust = .5),
         # panel.grid.major=element_blank(),
@@ -3193,7 +3333,7 @@ plot3 <- plot_model(m1_glmm_PWA_all,
            #transform=NULL,
            terms = c("PosOr.cont", "AAT_c", "session_day"),
            mrt.values="quart", ci.lvl = .95,
-           title=c("Model prediction of 3-way interaction:\nOrdinal position X overall naming (NAM in AAT)")) +
+           title=c("Model prediction of 3-way interaction:\nOrdinal position X overall naming (NAM in AAT) X session")) +
     scale_x_continuous(breaks = c(-1.99860685427696,
                                 -0.998606854276957,
                                 0.00139314572304272,
@@ -3202,14 +3342,14 @@ plot3 <- plot_model(m1_glmm_PWA_all,
                      labels= c(1,2,3,4,5))  + 
   xlab("Ordinal position") +
   ylab("Percentage of errors") +
-  scale_colour_manual(name = "Centered\nTT score",
+  scale_colour_manual(name = "Centered\nNAM score",
                        # labels=c("-1.23", " 0.81"),
-                        values=c("aquamarine3", "blue",
-                                 "brown3")) +
+                        values=c("#66cdaa", "#0000ff",
+                                 "#cd3333")) +
   scale_fill_manual(name = "Centered\nTT score",
                        # labels=c("-1.23", " 0.81"),
-                        values=c("aquamarine3", "blue",
-                                 "brown3")) +
+                        values=c("#66cdaa", "#0000ff",
+                                 "#cd3333")) +
   theme_bw()+
   theme(plot.title=element_text(size=22,hjust = .5),
         # panel.grid.major=element_blank(),
@@ -3830,6 +3970,7 @@ for(i in 1:nrow(means_final_subject)) {
     modeloutput$re2.PosOr.cont[means_final_subject$subject[i]],2)
 }
 
+
 means_final_subject <- means_final_subject[
   order(desc(means_final_subject$group),
         desc(means_final_subject$effect)),] 
@@ -3909,7 +4050,35 @@ ggsave(plot_rt_subject, filename =
        width = 34, height = 26, units = "cm",
        dpi = 300, device = cairo_pdf)
 #embedFonts(file = here::here("results", "figures", filename))
+
+## save for exploratory analyses: 
+means_final_subject_RTs <- means_final_subject
 ```
+
+Get an idea of the variance of the ordinal position effect between groups
+
+```{r}
+# # sd of ordinal position effects based on model estimate
+# means_final_subject %>% group_by(group, session) %>% 
+#   summarise(mean_effect=mean(effect), sd_effect=sd(effect))
+# means_final_subject %>%
+#    summarySEwithin(.,"effect",withinvars = c("PosOr", "session"),
+#                    betweenvars="group")
+# # sd of raw ordinal position effect
+# means_final_subject <- means_final_subject %>% arrange(subject, group, session, PosOr)
+# for(i in 1:nrow(means_final_subject)) {
+#   if(means_final_subject$PosOr[i]==1){
+#     means_final_subject$raw_ordpos[i] <- NA
+#   } else {
+#     means_final_subject$raw_ordpos[i] <- 
+#       means_final_subject$VOT[i] - means_final_subject$VOT[i-1] 
+#   }
+# }
+# means_final_subject %>%
+#    summarySEwithin(.,"raw_ordpos",withinvars = c("session"),
+#                    betweenvars="group", na.rm=T)
+```
+
 
 #### RTs by category
 Line graph for each category: 
@@ -4114,8 +4283,8 @@ for(i in 1:nrow(means_final_subject)) {
                                     means_final_subject$session == 1]
   # prepare for ordering
   means_final_subject$effect[i] <- 
-    modeloutput$PosOr.cont[means_final_subject$subject[i]] + 
-    modeloutput$re1.PosOr.cont[means_final_subject$subject[i]]
+    modeloutput$PosOr.cont[means_final_subject$subject[i]] #+ 
+   # modeloutput$re1.PosOr.cont[means_final_subject$subject[i]]
 }
 
 means_final_subject <- means_final_subject[order(desc(means_final_subject$group), desc(means_final_subject$effect)),] 
@@ -4204,6 +4373,9 @@ ggsave(plot_error_subject, filename =
        width = 34, height = 26, units = "cm",
        dpi = 300, device = cairo_pdf)
 #embedFonts(file = here::here("results", "figures", filename))
+
+## save for exploratory analyses: 
+means_final_subject_errors <- means_final_subject
 ```
 
 
@@ -4237,9 +4409,9 @@ for(i in 1:nrow(means_final_category)) {
                                     means_final_category$session == 1]
   # prepare for ordering
   means_final_category$effect[i] <- 
-    modeloutput$PosOr.cont[means_final_category$category[i]] + 
-    modeloutput$re1.PosOr.cont+
-    modeloutput$re2.group2.1[means_final_category$category[i]]
+    modeloutput$PosOr.cont[means_final_category$category[i]]# + 
+    # modeloutput$re1.PosOr.cont+
+    # modeloutput$re2.group2.1[means_final_category$category[i]]
 }
 
 means_final_category <-
@@ -4318,7 +4490,7 @@ means_final_category <- means_final_category %>%
                        labels=c("1", "2", "3", 
                     "Grand Mean (across categories, sessions, groups)")) +
     scale_linetype_manual(name="",values=c("c"="solid","d"="dashed"),
-                          labels=c("Participant mean",
+                          labels=c("Category mean",
                                    "Grand Mean"))+
     apatheme+
     labs(x="Ordinal Position",y ="Error Rate") +
@@ -4377,18 +4549,145 @@ m2_lmm_n <- lmer(lVOT ~ session/(group*PosOr.cont) +
 summary(m2_lmm_n)
 ```
 
-# -------------------------
-# Session info
-
-```{r}
-sessionInfo()
-```
 
 # -------------------------
 # Exploratory analyses
 We conducted several exploratory analyses to assess the stability of our effects, especially because we deviated from the pre-planned GLMMs for RT analyses. 
 
 Here, we report additional analyses that were suggested by reviewers
+
+### Inspecting participants with long or short time since onset of lesion
+Subject 112 was tested 4 months after onset, subject 103 was tested 7 months after onset, and subject 120 wast tested 259 months after onset 
+
+#### Extract by participant plots for these participants and plot
+
+```{r}
+means_final_subject_RTs_r <- 
+  means_final_subject_RTs %>% filter(subject %in% 
+                                       c(112, 103, 120)) %>%
+  droplevels() %>%
+  mutate(subject_en_mpo=case_when(
+     subject_en=="PWA 03\n(42.36)"~"PWA 03 (7 MPO)\n(42.36ms)",
+     subject_en=="PWA 20\n(33.71)"~"PWA 20 (259 MPO)\n(33.71ms)",
+     subject_en=="PWA 12\n(27.84)"~"PWA 12 (4 MPO)\n(27.84ms)",
+  )) %>%
+  mutate(subject_en_mpo=factor(subject_en_mpo, levels =
+                   c("PWA 12 (4 MPO)\n(27.84ms)", 
+                     "PWA 03 (7 MPO)\n(42.36ms)", 
+                     "PWA 20 (259 MPO)\n(33.71ms)")))
+  
+means_final_subject_errors_r <- 
+  means_final_subject_errors %>% 
+  filter(subject %in% c(112, 103, 120)) %>% droplevels() %>%
+  mutate(subject_en_mpo=case_when(
+     subject_en=="PWA 03\n(0.10)"~"PWA 03 (7 MPO)\n(0.10)",
+     subject_en=="PWA 20\n(0.06)"~"PWA 20 (259 MPO)\n(0.06)",
+     subject_en=="PWA 12\n(0.27)"~"PWA 12 (4 MPO)\n(0.27)",
+  )) %>%
+  mutate(subject_en_mpo=factor(subject_en_mpo, levels =
+                   c("PWA 12 (4 MPO)\n(0.27)", 
+                     "PWA 03 (7 MPO)\n(0.10)", 
+                     "PWA 20 (259 MPO)\n(0.06)")))
+
+### change grand mean to mean group effect
+modeloutput <- coef(m2)$subject
+
+## extract plots
+(plot_rt_subject_r <- means_final_subject_RTs_r %>%
+    ggplot(., aes(x=PosOr,y=normalizedRT, 
+                  color=session, group=session, na.rm=T)) +
+    geom_point(size =1, color = 'black') +
+    geom_line(aes(x=PosOr,y=normalizedRT, color=session,
+                  linetype="c"),
+              size = 0.5) +
+    # geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"),
+    #           group = 1,size = 0.8)+
+    geom_errorbar(aes(ymin=normalizedRT-se, ymax=normalizedRT+se), 
+                  width =.1) +
+    guides(linetype="none") + 
+    scale_color_manual(name="Session",
+                       values=c(
+                         "#0072B2", "#E69F00", "#000000", 
+                         "dark gray"),
+                       labels=c(
+                         "1", "2", "3")) + #, 
+                   #   "Grand Mean (across subjects, sessions, groups)")) +
+    # scale_linetype_manual(name="",values=c("c"="solid","d"="dashed"),
+    #                       labels=c("Participant mean",
+    #                                "Grand Mean"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Normalized RTs (ms)") +
+    facet_wrap(means_final_subject_RTs_r$subject_en_mpo, 
+               scales='free', ncol=3)+
+    scale_y_continuous(limits = c(-800, 800),
+                       breaks = c(-600,-400,-200,0,200,400,600)) +
+    scale_x_discrete(breaks=c(1,2,3,4,5))+
+    theme(legend.position = "bottom"))
+
+(plot_error_subject_r <- means_final_subject_errors_r %>%
+    mutate(session=case_when(session=="1" ~ "day 1",
+                             session=="2" ~ "day 2",
+                             session=="3" ~ "day 8")) %>%
+    ggplot(., aes(x=PosOr,y=normalizedRT, color=session, 
+                  group=session, na.rm=T)) +
+    geom_point(size =1, color = 'black') +
+    geom_line(aes(x=PosOr,y=normalizedRT, color=session, linetype="c"),
+              size = 0.5) +
+    geom_errorbar(aes(ymin=normalizedRT-se, ymax=normalizedRT+se), width =.1) +
+    # geom_line(aes(x=PosOr,y=grandmean, color="b", linetype="d"),
+    #           group = 1,size = 0.8)+
+    scale_color_manual(name="Session",
+                       breaks=c("day 1", "day 2", "day 8"), #, "b"),
+                       values=c("#0072B2", "#E69F00", "#000000"),#, 
+                                       #  "dark gray"),
+                        labels=c("1", "2", "3")) + #, 
+                    #   "Grand Mean (across subjects, sessions, groups)")) +
+    #scale_linetype_manual(name="",
+                          #values=c("c"="solid","d"="dashed"),
+                          #labels=c("Participant mean",
+                                 #  "Grand Mean"))+
+    apatheme+
+    labs(x="Ordinal Position",y ="Error Rate") +
+    facet_wrap(means_final_subject_errors_r$subject_en_mpo, scales='free', ncol=3)+
+    scale_y_continuous(limits = c(-0.5, 0.5),
+                       breaks = c(-0.4,-0.2,0,0.2,0.4)) +
+    scale_x_discrete(breaks=c(1,2,3,4,5))+
+    guides(linetype="none") + 
+    theme(legend.position = "bottom"))
+
+## combine both
+plots <- cowplot::plot_grid(plot_rt_subject_r, plot_error_subject_r,
+          nrow = 2, ncol=1, 
+          rel_heights = c(1,1),
+          margin(1,1,1,1),
+          labels = c("A", "B"),label_size = 34,
+                    label_fontfamily = "Helvetica", label_y = 1.01,
+          label_x=0)
+filename <- "CSI_online_aphasia_spoken_errors-by-category-and-subject_MPO.pdf"
+ggsave(plots, filename = 
+         here::here("results", "figures", filename),
+       width = 25, height = 20, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+
+```
+
+#### Get descriptives based on model data 
+
+```{r}
+mean(as.numeric(as.character(
+  means_final_subject_RTs$effect[
+    means_final_subject_RTs$group=="PWA"])), na.rm=T)
+sd(as.numeric(as.character(
+  means_final_subject_RTs$effect[
+    means_final_subject_RTs$group=="PWA"])), na.rm=T)
+
+mean(as.numeric(as.character(
+  means_final_subject_errors$effect[
+    means_final_subject_RTs$group=="PWA"
+  ])), na.rm=T)
+sd(as.numeric(as.character(
+  means_final_subject_errors$effect[means_final_subject_RTs$group=="PWA"])), na.rm=T)
+```
 
 ### Absence of CSI effect for fillers?
 #### Preparation
@@ -4745,7 +5044,178 @@ m2_lmm_control <- lmer(lVOT ~
 summary(m2_lmm_control)
 ```
 
-#### Other code
+
+### Comparing PWA tested in the clinic and at home 
+
+```{r}
+read.csv2(here::here("data", "additional_data",
+                     "questionnaire-test_data.csv")) -> tests
+df_RTs_PWA$test_location <- NA
+for(i in 1:length(unique(df_RTs_PWA$subject))){
+  df_RTs_PWA$test_location[
+    df_RTs_PWA$subject==unique(df_RTs_PWA$subject)[i]] <- 
+    tests$Ort.zu.Hause..1...in.Klinik..2.[
+      tests$Proband.in==unique(df_RTs_PWA$subject)[i]]
+}
+
+# 1 = home testes, 2 = tested in clinic
+df_RTs_PWA <- df_RTs_PWA %>% mutate(test_location=case_when(
+  test_location==1~"home",
+  test_location==2~"clinic")) %>%
+  mutate(test_location=factor(test_location, levels=c("home", "clinic")))
+
+
+# descriptives
+(means_final<- df_RTs_PWA %>% 
+   filter(category != "Filler") %>% 
+   Rmisc::summarySEwithin(.,"VOT",idvar = "subject",
+                          withinvars = c("PosOr","session"), 
+                          betweenvars = "test_location", na.rm = T))
+
+# plot
+override.linetype<-c("longdash", "dashed", "dotted")
+(plot_rt_repetition_home <- means_final %>% filter(test_location=="home") %>%
+    mutate(session=case_when(session == "1" ~ "day 1", 
+                                 session == "2" ~ "day 2",
+                                 session == "3" ~ "day 8")) %>% 
+    ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
+    geom_point(size = 2)+
+    stat_summary(aes(linetype=session),fun=mean,  
+                 geom="line", size = 0.5) +
+    scale_linetype_manual(values=c("longdash", "dashed", "dotted"))+
+    scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se, group = session), 
+                  width =.1) +
+    apatheme+
+    scale_y_continuous(limits = c(1120, 1650), 
+                       breaks =seq(1150,1650, by = 50)) +
+    labs(x="Ordinal Position ",y ="VOT (ms)", colour="Session",
+         linetype="Session",
+         title = "PWA tested at home") + 
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0)),
+    legend.key.width = unit(1, "cm"),
+    legend.position="none")+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none"))
+
+(plot_rt_repetition_clinic <- means_final %>% 
+    filter(test_location=="clinic") %>% 
+    mutate(session=case_when(session == "1" ~ "day 1", 
+                                 session == "2" ~ "day 2",
+                                 session == "3" ~ "day 8")) %>% 
+    ggplot(., aes(x=PosOr, y=VOT, group=session, color = session)) +
+    geom_point(size = 2)+
+    stat_summary(aes(linetype=session),fun=mean,  
+                 geom="line", size = 0.5) +
+    scale_linetype_manual(values=c("longdash", "dashed", "dotted"))+
+    scale_color_manual(values=c("#0072B2", "#E69F00", "#000000"))+
+    geom_errorbar(aes(ymin=VOT-se, ymax=VOT+se, group = session), 
+                  width =.1) +
+    apatheme+
+    scale_y_continuous(limits = c(1120, 1650), 
+                       breaks =seq(1150,1650, by = 50)) +
+    labs(x="Ordinal Position ",y ="VOT (ms)", colour="Session", linetype="Session",
+         title = "PWA tested in clinic") + 
+    theme(
+    axis.title.y = element_text(margin = margin(0,10,0,0)),
+    axis.title.x = element_text(margin = margin(10,0,0,0)),
+    legend.key.width = unit(1, "cm"))+
+   guides(color=guide_legend(
+     override.aes=list(linetype=override.linetype)))+
+    scale_linetype(guide="none"))
+
+plots <- cowplot::plot_grid(
+  plot_rt_repetition_home,plot_rt_repetition_clinic,
+  nrow = 1, ncol=2,  rel_widths = c(0.81,1), #rel_height = c(1,1),
+  margin(1,1,1,1),
+  labels = c("A", "B"),label_size = 34,
+  label_fontfamily = "Helvetica", label_y = 1.01,
+  label_x=-0.03)
+filename <- "CSI_online_aphasia_spoken_plot_rt_homevsclinic.pdf"
+ggsave(plots, filename = 
+         here::here("results", "figures", filename),
+       width = 25, height = 13, units = "cm", 
+       dpi = 300, device = cairo_pdf)
+#embedFonts(file = here::here("results", "figures", filename))
+
+## model
+contrasts(df_RTs_PWA$test_location) <- MASS::contr.sdif(2)
+levels(df_RTs_PWA$test_location)
+# use converging model and add test_location as predictor
+## fixed structure
+m1_lmm_PWA_location <- lmer(VOTlog ~ test_location*(PosOr.cont*session) +
+               (PosOr.cont+session|subject) +
+              (1|category),
+             data = df_RTs_PWA,
+            control=lmerControl(optimizer = "bobyqa",
+                                 optCtrl = list(maxfun = 2e5)))
+summary(m1_lmm_PWA_location)
+
+## random structure
+m1_lmm_PWA_location2 <- lmer(VOTlog ~ (PosOr.cont*session) +
+               (PosOr.cont+session|subject) +
+              (test_location|category),
+             data = df_RTs_PWA,
+            control=lmerControl(optimizer = "bobyqa",
+                                 optCtrl = list(maxfun = 2e5)))
+summary(m1_lmm_PWA_location2) # model does not converge and test_location explains least variance
+```
+
+### Assessing the variance of the ordinal position effect between groups
+#### VOTs
+Compute a nested model on the VOT model 
+
+````{r}
+m1_VOTs <- readRDS(file = 
+                     here::here(
+                       "results", "tables", 
+                       "CSI_online_aphasia_SessionxGroup_control_lmm_VOT.RDS"))
+#summary(m1_VOTs)
+#m1_VOTs@call
+
+## Use this structure for a nested model: 
+m1_VOTs_nested <- lmer(lVOT ~ group/session/PosOr.cont +
+                         (PosOr.cont+session|subject) +
+                         (PosOr.cont+group|category),
+                       data = df_RTs,
+                       control=lmerControl(optimizer = "bobyqa",
+                                           optCtrl = list(maxfun = 2e5)))
+summary(m1_VOTs_nested)
+as.data.frame(effects::allEffects(m1_VOTs_nested))
+plot(effects::allEffects(m1_VOTs_nested))
+
+## Check whether the by-group slope causes the SEs being similar between groups
+m1_VOTs_nested2 <- lmer(lVOT ~ group/session/PosOr.cont +
+                         (PosOr.cont+session|subject) +
+                         (PosOr.cont|category),
+                       data = df_RTs,
+                       control=lmerControl(optimizer = "bobyqa",
+                                           optCtrl = list(maxfun = 2e5)))
+summary(m1_VOTs_nested2)
+anova(m1_VOTs_nested, m1_VOTs_nested2)
+as.data.frame(effects::allEffects(m1_VOTs_nested2))
+plot(effects::allEffects(m1_VOTs_nested2))
+
+### Analyse with bayesian approach: 
+# bayes_VOTs_nested <- brms::brm(lVOT ~ group/session/PosOr.cont +
+#                          (PosOr.cont+session|subject) +
+#                          (PosOr.cont+group|category) , data=df_RTs,
+#     prior= c(prior(normal(0,100), class = Intercept),
+#              prior(normal(0,100), class = sd)),
+#     control=list(adapt_delta=.999, max_treedepth=12), 
+#     warmup = 100, #2000
+#     chains=8, iter=100, # 20000
+#     save_pars=save_pars(all=TRUE)
+#     )
+# 
+# save(fit_freq, file="fit_freq.Rdata")
+````
+
+
+### Other code
 
 
 <!-- ### Intercept-only models -->
@@ -5913,3 +6383,12 @@ summary(m2_lmm_control)
 
 <!-- We have good hypotheses regarding (a) LH gesamt, (b) MTG, (c) IFG, and (d) ATL  -->
 
+
+
+
+# -------------------------
+# Session info
+
+```{r}
+sessionInfo()
+```

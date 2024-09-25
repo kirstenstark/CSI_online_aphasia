@@ -150,7 +150,7 @@ for(i in 1:length(type)){
     
     # add subject personal code 
   eval(parse(text=paste0("for(j in 1:length(vot_files_", type[i], ")) {",
-    "if(substr(vot_files_", type[i],", 2,2)=='.'){",
+    "if(substr(vot_files_", type[i],"[[j]], 2,2)=='.'){",
       "datafiles_vot_", type[i], "[[j]]$OR02_01 <-",
         "substr(vot_files_", type[i],"[j], 4,9)",
     "} else {",
@@ -292,11 +292,13 @@ for(i in 1:(length(sosci_files_PWA)+length(sosci_files_control))){
   # delete columns with info we don't need
   if("SD22_BVS" %in% colnames(datafiles[[i]])){
     datafiles[[i]] <- datafiles[[i]] %>% 
-    select(-c(SERIAL, REF, MODE, SD22_PRV,SD22_BVS,LASTDATA, 
+    select(-c(SERIAL, REF, MODE, SD22_PRV,SD22_BVS,
+              LASTDATA, 
               SD19, SD19_01, SD19_02, SD19_03, MISSING, MISSREL))
   } else {
     datafiles[[i]] <- datafiles[[i]] %>% 
-    select(-c(SERIAL, REF, MODE, SD22_PRV,LASTDATA, 
+    select(-c(SERIAL, REF, MODE, SD22_PRV,
+              LASTDATA, 
               SD19, SD19_01, SD19_02, SD19_03, MISSING, MISSREL))
 }
 
@@ -314,12 +316,13 @@ if(!("IM01_01" %in% colnames(datafiles[[i]]))){
 # give columns more recognizable names
   datafiles[[i]] <- datafiles[[i]] %>% 
   dplyr::rename(gender = SD01, age = SD02_01,language = SD21, 
-                     os_system = SD22_OS, browser_automatic = SD22_BNM,
-                     system_format  = SD22_FmF,
+                     # os_system = SD22_OS, browser_automatic = SD22_BNM,
+                     # system_format  = SD22_FmF,
                      handedness = SD27, 
                      comments = IM01_01, time_wo_outlier = TIME_SUM,
-                     screen_width = SD22_ScW, screen_height = SD22_ScH,
-                     questionnaire_width = SD22_QnW)
+                     # screen_width = SD22_ScW, screen_height = SD22_ScH,
+                     # questionnaire_width = SD22_QnW
+                )
 
 
 #-------------------------------------------------------------
@@ -356,15 +359,22 @@ datafiles[[i]] <- datafiles[[i]] %>%
    mutate(gender = as.numeric(as.character(gender))) %>% 
    mutate(age = as.numeric(as.character(age))) %>% 
   mutate(language = as.numeric(as.character(language))) %>% 
-  mutate(os_system = as.numeric(as.character(os_system))) %>% 
-  mutate(system_format = as.numeric(as.character(system_format))) %>% 
+  mutate(SD22_OS = as.numeric(as.character(SD22_OS))) %>%
+  mutate(SD22_BNM = as.numeric(as.character(SD22_BNM))) %>% 
+  mutate(SD22_BID = as.character(SD22_BID)) %>%
+  mutate(SD22_FmF = as.numeric(as.character(SD22_FmF))) %>% 
+  mutate(SD22_ScW = as.numeric(as.character(SD22_ScW))) %>% 
+  mutate(SD22_ScH = as.numeric(as.character(SD22_ScH))) %>% 
+  mutate(SD22_QnW = as.numeric(as.character(SD22_QnW))) %>% 
+ # mutate(os_system = as.numeric(as.character(os_system))) %>% 
+ # mutate(system_format = as.numeric(as.character(system_format))) %>% 
   mutate(handedness = as.numeric(as.character(handedness))) %>% 
   mutate(comments = as.character(comments)) %>% 
   mutate(time_wo_outlier = as.numeric(as.character(time_wo_outlier))) %>% 
-  mutate(screen_width = as.numeric(as.character(screen_width))) %>%
-  mutate(screen_height = as.numeric(as.character(screen_height))) %>% 
-  mutate(questionnaire_width = as.numeric(as.character(questionnaire_width)))%>% 
-  mutate(browser_automatic = as.numeric(as.character(browser_automatic))) %>% 
+#  mutate(screen_width = as.numeric(as.character(screen_width))) %>%
+#  mutate(screen_height = as.numeric(as.character(screen_height))) %>% 
+#  mutate(questionnaire_width = as.numeric(as.character(questionnaire_width)))%>% 
+#  mutate(browser_automatic = as.numeric(as.character(browser_automatic))) %>% 
   mutate(CH01 = as.numeric(as.character(CH01))) %>%
    mutate(CH01_01 = as.numeric(as.character(CH01_01))) %>%
    mutate(CH01_02 = as.numeric(as.character(CH01_02))) %>%
@@ -506,7 +516,7 @@ For the spoken data, this is just to double check that everything went fine upon
 
 ```{r add_arrays, warning = FALSE  }
 # load arrays
-arrays <- read.csv2(here::here("data", "supplementary_info", arrays), 
+arrays <- read.csv2(here::here("data", "additional_data", arrays), 
     sep = ";", na = "NA")
 
 for (i in 1:(length(sosci_files_PWA)+length(sosci_files_control))) {
@@ -756,7 +766,7 @@ range(as.numeric(as.character(df$TIME007)), na.rm=T) # array loading (not visibl
 range(as.numeric(as.character(df$TIME008))) # familiarization instructions
 range(as.numeric(as.character(df$TIME009)), na.rm=T) # familiarization
 
-# Some participants already open the link prior to the experiment. Therefore, well only consider the time starting from the demographics page
+# Some participants already open the link prior to the experiment. Therefore, we'll only consider the time starting from the demographics page
 for(i in 1:nrow(df)){
   df$time_correct[i] <- sum(df[i,] %>% 
         select(starts_with("TIME")), na.rm=T)/60
@@ -851,9 +861,10 @@ Anonymize data frame
 ```{r}
 df <- df %>% select(-c("QUESTNNR", "STARTED", "OR01_01")) %>% #, "OR02_01")) %>%
   # drop unnecessary columns
-  select(-c("os_system", "SD22_BID", "browser_automatic",
-            "system_format", "screen_width", "screen_height",
-            "questionnaire_width", starts_with("TIME0"), 
+  select(-c(#"os_system", "SD22_BID", "browser_automatic",
+            #"system_format", "screen_width", "screen_height",
+            #"questionnaire_width",
+            starts_with("TIME0"), 
             "FINISHED", "Q_VIEWER", 
             "LASTPAGE", "MAXPAGE", "DEG_TIME"))
                 
@@ -866,6 +877,12 @@ Reduce data frame to relevant columns
 df %>% select(type, subject, session, trial, item, category, supercategory, 
               VOT, correct, AR, error, gender, age,language, handedness, 
               starts_with("CH"), array, comments, timetotal, time_correct,
+              # for descriptives: 
+              starts_with("SD22"),
+              # os_system, SD22_BID, browser_automatic,
+              # system_format, screen_width, screen_height,
+              # questionnaire_width,
+              
               OR02_01) -> d
 ```
 
