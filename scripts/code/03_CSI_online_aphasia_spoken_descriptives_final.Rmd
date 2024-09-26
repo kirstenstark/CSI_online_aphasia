@@ -356,21 +356,22 @@ setups %>% group_by(questionnaire_width) %>% count()
 #                                 !starts_with("KB") &
 #                                !starts_with("CH0") &
 #                                !"comments" & !"type" &
-#                                #!"gender_char" & 
+#                                #!"gender_char" &
 #                                !"itemvsnonitem1" &
 #                                !"itemvsnonitem2" &
 #                                !starts_with("MC") &
-#                                !starts_with("SD") & 
-#                                !c("os_system", "os_system_raw", 
+#                                !starts_with("SD") &
+#                                !c("os_system", "os_system_raw",
 #                                   "browser", "screen_width",
 #                                   "system_format",
-#                                   "questionnaire_width", 
-#                                   "screen_height", "OR02_01", "array")
-#                              # !"name" & !"time_wo_outlier" 
+#                                   "questionnaire_width",
+#                                   "screen_height", "OR02_01", "array") & 
+#                                ! "age"
+#                              # !"name" & !"time_wo_outlier"
 #                                )
 ```
 
 
 ```{r write_anonymized_df}
-# write.csv(df_a, here::here("data","data_long_anonymous.csv"))
+#write.csv(df_a, here::here("data","data_long_anonymous.csv"))
 ```
