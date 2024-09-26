@@ -1,8 +1,13 @@
 # pseudomized data
-data/
-data/raw/
-data/power-analysis/
-data/transent_data_files/
+/data/raw/*
+/data/transient_data_files/*
+/data/dewak/*
+/data/verbal_CSI_young_starketal2022/*
+/data/power-analysis/*
+/data/additional_data/*
+/data/CSI_online_young_PWA_old_combined/*
+/data/CSI_online_young_PWA_old_combined.csv
+
 results/
 /results/
 results/figures/
